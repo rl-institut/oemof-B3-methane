@@ -19,6 +19,7 @@ Welcome to oemof-B3's documentation!
 
    model_pipeline
    model_structure
+   components_power_to_gas
    # postprocessing
 
 .. toctree::
