@@ -18,6 +18,12 @@ Concept
 =======
 
 - scheme
-- equations
-- assumptions
+- process description
 - table with symbols
+
+
+Assumptions
+-----------
+
+Formulas
+--------

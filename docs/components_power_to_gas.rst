@@ -12,4 +12,4 @@ Components Power to Gas
 Setup the model structure
 =========================
 
-Text
+Includes plasmalyser, electrolysers and methanisation storage
