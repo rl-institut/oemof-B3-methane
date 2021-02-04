@@ -21,6 +21,11 @@ Concept
 - process description
 - table with symbols
 
+Die alkalische Elektrolyse ist die ausgereifteste Technologie der drei Arten. Es wird ein flüssiger Elektrolyt (Kaliumhydroxidlösung) 
+sowie eine ionenleitende Membran verwendet. Durch die Zugabe von Kaliumhydroxid wird die Leitfähigkeit von Wasser erhöht. An der Kathode 
+wird Wasser in Wasserstoff und Hydroxid-Ionen aufgespalten. Der Wasserstoff steigt auf und kann abgeschieden werden. Die Ionen diffundieren 
+durch die Membran und reagieren an der Anode unter Abgabe von Elektronen zu Wasser und Sauerstoff. Bei hohen Lasten ist eine aktive Umwälzung 
+des Elektrolyten erforderlich, damit eine ausreichende Zirkulation des Elektrolyten gewährleistet wird.
 
 Assumptions
 -----------
