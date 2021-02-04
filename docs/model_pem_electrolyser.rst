@@ -24,7 +24,7 @@ Concept
  Die PEM-Elektrolyse nutzt eine protonenleitende Membran, die beidseitig meist fest mit den Elektroden verbunden ist. 
  Bipolare Platten leiten das Wasser zur Anode und ermöglichen den Abtransport der Produktgase. An der Anode wird das 
  Wasser in Sauerstoff und Protonen aufgespalten. Die Protonen diffundieren durch die Membran zu Kathode und regieren 
- dort mit zwei Elektronen zu Wasserstoff.
+ dort mit zwei Elektronen zu Wasserstoff. :cite:`Sterner2017`
 
 Assumptions
 -----------
