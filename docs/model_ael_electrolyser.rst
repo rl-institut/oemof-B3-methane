@@ -21,6 +21,12 @@ Concept
 - process description
 - table with symbols
 
+.. figure:: _pics/AEL.png
+	:align: center
+	:width: 20%
+
+	Fig. 1: Simple diagram of an alkaline electrolyser.
+
 Die alkalische Elektrolyse ist die ausgereifteste Technologie der drei Arten. Es wird ein flüssiger Elektrolyt (Kaliumhydroxidlösung) 
 sowie eine ionenleitende Membran verwendet. Durch die Zugabe von Kaliumhydroxid wird die Leitfähigkeit von Wasser erhöht. An der Kathode 
 wird Wasser in Wasserstoff und Hydroxid-Ionen aufgespalten. Der Wasserstoff steigt auf und kann abgeschieden werden. Die Ionen diffundieren 
