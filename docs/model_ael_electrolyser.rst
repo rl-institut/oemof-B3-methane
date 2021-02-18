@@ -1,8 +1,8 @@
 .. _model_ael_electrolyser:
 
-~~~~~~~~~~~~~~~~
-AEL Electrolyser
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+Alkaline Electrolyser
+~~~~~~~~~~~~~~~~~~~~~
 
 .. contents:: `Contents`
     :depth: 1
@@ -23,18 +23,27 @@ Concept
 
 .. figure:: _pics/AEL.png
 	:align: center
-	:width: 20%
+	:width: 50%
 
 	Fig. 1: Simple diagram of an alkaline electrolyser.
 
-Die alkalische Elektrolyse ist die ausgereifteste Technologie der drei Arten. Es wird ein flüssiger Elektrolyt (Kaliumhydroxidlösung) 
-sowie eine ionenleitende Membran verwendet. Durch die Zugabe von Kaliumhydroxid wird die Leitfähigkeit von Wasser erhöht. An der Kathode 
-wird Wasser in Wasserstoff und Hydroxid-Ionen aufgespalten. Der Wasserstoff steigt auf und kann abgeschieden werden. Die Ionen diffundieren 
-durch die Membran und reagieren an der Anode unter Abgabe von Elektronen zu Wasser und Sauerstoff. Bei hohen Lasten ist eine aktive Umwälzung 
-des Elektrolyten erforderlich, damit eine ausreichende Zirkulation des Elektrolyten gewährleistet wird. :cite:`Sterner2017`
+The alkaline elektrolysis is the most mature technology among electrolysers. A liquid electrolyt (potassium hydroxide solution) as well as a ion-conducting membrane.
+The addition of potassium hydroxide increases the conductivity of water. At the cathode, water is split into hydrogen and hydroxide ions. 
+The hydrogen rises and can be separated. The ions diffuse through the membrane and react at the anode, releasing electrons to form water 
+and oxygen. At high loads, active circulation of the electrolyte is necessary to ensure sufficient circulation of the electrolyte. :cite:`Sterner2017`
 
 Assumptions
 -----------
 
 Formulas
 --------
+For a simple calculation of the energy consumption and the amount of water needed as well as hydrogen and oxygen produced,
+the following approach is applied.
+
+.. math::
+	\begin{align}
+		\eta & = \frac{m_{H_2} \cdot HHV_{H_2}}{E}
+	\end{align}
+
+with :math:`E = P \cdot t`
+

@@ -12,7 +12,7 @@ PEM Electrolyser
 Scope
 =====
 
-This model was developed to implement a simplified model of a PEM electrolszer for energy system optimization with oemof.solph. 
+This model was developed to implement a simplified model of a PEM electrolyser for energy system optimization with oemof.solph. 
 
 Concept
 =======
@@ -23,14 +23,14 @@ Concept
 
 .. figure:: _pics/PEMEL.png
 	:align: center
-	:width: 30%
+	:width: 50%
 
 	Fig. 1: Simple diagram of an proton exchange membrane electrolyser.
 
-Die PEM-Elektrolyse nutzt eine protonenleitende Membran, die beidseitig meist fest mit den Elektroden verbunden ist. 
-Bipolare Platten leiten das Wasser zur Anode und ermöglichen den Abtransport der Produktgase. An der Anode wird das 
-Wasser in Sauerstoff und Protonen aufgespalten. Die Protonen diffundieren durch die Membran zu Kathode und regieren 
-dort mit zwei Elektronen zu Wasserstoff. :cite:`Sterner2017`
+PEM electrolysis uses a proton-conducting membrane that is usually firmly connected to the electrodes on both sides. 
+Bipolar plates guide the water to the anode and enable the separation of the product gases. At the anode, the water is 
+split into oxygen and protons. The protons diffuse through the membrane to the cathode, where they react with two 
+electrons to form hydrogen. :cite:`Sterner2017`
 
 Assumptions
 -----------
@@ -42,8 +42,7 @@ the following approach is applied.
 
 .. math::
 	\begin{align}
-		E & = \frac{m_{H_2} \cdot HHV_{H_2}}{\eta} \\
-		m_{H_2} & = \frac{\eta \cdot E}{HHV_{H_2}}
+		\eta & = \frac{m_{H_2} \cdot HHV_{H_2}}{E}
 	\end{align}
 
 with :math:`E = P \cdot t`

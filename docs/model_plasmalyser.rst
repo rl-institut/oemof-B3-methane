@@ -26,20 +26,16 @@ Concept
 	
 	Fig. 1: Process of waste water plasmalysis.
 
-Allgemein ist die Plasmalyse ein Prozess bei dem unter Nutzung eines Plasmafeldes chemische Verbindungen aufgespalten werden
-(Plasma-chemische Dissoziation). Anschließend kommt es zur Bildung von neuen Molekülen durch die Synthese von zwei oder mehr 
-Elementen.
+In general, plasma analysis is a process in which chemical compounds are broken down using a plasma field
+(plasma chemical dissociation). This is followed by the formation of new molecules through the synthesis of two or more elements.
 
-Die Schmutzwasser-Plasmalyse nutzt Abwasser aus Klärwerken, Biogas- oder Industrieanlagen. Dieses Schmutzwasser (Brüdenwasser) hat
-einen hohen Anteil an Stickstoff- und Kohlenstoffverbindungen, die jeweils Wasserstoff enthalten (z.B Ammoniak NH\ :sub:`4`\ ) und 
-so die Energieausbeute erhöhen.
-Ein hochfrequentes Plasmafeld mit mehreren Tausend Kilovolt spaltet die Moleküle des Abwassers in einzelne C-, N-, H- und O-Atome 
-auf. Die Atome liegen als ionisiertes Gas vor, innerhalb dessen sie sich neu verbinden. Es entstehen Wasserstoff, Kohlenstoffdioxid, 
-Methan und Stickstoff. Die Gase können mit Hilfe einer Gasmembran getrennt und in Tanks gespeichert werden. Als Nebenprodukt bleibt 
-gereinigtes Wasser zurück. Der Wasserstoff und das Kohlenstoffdioxid können in der biologischen Methanisierung verwertet werden. 
-Das bereits gebildete Methan kann zusätzlich in den Speicher gebracht werden. Der reine Stickstoff lässt sich in der chemischen 
-Industrie weiterverarbeiten. 
-
+Waste water plasmalysis uses waste water from sewage treatment, biogas or industrial plants. This waste water has a high proportion
+of nitrogen and carbon compounds, each of which contains hydrogen (z.B ammonia NH\ :sub:`4`\ ) and thus increases the energy yield.
+A high-frequency plasma field with several thousand kilovolts splits the molecules of the waste water into individual C, N, H and O atoms.
+The atoms are now present as ionised gas within which they recombine to hydrogen, carbon dioxide, methane and nitrogen. The gases can be 
+separated with the help of a gas membrane and stored in tanks. As a by-product purified water remains. The hydrogen and carbon dioxide 
+can be utilised in biological methanisation. The methan that has already been formed can also stored. The pure nitrogen can be processed 
+in the chemical industry.
 
 Assumptions
 -----------

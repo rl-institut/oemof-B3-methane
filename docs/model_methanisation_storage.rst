@@ -26,10 +26,10 @@ Concept
 	
 	Fig. 1: Model of the underground storage.
 	
-Der Untergrundspeicher (UGS) dient als Reaktor für die biologische Methanisierung sowie als Speicher des produzierten Methans.
-In einem ersten Schritt werden die Edukte Wasserstoff und Kohlenstoffdioxid in den UGS geleitet. Im Prozess der biologischen Methanisierung 
-verwerten Archaeen während ihrer anaeroben Metabolisierung die Edukte in die Produkte Methan und Wasser.
-Das Methan wird im UGS gespeichert und kann bei Bedarf entnommen werden.
+The underground storage (UGS) serves as a reactor for biological methanation and as a storage facility for the methane produced. 
+In a first step, the reactants hydrogen and carbon dioxide are fed into the UGS. In the process of biological methanisation, 
+archaea process the reactants into the products methane and water during their anaerobic metabolisation.
+The methane is stored in the UGS and can be extracted as needed.
 
 Assumptions
 -----------
