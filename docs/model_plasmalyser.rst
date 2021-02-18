@@ -26,7 +26,7 @@ Concept
 	
 	Fig. 1: Process of waste water plasmalysis.
 
-In general, plasma analysis is a process in which chemical compounds are broken down using a plasma field
+In general, plasmalysis is a process in which chemical compounds are broken down using a plasma field
 (plasma chemical dissociation). This is followed by the formation of new molecules through the synthesis of two or more elements.
 
 Waste water plasmalysis uses waste water from sewage treatment, biogas or industrial plants. This waste water has a high proportion
