@@ -31,6 +31,12 @@ In a first step, the reactants hydrogen and carbon dioxide are fed into the UGS.
 archaea process the reactants into the products methane and water during their anaerobic metabolisation.
 The methane is stored in the UGS and can be extracted as needed.
 
+.. math::
+
+   \require{mhchem}
+   \ce{4H2 + CO2 -> CH4 + 2H2O}
+   
+   
 Assumptions
 -----------
 
