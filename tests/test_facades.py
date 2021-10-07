@@ -34,7 +34,7 @@ def test_methanisation_reactor():
     ch4_excess = Sink(label="ch4_excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
 
     m_reactor = MethanisationReactor(
-        name='m_reactor',
+        label='m_reactor',
         carrier='h2_co2',
         tech='methanisation_reactor',
         from_bus=h2_co2_bus,
