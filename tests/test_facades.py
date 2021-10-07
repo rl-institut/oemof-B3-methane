@@ -43,7 +43,6 @@ def test_methanisation_reactor():
         capacity_discharge=50,
         efficiency_charge=1,
         efficiency_discharge=1,
-        availability=[0.8, 0.7, 0.6],
         methanisation_rate=5,  # TODO: Passing lists does not work here yet.
         efficiency_methanisation=0.93
     )
