@@ -18,7 +18,7 @@ def test_methanisation_reactor():
     electrolyzer = Source(
         label="electrolyzer",
         outputs={
-            h2_co2_bus: Flow(fixed=True, nominal_value=150, actual_value=[0.7, 0.2, 0.9])
+            h2_co2_bus: Flow(nominal_value=150)
         },
     )
 
@@ -28,6 +28,8 @@ def test_methanisation_reactor():
             ch4_bus: Flow(fixed=True, nominal_value=100, actual_value=[0.1, 0.2, 0.1])
         },
     )
+
+    ch4_shortage = Source(label="ch4_shortage", outputs={ch4_bus: Flow(variable_costs=1e9)})
 
     ch4_excess = Sink(label="ch4_excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
 
@@ -46,7 +48,7 @@ def test_methanisation_reactor():
         efficiency_methanisation=0.93
     )
 
-    es.add(h2_co2_bus, ch4_bus, electrolyzer, ch4_demand, ch4_excess, m_reactor)
+    es.add(h2_co2_bus, ch4_bus, electrolyzer, ch4_demand, ch4_shortage, ch4_excess, m_reactor)
 
     m = Model(es)
 
@@ -63,3 +65,7 @@ def test_methanisation_reactor():
     sequences = pd.concat(seq_dict.values(), 1)
     sequences.columns = seq_dict.keys()
     print(sequences)
+
+
+if __name__ == "__main__":
+    test_methanisation_reactor()
