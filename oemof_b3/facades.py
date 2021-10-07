@@ -2,7 +2,7 @@ from oemof.solph import Bus, Flow, Sink, Transformer, sequence
 from oemoflex.facades import TYPEMAP, Facade
 
 
-class MethanisationReactor(Facade):
+class MethanisationReactor(Facade, Transformer):
     r"""A methanisation reactor that transforms e.g. H2 and CO2 to CH4.
 
     Note that investment is currently not implemented for this facade.
@@ -52,13 +52,36 @@ class MethanisationReactor(Facade):
         kwargs.update(
             {
                 "_facade_requires_": [
-                    "bus",
+                    "from_bus",
+                    "to_bus",
                     "carrier",
                     "tech",
                 ]
             }
         )
         super().__init__(*args, **kwargs)
+
+        self.capacity_charge = kwargs.get("capacity_charge")
+
+        self.capacity_discharge = kwargs.get("capacity_discharge")
+
+        self.efficiency_charging = kwargs.get("efficiency_charging", 1)
+
+        self.efficiency_discharging = kwargs.get("efficiency_discharging", 1)
+
+        self.availability = kwargs.get("availability", 1)
+
+        self.methanisation_rate = kwargs.get("methanisation_rate")
+
+        self.efficiency_methanisation = kwargs.get("efficiency_methanisation", 1)
+
+        self.marginal_cost = kwargs.get("marginal_cost", 0)
+
+        self.input_parameters = kwargs.get("input_parameters", {})
+
+        self.output_parameters = kwargs.get("output_parameters", {})
+
+        self.expandable = bool(kwargs.get("expandable", False))
 
         self.build_solph_components()
 
