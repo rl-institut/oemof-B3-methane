@@ -3,7 +3,7 @@ from oemof.solph.components import GenericStorage
 from oemoflex.facades import TYPEMAP, Facade
 
 
-class MethanisationReactor(Facade):
+class MethanisationReactor(Transformer, Facade):
     r"""A methanisation reactor that transforms e.g. H2 and CO2 to CH4.
 
     Note that investment is currently not implemented for this facade.
@@ -91,19 +91,11 @@ class MethanisationReactor(Facade):
         if self.expandable:
             raise NotImplementedError("Investment for bev class is not implemented.")
 
-        flow_in = Flow(input=self.from_bus)
-
-        flow_out = Flow(output=self.to_bus)
-
-        transformation_in = Flow()
-
-        transformation_out = Flow(nominal_value=self.methanisation_rate)
-
         storage_educts = GenericStorage(
             carrier=self.carrier,
             tech=self.tech,
             label=self.label + '-storage_educts',
-            inputs={self.from_bus: flow_in},
+            inputs={self.from_bus: Flow()},
             nominal_storage_capacity=1000,
         )
 
@@ -111,26 +103,20 @@ class MethanisationReactor(Facade):
             carrier=self.carrier,
             tech=self.tech,
             label=self.label + '-storage_products',
-            outputs={self.from_bus: flow_out},
+            outputs={self.to_bus: Flow()},
             nominal_storage_capacity=1000,
         )
 
-        transformation = Transformer(
-            carrier=self.carrier,
-            tech=self.tech,
-            label=self.label + '-methanisation',
-            inputs={storage_educts: transformation_in},
-            outputs={
-                storage_products: transformation_out
-            },
-            conversion_factors={storage_products: self.efficiency_methanisation},
-        )
+        self.inputs.update({storage_educts: Flow()})
 
-        self.inputs.update({self.from_bus: flow_in})
+        self.outputs.update({storage_products: Flow()})
 
-        self.outputs.update({self.to_bus: flow_out})
+        self.conversion_factors={
+            storage_educts: sequence(1),
+            storage_products: sequence(self.efficiency_methanisation)
+        }
 
-        self.subnodes = (storage_educts, storage_products, transformation)
+        self.subnodes = (storage_educts, storage_products)
 
 TYPEMAP.update(
     {
