@@ -48,6 +48,7 @@ class MethanisationReactor(Transformer, Facade):
     ...     efficiency_methanisation=0.93
     ...     )
     """
+
     def __init__(self, *args, **kwargs):
 
         kwargs.update(
@@ -70,11 +71,9 @@ class MethanisationReactor(Transformer, Facade):
 
         self.efficiency_discharging = kwargs.get("efficiency_discharging", 1)
 
-        self.availability = kwargs.get("availability", 1)
-
         self.methanisation_rate = kwargs.get("methanisation_rate")
 
-        self.efficiency_methanisation = kwargs.get("efficiency_methanisation", 1)
+        self.efficiency_methanisation = kwargs.get("efficiency_methanisation")
 
         self.marginal_cost = kwargs.get("marginal_cost", 0)
 
@@ -94,29 +93,44 @@ class MethanisationReactor(Transformer, Facade):
         storage_educts = GenericStorage(
             carrier=self.carrier,
             tech=self.tech,
-            label=self.label + '-storage_educts',
-            inputs={self.from_bus: Flow()},
+            label=self.label + "-storage_educts",
+            inputs={
+                self.from_bus: Flow(
+                    nominal_value=self.capacity_charge, **self.input_parameters
+                )
+            },
+            inflow_conversion_factor=self.efficiency_charging,
             nominal_storage_capacity=1000,
         )
 
         storage_products = GenericStorage(
             carrier=self.carrier,
             tech=self.tech,
-            label=self.label + '-storage_products',
-            outputs={self.to_bus: Flow()},
+            label=self.label + "-storage_products",
+            outputs={
+                self.to_bus: Flow(
+                    nominal_value=self.capacity_discharge,
+                    variable_cost=self.marginal_cost,
+                    **self.output_parameters
+                )
+            },
+            outflow_conversion_factor=self.efficiency_discharging,
             nominal_storage_capacity=1000,
         )
 
         self.inputs.update({storage_educts: Flow()})
 
-        self.outputs.update({storage_products: Flow()})
+        self.outputs.update(
+            {storage_products: Flow(nominal_value=self.methanisation_rate)}
+        )
 
-        self.conversion_factors={
+        self.conversion_factors = {
             storage_educts: sequence(1),
-            storage_products: sequence(self.efficiency_methanisation)
+            storage_products: sequence(self.efficiency_methanisation),
         }
 
         self.subnodes = (storage_educts, storage_products)
+
 
 TYPEMAP.update(
     {
