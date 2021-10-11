@@ -11,14 +11,16 @@ def test_methanisation_reactor():
 
     es = EnergySystem(timeindex=timeindex)
 
-    h2_co2_bus = Bus(label="h2_co2")
+    h2_bus = Bus(label="h2_co2")
+
+    co2_bus = Bus(label="co2", balanced=False)
 
     ch4_bus = Bus(label="ch4")
 
     electrolyzer = Source(
         label="electrolyzer",
         outputs={
-            h2_co2_bus: Flow(nominal_value=150)
+            h2_bus: Flow(nominal_value=150)
         },
     )
 
@@ -37,8 +39,9 @@ def test_methanisation_reactor():
         label='m_reactor',
         carrier='h2_co2',
         tech='methanisation_reactor',
-        from_bus=h2_co2_bus,
-        to_bus=ch4_bus,
+        h2_bus=h2_bus,
+        co2_bus=co2_bus,
+        ch4_bus=ch4_bus,
         capacity_charge=50,
         capacity_discharge=50,
         efficiency_charge=1,
@@ -47,7 +50,7 @@ def test_methanisation_reactor():
         efficiency_methanisation=0.93
     )
 
-    es.add(h2_co2_bus, ch4_bus, electrolyzer, ch4_demand, ch4_shortage, ch4_excess, m_reactor)
+    es.add(h2_bus, co2_bus, ch4_bus, electrolyzer, ch4_demand, ch4_shortage, ch4_excess, m_reactor)
 
     m = Model(es)
 

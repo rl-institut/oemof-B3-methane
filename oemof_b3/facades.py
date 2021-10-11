@@ -23,14 +23,16 @@ class MethanisationReactor(Transformer, Facade):
 
     >>> from oemof import solph
     >>> from oemof_b3 import facades
-    >>> bus_h2_co2 = solph.Bus('h2_co2')
+    >>> bus_h2 = solph.Bus('h2')
+    >>> bus_co2 = solph.Bus('hco2')
     >>> bus_ch4 = solph.Bus('ch4')
     >>> m_reactor = MethanisationReactor(
     ...     name='m_reactor',
     ...     carrier='h2_co2',
     ...     tech='methanisation_reactor',
-    ...     from_bus=bus_h2_co2,
-    ...     to_bus=bus_ch4,
+    ...     h2_bus=bus_h2,
+    ...     c02_bus=bus_co2,
+    ...     ch4_bus=bus_ch4,
     ...     capacity_charge=50,
     ...     capacity_discharge=50,
     ...     efficiency_charge=1,
@@ -54,8 +56,9 @@ class MethanisationReactor(Transformer, Facade):
         kwargs.update(
             {
                 "_facade_requires_": [
-                    "from_bus",
-                    "to_bus",
+                    "h2_bus",
+                    "co2_bus",
+                    "ch4_bus",
                     "carrier",
                     "tech",
                 ]
@@ -90,17 +93,30 @@ class MethanisationReactor(Transformer, Facade):
         if self.expandable:
             raise NotImplementedError("Investment for bev class is not implemented.")
 
+
+
         storage_educts = GenericStorage(
             carrier=self.carrier,
             tech=self.tech,
             label=self.label + "-storage_educts",
+            inflow_conversion_factor=self.efficiency_charging,
+            nominal_storage_capacity=1000,
+        )
+
+        combine_educts = Transformer(
+            carrier=self.carrier,
+            tech=self.tech,
+            label=self.label + "-combine-educts",
             inputs={
-                self.from_bus: Flow(
+                self.h2_bus: Flow(),
+                self.co2_bus: Flow(),
+            },
+            outputs={
+                storage_educts: Flow(
                     nominal_value=self.capacity_charge, **self.input_parameters
                 )
             },
-            inflow_conversion_factor=self.efficiency_charging,
-            nominal_storage_capacity=1000,
+            conversion_factors={self.co2_bus: 0.2, self.h2_bus: 0.8}
         )
 
         storage_products = GenericStorage(
@@ -108,7 +124,7 @@ class MethanisationReactor(Transformer, Facade):
             tech=self.tech,
             label=self.label + "-storage_products",
             outputs={
-                self.to_bus: Flow(
+                self.ch4_bus: Flow(
                     nominal_value=self.capacity_discharge,
                     variable_cost=self.marginal_cost,
                     **self.output_parameters
@@ -129,7 +145,7 @@ class MethanisationReactor(Transformer, Facade):
             storage_products: sequence(self.efficiency_methanisation),
         }
 
-        self.subnodes = (storage_educts, storage_products)
+        self.subnodes = (combine_educts, storage_educts, storage_products)
 
 
 TYPEMAP.update(
