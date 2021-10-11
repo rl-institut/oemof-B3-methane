@@ -93,8 +93,6 @@ class MethanisationReactor(Transformer, Facade):
         if self.expandable:
             raise NotImplementedError("Investment for bev class is not implemented.")
 
-
-
         storage_educts = GenericStorage(
             carrier=self.carrier,
             tech=self.tech,
@@ -116,7 +114,7 @@ class MethanisationReactor(Transformer, Facade):
                     nominal_value=self.capacity_charge, **self.input_parameters
                 )
             },
-            conversion_factors={self.co2_bus: 0.2, self.h2_bus: 0.8}
+            conversion_factors={self.co2_bus: 0.2, self.h2_bus: 0.8},
         )
 
         storage_products = GenericStorage(

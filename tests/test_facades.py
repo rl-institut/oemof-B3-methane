@@ -19,9 +19,7 @@ def test_methanisation_reactor():
 
     electrolyzer = Source(
         label="electrolyzer",
-        outputs={
-            h2_bus: Flow(nominal_value=150)
-        },
+        outputs={h2_bus: Flow(nominal_value=150)},
     )
 
     ch4_demand = Sink(
@@ -31,14 +29,16 @@ def test_methanisation_reactor():
         },
     )
 
-    ch4_shortage = Source(label="ch4_shortage", outputs={ch4_bus: Flow(variable_costs=1e9)})
+    ch4_shortage = Source(
+        label="ch4_shortage", outputs={ch4_bus: Flow(variable_costs=1e9)}
+    )
 
     ch4_excess = Sink(label="ch4_excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
 
     m_reactor = MethanisationReactor(
-        label='m_reactor',
-        carrier='h2_co2',
-        tech='methanisation_reactor',
+        label="m_reactor",
+        carrier="h2_co2",
+        tech="methanisation_reactor",
         h2_bus=h2_bus,
         co2_bus=co2_bus,
         ch4_bus=ch4_bus,
@@ -47,10 +47,19 @@ def test_methanisation_reactor():
         efficiency_charge=1,
         efficiency_discharge=1,
         methanisation_rate=5,  # TODO: Passing lists does not work here yet.
-        efficiency_methanisation=0.93
+        efficiency_methanisation=0.93,
     )
 
-    es.add(h2_bus, co2_bus, ch4_bus, electrolyzer, ch4_demand, ch4_shortage, ch4_excess, m_reactor)
+    es.add(
+        h2_bus,
+        co2_bus,
+        ch4_bus,
+        electrolyzer,
+        ch4_demand,
+        ch4_shortage,
+        ch4_excess,
+        m_reactor,
+    )
 
     m = Model(es)
 
