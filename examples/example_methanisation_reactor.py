@@ -125,11 +125,11 @@ el_demand = Sink(
 # )
 # Add Shortages
 el_shortage = Source(label="electricity-shortage", outputs={el_bus: Flow(variable_costs=1e9)})
-ch4_shortage = Source(label="ch4_shortage", outputs={ch4_bus: Flow(variable_costs=1e9)})
+ch4_shortage = Source(label="ch4-shortage", outputs={ch4_bus: Flow(variable_costs=1e9)})
 
 # Add Excesses
 el_excess = Sink(label="electricity-curtailment", inputs={el_bus: Flow(variable_costs=0.0001)})
-ch4_excess = Sink(label="ch4_excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
+ch4_excess = Sink(label="ch4-excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
 
 # Add Transformers
 ch4_power_plant = Transformer(
@@ -209,14 +209,19 @@ sequences = pd.concat(seq_dict.values(), 1)
 sequences.columns = seq_dict.keys()
 
 bus_sequences = postpro.bus_results(es, results, select="sequences", concat=False)
-df = bus_sequences["electricity"]
 
+bus_name = "ch4"
+df = bus_sequences[bus_name]
+
+# labels to strings
 df.to_csv("test.csv")
 df = pd.read_csv("test.csv", header=[0,1,2], index_col=0)
+df.loc[:, ("ch4", "ch4-demand", "flow")] = 0
+
 
 df, df_demand = plots.prepare_dispatch_data(
     df,
-    bus_name="electricity",
+    bus_name=bus_name,
     demand_name="demand",
     labels_dict=labels_dict,
 )
@@ -229,7 +234,6 @@ plots.plot_dispatch(
     unit="W",
     colors_odict=colors_odict,
 )
-df_demand.plot(ax=ax)
 
 ax.legend(
     loc="upper center",

@@ -16,3 +16,7 @@ heat-demand: Heat demand
 hydro-ror: Hydro ROR
 solar-pv: PV
 wind-onshore: Wind on
+ch4-excess: CH4 excess
+ch4-demand: CH4 demand
+ch4-shortage: CH4 shortage
+m_reactor-storage_products: Methanisation
