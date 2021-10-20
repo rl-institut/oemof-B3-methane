@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+from oemof.tabular.tools import postprocessing as postpro
 from oemof.solph import Bus, EnergySystem, Flow, Model, Sink, Source, Transformer
 from oemof_b3.facades import MethanisationReactor
 from oemoflex.tools import plots as plots
@@ -19,11 +20,19 @@ from oemof_b3.tools.data_processing import (
     filter_df,
 )
 
+# Constants
 year = 2018
 region = "BE"
-steps = 300
+steps = 24  # time steps of simulation
+DEMAND_EL = 15  # Electricity demand
+DEMAND_H2 = 8
+CAP_WIND = 10 # Installed capacity wind
+CAP_PV = 12 # Installed capacity PV
+CAP_CO2 = 6 # CO2 Import
+CAP_CH4 = 5 # CH4 Power plant
 
-# TODO: To be deleted after:
+
+# TODO: Only to sample time series - To be deleted after:
 ts_test = []
 for time_steps in np.arange(0, steps):
     ts_test.append(np.random.choice(np.arange(0.01, 0.8, 0.01)))
@@ -45,6 +54,8 @@ sc_region_filtered = filter_df(sc, "region", [region, "All"])
 
 # Read time series
 stacked_ts = load_b3_timeseries(os.path.join(raw_path, "feedin_time_series.csv"))
+el_demand = pd.read_csv(os.path.join(raw_path, "2015_entsoe_50Hz_h.csv"))
+
 ts_region_filtered = filter_df(stacked_ts, "region", [region, "All"])
 
 # Get wind profile
@@ -56,9 +67,10 @@ ts_region_pv_filtered = filter_df(ts_region_filtered, "var_name", "pv-profile")
 ts_pv = unstack_timeseries(ts_region_pv_filtered)
 
 # Get electricity demand
-# TODO: Replace constant ts with ts of actual el demand data
-el_demand_berlin_2018 = 38037 / 3600  # From Energie- und CO2-Bilanz in GWh
-el_demand_berlin = pd.Series(np.ones(steps) * el_demand_berlin_2018 / steps)
+el_demand_norm = np.divide(
+    el_demand["Actual Total Load [MW] - CTA|DE(50Hertz)"],
+    sum(el_demand["Actual Total Load [MW] - CTA|DE(50Hertz)"]),
+)
 
 # Make time index
 timeindex = pd.date_range(str(year) + "-01-01", periods=steps, freq="H")
@@ -81,7 +93,7 @@ wind_source = Source(
         el_bus: Flow(
             fixed=True,
             actual_value=ts_wind["wind-profile"][0:steps],
-            nominal_value=0.2,
+            nominal_value=CAP_WIND,
             variable_costs=15,
         )
     },
@@ -93,33 +105,36 @@ pv_source = Source(
         el_bus: Flow(
             fixed=True,
             actual_value=ts_pv["pv-profile"][0:steps],
-            nominal_value=6.437,
+            nominal_value=CAP_PV,
             variable_costs=10,
         )
     },
 )
 
-co2_import = Source(label="co2_import", outputs={co2_bus: Flow(nominal_value=0.6)})
+co2_import = Source(label="co2_import", outputs={co2_bus: Flow(nominal_value=CAP_CO2)})
 
 # Add Sinks
 el_demand = Sink(
     label="electricity-demand",
-    inputs={el_bus: Flow(fixed=True, actual_value=el_demand_berlin, variable_costs=6)},
+    inputs={el_bus: Flow(fixed=True, actual_value=el_demand_norm, nominal_value=DEMAND_EL, variable_costs=6)},
 )
 
 # ch4_demand = Sink(
 #     label="ch4_demand",
 #     inputs={ch4_bus: Flow(fixed=True, actual_valueed=True, nominal_value=100, actual_value=[0.1, 0.2, 0.1])},
 # )
-#
-# ch4_shortage = Source(label="ch4_shortage", outputs={ch4_bus: Flow(variable_costs=1e9)})
-#
-# ch4_excess = Sink(label="ch4_excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
+# Add Shortages
+el_shortage = Source(label="el_shortage", outputs={el_bus: Flow(variable_costs=1e9)})
+ch4_shortage = Source(label="ch4_shortage", outputs={ch4_bus: Flow(variable_costs=1e9)})
+
+# Add Excesses
+el_excess = Sink(label="el_excess", inputs={el_bus: Flow(variable_costs=0.0001)})
+ch4_excess = Sink(label="ch4_excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
 
 # Add Transformers
 ch4_power_plant = Transformer(
     label="ch4-gt",
-    inputs={ch4_bus: Flow(nominal_value=0.4, variable_costs=7)},
+    inputs={ch4_bus: Flow(nominal_value=CAP_CH4, variable_costs=7)},
     outputs={el_bus: Flow()},
     conversion_factors={ch4_bus: 0.45},
 )
@@ -127,7 +142,7 @@ ch4_power_plant = Transformer(
 electrolyzer = Transformer(
     label="electricity-electrolyzer",
     inputs={el_bus: Flow(variable_costs=6)},
-    outputs={h2_bus: Flow(nominal_value=0.6)},
+    outputs={h2_bus: Flow(nominal_value=DEMAND_H2)},
     conversion_factors={h2_bus: 0.73},
 )
 
@@ -167,13 +182,17 @@ es.add(
     pv_source,
     # RoR_source,
     co2_import,
-    electrolyzer,
-    # ch4_demand,
-    # ch4_shortage,
-    # ch4_excess,
-    ch4_power_plant,
-    m_reactor,
     el_demand,
+    el_shortage,
+    ch4_shortage,
+    el_excess,
+    ch4_excess,
+    # ch4_demand,
+    ch4_shortage,
+    ch4_excess,
+    ch4_power_plant,
+    electrolyzer,
+    m_reactor,
 )
 
 m = Model(es)
@@ -190,6 +209,8 @@ seq_dict = {k: v["sequences"] for k, v in results.items() if "sequences" in v}
 sequences = pd.concat(seq_dict.values(), 1)
 sequences.columns = seq_dict.keys()
 
+test = postpro.bus_results(es, results, select="sequences", concat=False)
+
 df, df_demand = plots.prepare_dispatch_data(
     sequences,
     bus_name="electricity",
@@ -205,5 +226,3 @@ plots.plot_dispatch(
     unit="W",
     colors_odict=colors_odict,
 )
-
-# TODO: Create plots of sequences time series like this: plot(sequences[sequences.columns[4]])
