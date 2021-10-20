@@ -3,12 +3,10 @@ import pandas as pd
 import numpy as np
 from oemof.tabular.tools import postprocessing as postpro
 from oemof.solph import Bus, EnergySystem, Flow, Model, Sink, Source, Transformer
-from oemof_b3.facades import MethanisationReactor
-from oemoflex.tools import plots as plots
-
-
-from oemof.outputlib.processing import convert_keys_to_strings
+from oemoflex.tools import plots
 import matplotlib.pyplot as plt
+from oemof_b3.facades import MethanisationReactor
+
 from oemof_b3 import labels_dict, colors_odict
 
 from oemof_b3.tools.data_processing import (
@@ -130,7 +128,14 @@ el_demand = Sink(
 
 # ch4_demand = Sink(
 #     label="ch4_demand",
-#     inputs={ch4_bus: Flow(fixed=True, actual_valueed=True, nominal_value=100, actual_value=[0.1, 0.2, 0.1])},
+#     inputs={
+#         ch4_bus: Flow(
+#             fixed=True,
+#             actual_valueed=True,
+#             nominal_value=100,
+#             actual_value=[0.1, 0.2, 0.1],
+#         )
+#     },
 # )
 # Add Shortages
 el_shortage = Source(
@@ -158,11 +163,6 @@ electrolyzer = Transformer(
     outputs={h2_bus: Flow(nominal_value=DEMAND_H2)},
     conversion_factors={h2_bus: 0.73},
 )
-
-# electrolyzer = Source(
-#     label="electrolyzer",
-#     outputs={h2_bus: Flow(nominal_value=150)},
-# )
 
 # heat_demand = Sink(
 #     label="heat_demand", inputs={heat_cen_bus: Flow(actual_value=np.ones(steps))}
@@ -226,7 +226,7 @@ bus_sequences = postpro.bus_results(es, results, select="sequences", concat=Fals
 bus_name = ["electricity", "ch4"]
 
 fig, (ax1, ax2) = plt.subplots(2, 1)
-fig.set_size_inches(10, 6, forward=True)
+fig.set_size_inches(12, 8, forward=True)
 fig.subplots_adjust(hspace=0.5)
 
 for bus in bus_name:
@@ -253,17 +253,25 @@ for bus in bus_name:
         ax=ax,
         df=df,
         df_demand=df_demand,
-        unit="W",
+        unit="MW",
         colors_odict=colors_odict,
     )
 
     ax.legend(
         loc="upper center",
-        bbox_to_anchor=(0.5, -0.1),
+        bbox_to_anchor=(0.5, -0.5),
         fancybox=True,
         ncol=4,
         fontsize=14,
     )
+
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(45)
+
+ax1.set_ylabel("Installed capacity")
+ax2.set_ylabel("Installed capacity")
+ax2.set_xlabel("time")
+ax2.sharex(ax1)
 
 fig.tight_layout()
 
