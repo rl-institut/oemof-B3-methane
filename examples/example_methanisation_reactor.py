@@ -3,6 +3,12 @@ import pandas as pd
 import numpy as np
 from oemof.solph import Bus, EnergySystem, Flow, Model, Sink, Source, Transformer
 from oemof_b3.facades import MethanisationReactor
+from oemoflex.tools import plots as plots
+
+
+from oemof.outputlib.processing import convert_keys_to_strings
+import matplotlib.pyplot as plt
+from oemof_b3 import labels_dict, colors_odict
 
 from oemof_b3.tools.data_processing import (
     load_b3_scalars,
@@ -15,7 +21,7 @@ from oemof_b3.tools.data_processing import (
 
 year = 2018
 region = "BE"
-steps = 3
+steps = 300
 
 # TODO: To be deleted after:
 ts_test = []
@@ -73,7 +79,8 @@ wind_source = Source(
     label="wind_source",
     outputs={
         el_bus: Flow(
-            fix=ts_wind["wind-profile"][0:steps],
+            fixed=True,
+            actual_value=ts_wind["wind-profile"][0:steps],
             nominal_value=0.2,
             variable_costs=15,
         )
@@ -84,7 +91,8 @@ pv_source = Source(
     label="pv_source",
     outputs={
         el_bus: Flow(
-            fix=ts_pv["pv-profile"][0:steps],
+            fixed=True,
+            actual_value=ts_pv["pv-profile"][0:steps],
             nominal_value=6.437,
             variable_costs=10,
         )
@@ -96,12 +104,12 @@ co2_import = Source(label="co2_import", outputs={co2_bus: Flow(nominal_value=0.6
 # Add Sinks
 el_demand = Sink(
     label="electricity_demand",
-    inputs={el_bus: Flow(fix=el_demand_berlin, variable_costs=6)},
+    inputs={el_bus: Flow(fixed=True, actual_value=el_demand_berlin, variable_costs=6)},
 )
 
 # ch4_demand = Sink(
 #     label="ch4_demand",
-#     inputs={ch4_bus: Flow(fixed=True, nominal_value=100, actual_value=[0.1, 0.2, 0.1])},
+#     inputs={ch4_bus: Flow(fixed=True, actual_valueed=True, nominal_value=100, actual_value=[0.1, 0.2, 0.1])},
 # )
 #
 # ch4_shortage = Source(label="ch4_shortage", outputs={ch4_bus: Flow(variable_costs=1e9)})
@@ -177,9 +185,25 @@ m.solve()
 
 results = m.results()
 
+results = convert_keys_to_strings(results)
 seq_dict = {k: v["sequences"] for k, v in results.items() if "sequences" in v}
 sequences = pd.concat(seq_dict.values(), 1)
 sequences.columns = seq_dict.keys()
-print(sequences)
+
+df, df_demand = plots.prepare_dispatch_data(
+    sequences,
+    bus_name="electricity",
+    demand_name="demand",
+    labels_dict=labels_dict,
+)
+
+fig, ax = plt.subplots()
+plots.plot_dispatch(
+    ax=ax,
+    df=df,
+    df_demand=df_demand,
+    unit="W",
+    colors_odict=colors_odict,
+)
 
 # TODO: Create plots of sequences time series like this: plot(sequences[sequences.columns[4]])
