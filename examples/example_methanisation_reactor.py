@@ -103,7 +103,7 @@ co2_import = Source(label="co2_import", outputs={co2_bus: Flow(nominal_value=0.6
 
 # Add Sinks
 el_demand = Sink(
-    label="electricity_demand",
+    label="electricity-demand",
     inputs={el_bus: Flow(fixed=True, actual_value=el_demand_berlin, variable_costs=6)},
 )
 
@@ -118,14 +118,14 @@ el_demand = Sink(
 
 # Add Transformers
 ch4_power_plant = Transformer(
-    label="ch4_power_plant",
+    label="ch4-gt",
     inputs={ch4_bus: Flow(nominal_value=0.4, variable_costs=7)},
     outputs={el_bus: Flow()},
     conversion_factors={ch4_bus: 0.45},
 )
 
 electrolyzer = Transformer(
-    label="electrolyzer",
+    label="electricity-electrolyzer",
     inputs={el_bus: Flow(variable_costs=6)},
     outputs={h2_bus: Flow(nominal_value=0.6)},
     conversion_factors={h2_bus: 0.73},
