@@ -88,7 +88,7 @@ el_bus = Bus(label="electricity")
 
 # Add Sources
 wind_source = Source(
-    label="wind_source",
+    label="wind-onshore",
     outputs={
         el_bus: Flow(
             fixed=True,
@@ -100,7 +100,7 @@ wind_source = Source(
 )
 
 pv_source = Source(
-    label="pv_source",
+    label="solar-pv",
     outputs={
         el_bus: Flow(
             fixed=True,
@@ -124,11 +124,11 @@ el_demand = Sink(
 #     inputs={ch4_bus: Flow(fixed=True, actual_valueed=True, nominal_value=100, actual_value=[0.1, 0.2, 0.1])},
 # )
 # Add Shortages
-el_shortage = Source(label="el_shortage", outputs={el_bus: Flow(variable_costs=1e9)})
+el_shortage = Source(label="electricity-shortage", outputs={el_bus: Flow(variable_costs=1e9)})
 ch4_shortage = Source(label="ch4_shortage", outputs={ch4_bus: Flow(variable_costs=1e9)})
 
 # Add Excesses
-el_excess = Sink(label="el_excess", inputs={el_bus: Flow(variable_costs=0.0001)})
+el_excess = Sink(label="electricity-curtailment", inputs={el_bus: Flow(variable_costs=0.0001)})
 ch4_excess = Sink(label="ch4_excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
 
 # Add Transformers
@@ -204,15 +204,18 @@ m.solve()
 
 results = m.results()
 
-results = convert_keys_to_strings(results)
 seq_dict = {k: v["sequences"] for k, v in results.items() if "sequences" in v}
 sequences = pd.concat(seq_dict.values(), 1)
 sequences.columns = seq_dict.keys()
 
-test = postpro.bus_results(es, results, select="sequences", concat=False)
+bus_sequences = postpro.bus_results(es, results, select="sequences", concat=False)
+df = bus_sequences["electricity"]
+
+df.to_csv("test.csv")
+df = pd.read_csv("test.csv", header=[0,1,2], index_col=0)
 
 df, df_demand = plots.prepare_dispatch_data(
-    sequences,
+    df,
     bus_name="electricity",
     demand_name="demand",
     labels_dict=labels_dict,
@@ -226,3 +229,16 @@ plots.plot_dispatch(
     unit="W",
     colors_odict=colors_odict,
 )
+df_demand.plot(ax=ax)
+
+ax.legend(
+    loc="upper center",
+    bbox_to_anchor=(0.5, -0.1),
+    fancybox=True,
+    ncol=4,
+    fontsize=14,
+)
+
+fig.tight_layout()
+
+plt.show()
