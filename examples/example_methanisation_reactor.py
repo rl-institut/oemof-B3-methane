@@ -24,12 +24,14 @@ from oemof_b3.tools.data_processing import (
 year = 2018
 region = "BE"
 steps = 24  # time steps of simulation
-DEMAND_EL = 15  # Electricity demand
+DEMAND_EL = 150000  # Electricity demand
 DEMAND_H2 = 8
-CAP_WIND = 10 # Installed capacity wind
-CAP_PV = 12 # Installed capacity PV
-CAP_CO2 = 6 # CO2 Import
-CAP_CH4 = 5 # CH4 Power plant
+CAP_WIND = 16  # Installed capacity wind
+CAP_PV = 10  # Installed capacity PV
+CAP_CO2 = 2  # CO2 Import
+CAP_CH4 = 6  # CH4 Power plant
+CAP_CHARGE_M_REAC = 2.832 / 1000
+CAP_DISCHARGE_M_REAC = 7.743 / 1000
 
 
 # TODO: Only to sample time series - To be deleted after:
@@ -116,7 +118,14 @@ co2_import = Source(label="co2_import", outputs={co2_bus: Flow(nominal_value=CAP
 # Add Sinks
 el_demand = Sink(
     label="electricity-demand",
-    inputs={el_bus: Flow(fixed=True, actual_value=el_demand_norm, nominal_value=DEMAND_EL, variable_costs=6)},
+    inputs={
+        el_bus: Flow(
+            fixed=True,
+            actual_value=el_demand_norm[0:steps],
+            nominal_value=DEMAND_EL,
+            variable_costs=6,
+        )
+    },
 )
 
 # ch4_demand = Sink(
@@ -124,11 +133,15 @@ el_demand = Sink(
 #     inputs={ch4_bus: Flow(fixed=True, actual_valueed=True, nominal_value=100, actual_value=[0.1, 0.2, 0.1])},
 # )
 # Add Shortages
-el_shortage = Source(label="electricity-shortage", outputs={el_bus: Flow(variable_costs=1e9)})
+el_shortage = Source(
+    label="electricity-shortage", outputs={el_bus: Flow(variable_costs=1e9)}
+)
 ch4_shortage = Source(label="ch4-shortage", outputs={ch4_bus: Flow(variable_costs=1e9)})
 
 # Add Excesses
-el_excess = Sink(label="electricity-curtailment", inputs={el_bus: Flow(variable_costs=0.0001)})
+el_excess = Sink(
+    label="electricity-curtailment", inputs={el_bus: Flow(variable_costs=0.0001)}
+)
 ch4_excess = Sink(label="ch4-excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
 
 # Add Transformers
@@ -163,8 +176,8 @@ m_reactor = MethanisationReactor(
     h2_bus=h2_bus,
     co2_bus=co2_bus,
     ch4_bus=ch4_bus,
-    capacity_charge=2.832 / 1000,
-    capacity_discharge=7.743 / 1000,
+    capacity_charge=CAP_CHARGE_M_REAC,
+    capacity_discharge=CAP_DISCHARGE_M_REAC,
     efficiency_charge=1,
     efficiency_discharge=1,
     methanisation_rate=5,  # TODO: Passing lists does not work here yet.
@@ -210,38 +223,47 @@ sequences.columns = seq_dict.keys()
 
 bus_sequences = postpro.bus_results(es, results, select="sequences", concat=False)
 
-bus_name = "ch4"
-df = bus_sequences[bus_name]
+bus_name = ["electricity", "ch4"]
 
-# labels to strings
-df.to_csv("test.csv")
-df = pd.read_csv("test.csv", header=[0,1,2], index_col=0)
-df.loc[:, ("ch4", "ch4-demand", "flow")] = 0
+fig, (ax1, ax2) = plt.subplots(2, 1)
+fig.set_size_inches(10, 6, forward=True)
+fig.subplots_adjust(hspace=0.5)
 
+for bus in bus_name:
+    df = bus_sequences[bus]
 
-df, df_demand = plots.prepare_dispatch_data(
-    df,
-    bus_name=bus_name,
-    demand_name="demand",
-    labels_dict=labels_dict,
-)
+    # labels to strings
+    df.to_csv("test.csv")
+    df = pd.read_csv("test.csv", header=[0, 1, 2], index_col=0)
 
-fig, ax = plt.subplots()
-plots.plot_dispatch(
-    ax=ax,
-    df=df,
-    df_demand=df_demand,
-    unit="W",
-    colors_odict=colors_odict,
-)
+    if bus == "electricity":
+        ax = ax1
+    if bus == "ch4":
+        df.loc[:, ("ch4", "ch4-demand", "flow")] = 0
+        ax = ax2
 
-ax.legend(
-    loc="upper center",
-    bbox_to_anchor=(0.5, -0.1),
-    fancybox=True,
-    ncol=4,
-    fontsize=14,
-)
+    df, df_demand = plots.prepare_dispatch_data(
+        df,
+        bus_name=bus,
+        demand_name="demand",
+        labels_dict=labels_dict,
+    )
+
+    plots.plot_dispatch(
+        ax=ax,
+        df=df,
+        df_demand=df_demand,
+        unit="W",
+        colors_odict=colors_odict,
+    )
+
+    ax.legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.1),
+        fancybox=True,
+        ncol=4,
+        fontsize=14,
+    )
 
 fig.tight_layout()
 
