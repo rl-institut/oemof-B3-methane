@@ -30,6 +30,7 @@ CAP_CO2 = 2  # CO2 Import
 CAP_CH4 = 6  # CH4 Power plant
 CAP_CHARGE_M_REAC = 2.8
 CAP_DISCHARGE_M_REAC = 7.7
+METHANATION_RATE = 2
 
 
 # TODO: Only to sample time series - To be deleted after:
@@ -180,7 +181,7 @@ m_reactor = MethanisationReactor(
     capacity_discharge=CAP_DISCHARGE_M_REAC,
     efficiency_charge=1,
     efficiency_discharge=1,
-    methanisation_rate=5,  # TODO: Passing lists does not work here yet.
+    methanisation_rate=METHANATION_RATE,  # TODO: Passing lists does not work here yet.
     efficiency_methanisation=0.93,
 )
 
