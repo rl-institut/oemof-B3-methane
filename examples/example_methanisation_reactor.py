@@ -21,15 +21,15 @@ from oemof_b3.tools.data_processing import (
 # Constants
 year = 2018
 region = "BE"
-steps = 24  # time steps of simulation
-DEMAND_EL = 150000  # Electricity demand
+steps = 240  # time steps of simulation
+DEMAND_EL = 100000  # Electricity demand
 DEMAND_H2 = 8
 CAP_WIND = 16  # Installed capacity wind
 CAP_PV = 10  # Installed capacity PV
 CAP_CO2 = 2  # CO2 Import
 CAP_CH4 = 6  # CH4 Power plant
-CAP_CHARGE_M_REAC = 2.832 / 1000
-CAP_DISCHARGE_M_REAC = 7.743 / 1000
+CAP_CHARGE_M_REAC = 2.8
+CAP_DISCHARGE_M_REAC = 7.7
 
 
 # TODO: Only to sample time series - To be deleted after:
@@ -268,11 +268,11 @@ for bus in bus_name:
     for tick in ax.get_xticklabels():
         tick.set_rotation(45)
 
-ax1.set_ylabel("Installed capacity")
-ax2.set_ylabel("Installed capacity")
+ax1.set_ylabel("Power")
+ax2.set_ylabel("Power")
 ax2.set_xlabel("time")
 ax2.sharex(ax1)
 
 fig.tight_layout()
 
-plt.show()
+plt.savefig("dispatch.png")
