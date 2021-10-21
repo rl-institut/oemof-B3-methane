@@ -220,6 +220,11 @@ from oemof.outputlib.processing import convert_keys_to_strings
 str_results = convert_keys_to_strings(results)
 seq_dict = {k: v["sequences"] for k, v in str_results.items() if "sequences" in v}
 sequences = pd.concat(seq_dict.values(), 1)
+
+# drop status variable of integer variable if present
+if "status" in sequences.columns:
+    sequences.drop("status", axis=1, inplace=True)
+
 sequences.columns = seq_dict.keys()
 
 bus_sequences = postpro.bus_results(es, results, select="sequences", concat=False)
