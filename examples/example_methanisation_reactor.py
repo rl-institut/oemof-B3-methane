@@ -201,8 +201,6 @@ es.add(
     el_excess,
     ch4_excess,
     # ch4_demand,
-    ch4_shortage,
-    ch4_excess,
     ch4_power_plant,
     electrolyzer,
     m_reactor,
@@ -217,7 +215,9 @@ m.solve()
 
 results = m.results()
 
-seq_dict = {k: v["sequences"] for k, v in results.items() if "sequences" in v}
+from oemof.outputlib.processing import convert_keys_to_strings
+str_results = convert_keys_to_strings(results)
+seq_dict = {k: v["sequences"] for k, v in str_results.items() if "sequences" in v}
 sequences = pd.concat(seq_dict.values(), 1)
 sequences.columns = seq_dict.keys()
 
@@ -225,7 +225,7 @@ bus_sequences = postpro.bus_results(es, results, select="sequences", concat=Fals
 
 bus_name = ["electricity", "ch4"]
 
-fig, (ax1, ax2) = plt.subplots(2, 1)
+fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
 fig.set_size_inches(12, 8, forward=True)
 fig.subplots_adjust(hspace=0.5)
 
@@ -268,10 +268,28 @@ for bus in bus_name:
     for tick in ax.get_xticklabels():
         tick.set_rotation(45)
 
+
+ax3.plot(sequences[("m_reactor-storage_products", 'None')], c='b', label="Storage Level Products")
+ax3.plot(sequences[("m_reactor-storage_educts", 'None')], c='r', label="Storage Level Educts")
+ax3.legend(
+    loc="upper center",
+    bbox_to_anchor=(0.5, -0.5),
+    fancybox=True,
+    ncol=4,
+    fontsize=14,
+)
+methanation = sequences[("m_reactor", "m_reactor-storage_products")]
+ax4.plot(methanation)
+
 ax1.set_ylabel("Power")
 ax2.set_ylabel("Power")
 ax2.set_xlabel("time")
 ax2.sharex(ax1)
+
+ax1.axes.get_xaxis().set_visible(False)
+ax2.axes.get_xaxis().set_visible(False)
+ax3.axes.get_xaxis().set_visible(False)
+ax4.axes.get_xaxis().set_visible(False)
 
 fig.tight_layout()
 
