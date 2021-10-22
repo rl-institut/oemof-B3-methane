@@ -263,39 +263,39 @@ for bus in bus_name:
         colors_odict=colors_odict,
     )
 
-    ax.legend(
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.5),
-        fancybox=True,
-        ncol=4,
-        fontsize=14,
-    )
-
     for tick in ax.get_xticklabels():
         tick.set_rotation(45)
 
 
-ax3.plot(sequences[("m_reactor-storage_products", 'None')], c='b', label="Storage Level Products")
-ax3.plot(sequences[("m_reactor-storage_educts", 'None')], c='r', label="Storage Level Educts")
-ax3.legend(
+ax3.plot(sequences[("m_reactor-storage_products", 'None')], c='r', label="Storage Level Products")
+ax3.plot(sequences[("m_reactor-storage_educts", 'None')], c='b', label="Storage Level Educts")
+
+methanation = sequences[("m_reactor", "m_reactor-storage_products")]
+ax4.fill_between(methanation.index, 0, methanation, label="Methanation", color=colors_odict["Methanation"])
+
+h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
+handles = [item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist]
+labels = [item for sublist in list(map(lambda x: x[1], h_l)) for item in sublist]
+
+ax4.legend(
+    handles=handles,
+    labels=labels,
     loc="upper center",
     bbox_to_anchor=(0.5, -0.5),
     fancybox=True,
     ncol=4,
     fontsize=14,
 )
-methanation = sequences[("m_reactor", "m_reactor-storage_products")]
-ax4.plot(methanation)
 
 ax1.set_ylabel("Power")
 ax2.set_ylabel("Power")
-ax2.set_xlabel("time")
-ax2.sharex(ax1)
+ax3.set_ylabel("Storage level / MWh")
+ax4.set_ylabel("Power / MW")
+ax4.set_xlabel("Time")
 
 ax1.axes.get_xaxis().set_visible(False)
 ax2.axes.get_xaxis().set_visible(False)
 ax3.axes.get_xaxis().set_visible(False)
-ax4.axes.get_xaxis().set_visible(False)
 
 fig.tight_layout()
 
