@@ -21,8 +21,8 @@ BEV,gold
 Transmission in,#8c564b
 Transmission out,#8c564b
 
-Shortage,#7f7f7f
-Curtailment,#7f7f7f
+Shortage,#cfcfcf
+Curtailment,#cfcfcf
 
 El. demand,#000000
 
@@ -49,5 +49,5 @@ Lignite,saddlebrown
 Oil,#9467bd
 Other,#7f7f7f
 Methanation,#9467bd
-CH4 shortage,#7f7f7f
+CH4 shortage,#cfcfcf
 CH4 demand,saddlebrown
