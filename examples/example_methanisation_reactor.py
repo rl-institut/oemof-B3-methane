@@ -25,23 +25,22 @@ DEMAND_EL = 100000  # Electricity demand
 DEMAND_H2 = 8
 
 # Capacities
-CAP_WIND = 16  # Installed capacity wind
-CAP_PV = 10  # Installed capacity PV
-CAP_CO2 = 2  # CO2 Import
-CAP_CH4 = 6  # CH4 Power plant
+CAP_WIND = 0  # Installed capacity wind
+CAP_PV = 0  # Installed capacity PV
+CAP_CH4 = 20  # CH4 Power plant
 CAP_CHARGE_M_REAC = 2.8
 CAP_DISCHARGE_M_REAC = 7.7
-METHANATION_RATE = 4
+METHANATION_RATE = 8
 
 # Costs
 VAR_COST_WIND = 0.001
 VAR_COST_PV = 0.001
 VAR_COST_EL_DEMAND = 0.001
 VAR_COST_EL_SHORTAGE = 1e9
-VAR_COST_CH4_SHORTAGE = 1e9
+VAR_COST_CH4_SHORTAGE = 40
 VAR_COST_EL_EXCESS=0
 VAR_COST_CH4_EXCESS=0
-VAR_COST_CH4_PP_INPUT=40
+VAR_COST_CH4_PP_INPUT=0
 VAR_COST_ELY_INPUT=0
 
 # Efficiencies
@@ -129,7 +128,7 @@ pv_source = Source(
     },
 )
 
-co2_import = Source(label="co2_import", outputs={co2_bus: Flow(nominal_value=CAP_CO2)})
+co2_import = Source(label="co2_import", outputs={co2_bus: Flow()})
 
 # Add Sinks
 el_demand = Sink(
@@ -171,8 +170,8 @@ ch4_excess = Sink(label="ch4-excess", inputs={ch4_bus: Flow(variable_costs=VAR_C
 # Add Transformers
 ch4_power_plant = Transformer(
     label="ch4-gt",
-    inputs={ch4_bus: Flow(nominal_value=CAP_CH4, variable_costs=VAR_COST_CH4_PP_INPUT)},
-    outputs={el_bus: Flow()},
+    inputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_PP_INPUT)},
+    outputs={el_bus: Flow(nominal_value=CAP_CH4)},
     conversion_factors={ch4_bus: EFF_CH4_PP},
 )
 
