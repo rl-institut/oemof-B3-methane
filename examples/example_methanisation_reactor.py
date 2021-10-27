@@ -24,8 +24,8 @@ steps = 240  # time steps of simulation
 DEMAND_EL = 100000  # Electricity demand
 
 # Capacities
-CAP_WIND = 0  # Installed capacity wind
-CAP_PV = 0  # Installed capacity PV
+CAP_WIND = 25  # Installed capacity wind
+CAP_PV = 20  # Installed capacity PV
 CAP_ELY = 8
 CAP_CH4 = 20  # CH4 Power plant
 CAP_CHARGE_M_REAC = 2.8
