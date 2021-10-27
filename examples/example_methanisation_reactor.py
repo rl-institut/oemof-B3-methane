@@ -217,6 +217,7 @@ m.solve()
 results = m.results()
 
 from oemof.outputlib.processing import convert_keys_to_strings
+
 str_results = convert_keys_to_strings(results)
 seq_dict = {k: v["sequences"] for k, v in str_results.items() if "sequences" in v}
 sequences = pd.concat(seq_dict.values(), 1)
@@ -267,11 +268,23 @@ for bus in bus_name:
         tick.set_rotation(45)
 
 
-ax3.plot(sequences[("m_reactor-storage_products", 'None')], c='r', label="Storage Level Products")
-ax3.plot(sequences[("m_reactor-storage_educts", 'None')], c='b', label="Storage Level Educts")
+ax3.plot(
+    sequences[("m_reactor-storage_products", "None")],
+    c="r",
+    label="Storage Level Products",
+)
+ax3.plot(
+    sequences[("m_reactor-storage_educts", "None")], c="b", label="Storage Level Educts"
+)
 
 methanation = sequences[("m_reactor", "m_reactor-storage_products")]
-ax4.fill_between(methanation.index, 0, methanation, label="Methanation", color=colors_odict["Methanation"])
+ax4.fill_between(
+    methanation.index,
+    0,
+    methanation,
+    label="Methanation",
+    color=colors_odict["Methanation"],
+)
 
 h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
 handles = [item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist]

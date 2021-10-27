@@ -137,16 +137,19 @@ class MethanisationReactor(Transformer, Facade):
         self.outputs.update(
             # 1. Fixed methanation rate
             # {storage_products: Flow(fixed=True, actual_value=sequence(1), nominal_value=self.methanisation_rate)}
-
             # 2. Methanation rate can be optimized
             # {storage_products: Flow(nominal_value=self.methanisation_rate)}
-
             # 3. Methanation rate can be optimized and has a "minimum load".
             # {storage_products: Flow(nominal_value=self.methanisation_rate*2, min=0.5, nonconvex=NonConvex())}
-
             # 4. Methanation rate can be optimized, has a "minimum load" and constraints on ramping up and down
-            {storage_products: Flow(nominal_value=self.methanisation_rate, min=0.1, positive_gradient={"ub": .01, "costs": 0}, negative_gradient={"ub": .01, "costs": 0})}
-
+            {
+                storage_products: Flow(
+                    nominal_value=self.methanisation_rate,
+                    min=0.1,
+                    positive_gradient={"ub": 0.01, "costs": 0},
+                    negative_gradient={"ub": 0.01, "costs": 0},
+                )
+            }
             # 5. Methanation rate depends on available educts but is constrained by active reactor volume.
             # TODO: Linear dependency on storage level (via extra constraint?)
         )
