@@ -96,7 +96,7 @@ timeindex = pd.date_range(str(year) + "-01-01", periods=steps, freq="H")
 es = EnergySystem(timeindex=timeindex)
 
 # Add busses
-h2_bus = Bus(label="h2_co2")
+h2_bus = Bus(label="h2")
 co2_bus = Bus(label="co2", balanced=False)
 ch4_bus = Bus(label="ch4")
 el_bus = Bus(label="electricity")
