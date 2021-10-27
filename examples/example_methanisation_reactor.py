@@ -319,4 +319,4 @@ ax3.axes.get_xaxis().set_visible(False)
 
 fig.tight_layout()
 
-plt.savefig("example_methanisation_reactor.png")
+plt.savefig(f"example_methanisation_reactor_option_{METHANATION_OPTION}.png")
