@@ -135,6 +135,11 @@ class MethanisationReactor(Transformer, Facade):
         self.inputs.update({storage_educts: Flow()})
 
         self.outputs.update(
+            # # 0. No constraints on methanation
+            # {
+            #     storage_products: Flow(
+            #     )
+            # }
             # # 1. Fixed methanation rate
             # {
             #     storage_products: Flow(
