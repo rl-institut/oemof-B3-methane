@@ -170,7 +170,7 @@ ch4_power_plant = Transformer(
     label="ch4-gt",
     inputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_PP_INPUT)},
     outputs={el_bus: Flow(nominal_value=CAP_CH4)},
-    conversion_factors={ch4_bus: EFF_CH4_PP},
+    conversion_factors={el_bus: EFF_CH4_PP},
 )
 
 electrolyzer = Transformer(
