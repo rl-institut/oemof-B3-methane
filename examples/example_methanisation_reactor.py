@@ -1,22 +1,19 @@
 import os
-import pandas as pd
-import numpy as np
-from oemof.tabular.tools import postprocessing as postpro
-from oemof.solph import Bus, EnergySystem, Flow, Model, Sink, Source, Transformer
-from oemoflex.tools import plots
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from oemof.outputlib.processing import convert_keys_to_strings
+from oemof.solph import (Bus, EnergySystem, Flow, Model, Sink, Source,
+                         Transformer)
+from oemof.tabular.tools import postprocessing as postpro
+from oemoflex.tools import plots
+
+from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.facades import MethanisationReactor
-
-from oemof_b3 import labels_dict, colors_odict
-
-from oemof_b3.tools.data_processing import (
-    load_b3_scalars,
-    # stack_timeseries,
-    unstack_timeseries,
-    load_b3_timeseries,
-    # save_df,
-    filter_df,
-)
+from oemof_b3.tools.data_processing import (filter_df, load_b3_scalars,
+                                            load_b3_timeseries,
+                                            unstack_timeseries)
 
 # Constants
 year = 2018
@@ -138,6 +135,7 @@ el_demand = Sink(
 #         )
 #     },
 # )
+
 # Add Shortages
 el_shortage = Source(
     label="electricity-shortage", outputs={el_bus: Flow(variable_costs=1e9)}
@@ -165,11 +163,6 @@ electrolyzer = Transformer(
     conversion_factors={h2_bus: 0.73},
 )
 
-# heat_demand = Sink(
-#     label="heat_demand", inputs={heat_cen_bus: Flow(actual_value=np.ones(steps))}
-# )
-
-
 m_reactor = MethanisationReactor(
     label="m_reactor",
     carrier="h2_co2",
@@ -190,11 +183,8 @@ es.add(
     co2_bus,
     ch4_bus,
     el_bus,
-    # heat_cen_bus,
-    # heat_dec_bus,
     wind_source,
     pv_source,
-    # RoR_source,
     co2_import,
     el_demand,
     el_shortage,
@@ -215,8 +205,6 @@ m.write(lp_file_path, io_options={"symbolic_solver_labels": True})
 m.solve()
 
 results = m.results()
-
-from oemof.outputlib.processing import convert_keys_to_strings
 
 str_results = convert_keys_to_strings(results)
 seq_dict = {k: v["sequences"] for k, v in str_results.items() if "sequences" in v}
@@ -312,4 +300,4 @@ ax3.axes.get_xaxis().set_visible(False)
 
 fig.tight_layout()
 
-plt.savefig("dispatch.png")
+plt.savefig("example_methanisation_reactor.png")
