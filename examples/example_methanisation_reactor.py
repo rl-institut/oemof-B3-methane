@@ -32,6 +32,8 @@ CAP_CHARGE_M_REAC = 2.8
 CAP_DISCHARGE_M_REAC = 7.7
 METHANATION_RATE = 8
 
+METHANATION_OPTION = 0
+
 # Costs
 VAR_COST_WIND = 0.001
 VAR_COST_PV = 0.001
@@ -193,6 +195,7 @@ m_reactor = MethanisationReactor(
     efficiency_discharge=1,
     methanisation_rate=METHANATION_RATE,  # TODO: Passing lists does not work here yet.
     efficiency_methanisation=EFF_METHANATION,
+    methanisation_option=METHANATION_OPTION,
 )
 
 es.add(

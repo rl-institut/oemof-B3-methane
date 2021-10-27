@@ -86,6 +86,8 @@ class MethanisationReactor(Transformer, Facade):
 
         self.expandable = bool(kwargs.get("expandable", False))
 
+        self.methanisation_option = kwargs.get("methanisation_option", 0)
+
         self.build_solph_components()
 
     def build_solph_components(self):
@@ -134,43 +136,46 @@ class MethanisationReactor(Transformer, Facade):
 
         self.inputs.update({storage_educts: Flow()})
 
-        self.outputs.update(
-            # # 0. No constraints on methanation
-            # {
-            #     storage_products: Flow(
-            #     )
-            # }
-            # # 1. Fixed methanation rate
-            # {
-            #     storage_products: Flow(
-            #         fixed=True,
-            #         actual_value=sequence(1),
-            #         nominal_value=self.methanisation_rate,
-            #     )
-            # }
-            # # 2. Methanation rate can be optimized
-            # {storage_products: Flow(nominal_value=self.methanisation_rate)}
-            # # 3. Methanation rate can be optimized and has a "minimum load".
-            # {
-            #     storage_products: Flow(
-            #         nominal_value=self.methanisation_rate * 2,
-            #         min=0.5,
-            #         nonconvex=NonConvex(),
-            #     )
-            # }
-            # # 4. Methanation rate can be optimized,
-            # # has a "minimum load" and constraints on ramping up and down
-            {
+        methanisation_implementation = {}
+        # 0. No constraints on methanation
+        methanisation_implementation[0] = {
+            storage_products: Flow(
+            )
+        }
+        # 1. Fixed methanation rate
+        methanisation_implementation[1] = {
+                storage_products: Flow(
+                    fixed=True,
+                    actual_value=sequence(1),
+                    nominal_value=self.methanisation_rate,
+                )
+            }
+        # 2. Methanation rate can be optimized
+        methanisation_implementation[2] = {storage_products: Flow(nominal_value=self.methanisation_rate)}
+        # 3. Methanation rate can be optimized and has a "minimum load".
+        methanisation_implementation[3] = {
+                storage_products: Flow(
+                    nominal_value=self.methanisation_rate,
+                    min=0.5,
+                    nonconvex=NonConvex(),
+                )
+        }
+        # 4. Methanation rate can be optimized,
+        # has a "minimum load" and constraints on ramping up and down
+        methanisation_implementation[4] = {
                 storage_products: Flow(
                     nominal_value=self.methanisation_rate,
                     min=0.1,
                     positive_gradient={"ub": 0.01, "costs": 0},
                     negative_gradient={"ub": 0.01, "costs": 0},
                 )
-            }
-            # # 5. Methanation rate depends on available educts but is constrained by active
-            # # reactor volume.
-            # # TODO: Linear dependency on storage level (via extra constraint?)
+        }
+        # 5. Methanation rate depends on available educts but is constrained by active
+        # reactor volume.
+        # TODO: Linear dependency on storage level (via extra constraint?)
+
+        self.outputs.update(
+            methanisation_implementation[self.methanisation_option]
         )
 
         self.conversion_factors = {
