@@ -19,15 +19,35 @@ from oemof_b3.tools.data_processing import (filter_df, load_b3_scalars,
 year = 2018
 region = "BE"
 steps = 240  # time steps of simulation
+
+# Demands
 DEMAND_EL = 100000  # Electricity demand
 DEMAND_H2 = 8
+
+# Capacities
 CAP_WIND = 16  # Installed capacity wind
 CAP_PV = 10  # Installed capacity PV
 CAP_CO2 = 2  # CO2 Import
 CAP_CH4 = 6  # CH4 Power plant
 CAP_CHARGE_M_REAC = 2.8
 CAP_DISCHARGE_M_REAC = 7.7
-METHANATION_RATE = 2
+METHANATION_RATE = 4
+
+# Costs
+VAR_COST_WIND = 15
+VAR_COST_PV = 10
+VAR_COST_EL_DEMAND = 6
+VAR_COST_EL_SHORTAGE = 1e9
+VAR_COST_CH4_SHORTAGE = 1e9
+VAR_COST_EL_EXCESS=0.0001
+VAR_COST_CH4_EXCESS=0.0001
+VAR_COST_CH4_PP_INPUT=7
+VAR_COST_ELY_INPUT=6
+
+# Efficiencies
+EFF_CH4_PP=0.45
+EFF_ELY=0.73
+EFF_METHANATION=0.93
 
 
 # TODO: Only to sample time series - To be deleted after:
@@ -92,7 +112,7 @@ wind_source = Source(
             fixed=True,
             actual_value=ts_wind["wind-profile"][0:steps],
             nominal_value=CAP_WIND,
-            variable_costs=15,
+            variable_costs=VAR_COST_WIND,
         )
     },
 )
@@ -104,7 +124,7 @@ pv_source = Source(
             fixed=True,
             actual_value=ts_pv["pv-profile"][0:steps],
             nominal_value=CAP_PV,
-            variable_costs=10,
+            variable_costs=VAR_COST_PV,
         )
     },
 )
@@ -119,7 +139,7 @@ el_demand = Sink(
             fixed=True,
             actual_value=el_demand_norm[0:steps],
             nominal_value=DEMAND_EL,
-            variable_costs=6,
+            variable_costs=VAR_COST_EL_DEMAND,
         )
     },
 )
@@ -138,29 +158,29 @@ el_demand = Sink(
 
 # Add Shortages
 el_shortage = Source(
-    label="electricity-shortage", outputs={el_bus: Flow(variable_costs=1e9)}
+    label="electricity-shortage", outputs={el_bus: Flow(variable_costs=VAR_COST_EL_SHORTAGE)}
 )
-ch4_shortage = Source(label="ch4-shortage", outputs={ch4_bus: Flow(variable_costs=1e9)})
+ch4_shortage = Source(label="ch4-shortage", outputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_SHORTAGE)})
 
 # Add Excesses
 el_excess = Sink(
-    label="electricity-curtailment", inputs={el_bus: Flow(variable_costs=0.0001)}
+    label="electricity-curtailment", inputs={el_bus: Flow(variable_costs=VAR_COST_EL_EXCESS)}
 )
-ch4_excess = Sink(label="ch4-excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
+ch4_excess = Sink(label="ch4-excess", inputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_EXCESS)})
 
 # Add Transformers
 ch4_power_plant = Transformer(
     label="ch4-gt",
-    inputs={ch4_bus: Flow(nominal_value=CAP_CH4, variable_costs=7)},
+    inputs={ch4_bus: Flow(nominal_value=CAP_CH4, variable_costs=VAR_COST_CH4_PP_INPUT)},
     outputs={el_bus: Flow()},
-    conversion_factors={ch4_bus: 0.45},
+    conversion_factors={ch4_bus: EFF_CH4_PP},
 )
 
 electrolyzer = Transformer(
     label="electricity-electrolyzer",
-    inputs={el_bus: Flow(variable_costs=6)},
+    inputs={el_bus: Flow(variable_costs=VAR_COST_ELY_INPUT)},
     outputs={h2_bus: Flow(nominal_value=DEMAND_H2)},
-    conversion_factors={h2_bus: 0.73},
+    conversion_factors={h2_bus: EFF_ELY},
 )
 
 m_reactor = MethanisationReactor(
@@ -175,7 +195,7 @@ m_reactor = MethanisationReactor(
     efficiency_charge=1,
     efficiency_discharge=1,
     methanisation_rate=METHANATION_RATE,  # TODO: Passing lists does not work here yet.
-    efficiency_methanisation=0.93,
+    efficiency_methanisation=EFF_METHANATION,
 )
 
 es.add(
