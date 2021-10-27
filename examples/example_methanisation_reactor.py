@@ -128,8 +128,6 @@ pv_source = Source(
     },
 )
 
-co2_import = Source(label="co2_import", outputs={co2_bus: Flow()})
-
 # Add Sinks
 el_demand = Sink(
     label="electricity-demand",
@@ -204,7 +202,6 @@ es.add(
     el_bus,
     wind_source,
     pv_source,
-    co2_import,
     el_demand,
     el_shortage,
     ch4_shortage,
