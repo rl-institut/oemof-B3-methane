@@ -22,11 +22,11 @@ steps = 240  # time steps of simulation
 
 # Demands
 DEMAND_EL = 100000  # Electricity demand
-DEMAND_H2 = 8
 
 # Capacities
 CAP_WIND = 0  # Installed capacity wind
 CAP_PV = 0  # Installed capacity PV
+CAP_ELY = 8
 CAP_CH4 = 20  # CH4 Power plant
 CAP_CHARGE_M_REAC = 2.8
 CAP_DISCHARGE_M_REAC = 7.7
@@ -178,7 +178,7 @@ ch4_power_plant = Transformer(
 electrolyzer = Transformer(
     label="electricity-electrolyzer",
     inputs={el_bus: Flow(variable_costs=VAR_COST_ELY_INPUT)},
-    outputs={h2_bus: Flow(nominal_value=DEMAND_H2)},
+    outputs={h2_bus: Flow(nominal_value=CAP_ELY)},
     conversion_factors={h2_bus: EFF_ELY},
 )
 
