@@ -4,16 +4,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from oemof.outputlib.processing import convert_keys_to_strings
-from oemof.solph import (Bus, EnergySystem, Flow, Model, Sink, Source,
-                         Transformer)
+from oemof.solph import Bus, EnergySystem, Flow, Model, Sink, Source, Transformer
 from oemof.tabular.tools import postprocessing as postpro
 from oemoflex.tools import plots
 
 from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.facades import MethanisationReactor
-from oemof_b3.tools.data_processing import (filter_df, load_b3_scalars,
-                                            load_b3_timeseries,
-                                            unstack_timeseries)
+from oemof_b3.tools.data_processing import (
+    filter_df,
+    load_b3_scalars,
+    load_b3_timeseries,
+    unstack_timeseries,
+)
 
 # Constants
 year = 2018
@@ -40,15 +42,15 @@ VAR_COST_PV = 0.001
 VAR_COST_EL_DEMAND = 0.001
 VAR_COST_EL_SHORTAGE = 1e9
 VAR_COST_CH4_SHORTAGE = 40
-VAR_COST_EL_EXCESS=0
-VAR_COST_CH4_EXCESS=0
-VAR_COST_CH4_PP_INPUT=0
-VAR_COST_ELY_INPUT=0
+VAR_COST_EL_EXCESS = 0
+VAR_COST_CH4_EXCESS = 0
+VAR_COST_CH4_PP_INPUT = 0
+VAR_COST_ELY_INPUT = 0
 
 # Efficiencies
-EFF_CH4_PP=0.45
-EFF_ELY=0.73
-EFF_METHANATION=0.93
+EFF_CH4_PP = 0.45
+EFF_ELY = 0.73
+EFF_METHANATION = 0.93
 
 
 # TODO: Only to sample time series - To be deleted after:
@@ -157,15 +159,21 @@ el_demand = Sink(
 
 # Add Shortages
 el_shortage = Source(
-    label="electricity-shortage", outputs={el_bus: Flow(variable_costs=VAR_COST_EL_SHORTAGE)}
+    label="electricity-shortage",
+    outputs={el_bus: Flow(variable_costs=VAR_COST_EL_SHORTAGE)},
 )
-ch4_shortage = Source(label="ch4-shortage", outputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_SHORTAGE)})
+ch4_shortage = Source(
+    label="ch4-shortage", outputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_SHORTAGE)}
+)
 
 # Add Excesses
 el_excess = Sink(
-    label="electricity-curtailment", inputs={el_bus: Flow(variable_costs=VAR_COST_EL_EXCESS)}
+    label="electricity-curtailment",
+    inputs={el_bus: Flow(variable_costs=VAR_COST_EL_EXCESS)},
 )
-ch4_excess = Sink(label="ch4-excess", inputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_EXCESS)})
+ch4_excess = Sink(
+    label="ch4-excess", inputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_EXCESS)}
+)
 
 # Add Transformers
 ch4_power_plant = Transformer(
