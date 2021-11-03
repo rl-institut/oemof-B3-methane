@@ -336,15 +336,20 @@ fig.tight_layout()
 plt.savefig(f"example_methanisation_reactor_option_{METHANATION_OPTION}.png")
 
 # Get scalar results
-results_scalars = pd.DataFrame()
-bus_name = ["electricity", "ch4", "h2", "co2"]
-for bus in bus_name:
-    df_result = bus_sequences[bus]
-    df_result.to_csv("test.csv")
-    df_result = pd.read_csv("test.csv", header=[0, 1, 2], index_col=0)
-    df_result_columns = df_result.columns
-    for column in df_result_columns:
-        result = np.sum(df_result[column])
-        results_scalars[column] = [result]
+select_scalars = [
+    ('electricity-electrolyzer', 'h2'),
+    ('m_reactor-storage_products', 'ch4'),
+    ('electricity', 'electricity-curtailment'),
+    ('electricity-shortage', 'electricity'),
+    ('ch4-gt', 'electricity'),
+]
 
-results_scalars.to_csv("test_1.csv")
+summed_sequences = sequences.sum().round(2)
+
+summed_sequences.index.names = ["from", "to"]
+
+summed_sequences.name = "annual_sum"
+
+sums_of_interest = summed_sequences.loc[select_scalars]
+
+sums_of_interest.to_csv(f"sums_of_interest_{METHANATION_OPTION}.csv", header=True)
