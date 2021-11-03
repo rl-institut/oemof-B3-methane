@@ -32,9 +32,10 @@ CAP_ELY = 8
 CAP_CH4 = 20  # CH4 Power plant
 CAP_CHARGE_M_REAC = 2.8
 CAP_DISCHARGE_M_REAC = 7.7
-METHANATION_RATE = 4.7
+METHANATION_RATE = 4
 
-METHANATION_OPTION = 0
+METHANATION_OPTION = 4
+TS_TEST = False
 
 # Costs
 VAR_COST_WIND = 0.001
@@ -51,13 +52,6 @@ VAR_COST_ELY_INPUT = 0
 EFF_CH4_PP = 0.45
 EFF_ELY = 0.73
 EFF_METHANATION = 0.93
-
-
-# TODO: Only to sample time series - To be deleted after:
-ts_test = []
-for time_steps in np.arange(0, steps):
-    ts_test.append(np.random.choice(np.arange(0.01, 0.8, 0.01)))
-
 
 # Set paths
 path_file = os.path.abspath(__file__)
@@ -81,17 +75,29 @@ ts_region_filtered = filter_df(stacked_ts, "region", [region, "All"])
 
 # Get wind profile
 ts_region_wind_filtered = filter_df(ts_region_filtered, "var_name", "wind-profile")
-ts_wind = unstack_timeseries(ts_region_wind_filtered)
+ts_wind = unstack_timeseries(ts_region_wind_filtered)["wind-profile"]
 
 # Get pv profile
 ts_region_pv_filtered = filter_df(ts_region_filtered, "var_name", "pv-profile")
-ts_pv = unstack_timeseries(ts_region_pv_filtered)
+ts_pv = unstack_timeseries(ts_region_pv_filtered)["pv-profile"]
 
 # Get electricity demand
 el_demand_norm = np.divide(
     el_demand["Actual Total Load [MW] - CTA|DE(50Hertz)"],
     sum(el_demand["Actual Total Load [MW] - CTA|DE(50Hertz)"]),
 )
+
+# TODO: Only to sample time series - To be deleted after:
+if TS_TEST:
+    assert steps >= 240
+    ts_wind = np.zeros(steps)
+    ts_pv = np.zeros(steps)
+    el_demand = np.zeros(steps)
+
+    ts_wind[24:72] = 0.4
+    el_demand[180:220] = 0.1
+
+    el_demand_norm = el_demand / sum(el_demand)
 
 # Make time index
 timeindex = pd.date_range(str(year) + "-01-01", periods=steps, freq="H")
@@ -113,7 +119,7 @@ wind_source = Source(
     outputs={
         el_bus: Flow(
             fixed=True,
-            actual_value=ts_wind["wind-profile"][0:steps],
+            actual_value=ts_wind[0:steps],
             nominal_value=CAP_WIND,
             variable_costs=VAR_COST_WIND,
         )
@@ -125,7 +131,7 @@ pv_source = Source(
     outputs={
         el_bus: Flow(
             fixed=True,
-            actual_value=ts_pv["pv-profile"][0:steps],
+            actual_value=ts_pv[0:steps],
             nominal_value=CAP_PV,
             variable_costs=VAR_COST_PV,
         )
