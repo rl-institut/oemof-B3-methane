@@ -320,3 +320,17 @@ ax3.axes.get_xaxis().set_visible(False)
 fig.tight_layout()
 
 plt.savefig(f"example_methanisation_reactor_option_{METHANATION_OPTION}.png")
+
+# Get scalar results
+results_scalars = pd.DataFrame()
+bus_name = ["electricity", "ch4", "h2", "co2"]
+for bus in bus_name:
+    df_result = bus_sequences[bus]
+    df_result.to_csv("test.csv")
+    df_result = pd.read_csv("test.csv", header=[0, 1, 2], index_col=0)
+    df_result_columns = df_result.columns
+    for column in df_result_columns:
+        result = np.sum(df_result[column])
+        results_scalars[column] = [result]
+
+results_scalars.to_csv("test_1.csv")
