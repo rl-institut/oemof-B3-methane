@@ -101,6 +101,7 @@ class MethanisationReactor(Transformer, Facade):
             label=self.label + "-storage_educts",
             inflow_conversion_factor=self.efficiency_charging,
             nominal_storage_capacity=1000,
+            loss_rate=0.001,
         )
 
         combine_educts = Transformer(
@@ -170,7 +171,16 @@ class MethanisationReactor(Transformer, Facade):
                     negative_gradient={"ub": 0.01, "costs": 0},
                 )
         }
-        # 5. Methanation rate depends on available educts but is constrained by active
+        # 5. Methanation rate can be optimized
+        # and has constraints on ramping up and down
+        methanisation_implementation[5] = {
+                storage_products: Flow(
+                    nominal_value=self.methanisation_rate,
+                    positive_gradient={"ub": 0.01, "costs": 0},
+                    negative_gradient={"ub": 0.05, "costs": 0},
+                )
+        }
+        # 6. Methanation rate depends on available educts but is constrained by active
         # reactor volume.
         # TODO: Linear dependency on storage level (via extra constraint?)
 
