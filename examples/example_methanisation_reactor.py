@@ -32,9 +32,9 @@ CAP_ELY = 8
 CAP_CH4 = 20  # CH4 Power plant
 CAP_CHARGE_M_REAC = 2.8
 CAP_DISCHARGE_M_REAC = 7.7
-METHANATION_RATE = 4
+METHANATION_RATE = 2
 
-METHANATION_OPTION = 4
+METHANATION_OPTION = 1
 TS_TEST = False
 
 # Costs
@@ -353,3 +353,15 @@ summed_sequences.name = "annual_sum"
 sums_of_interest = summed_sequences.loc[select_scalars]
 
 sums_of_interest.to_csv(f"sums_of_interest_{METHANATION_OPTION}.csv", header=True)
+
+# join scalar results
+files = os.listdir(os.path.dirname(path_file))
+
+files_sum = sorted([f for f in files if "sums_of_interest" in f])
+all_sums = pd.DataFrame()
+for f in files_sum:
+    df = pd.read_csv(f, header=0, index_col=[0, 1])
+    df.columns = [f.split('.')[0]]
+    all_sums = pd.concat([all_sums, df], 1)
+
+print(all_sums)
