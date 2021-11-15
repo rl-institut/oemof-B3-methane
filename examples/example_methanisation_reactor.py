@@ -17,9 +17,9 @@ from oemof_b3.tools.data_processing import (
 from oemoflex.tools import plots
 
 # Constants
-year = 2018
-region = "BE"
-steps = 240  # time steps of simulation
+YEAR = 2018
+REGION = "BE"
+STEPS = 240  # time steps of simulation
 
 # Demands
 DEMAND_EL = 100000  # Electricity demand
@@ -64,13 +64,13 @@ schema_path = os.path.abspath(
 
 # Read scalars
 sc = load_b3_scalars(os.path.join(raw_path, "scalars.csv"))
-sc_region_filtered = filter_df(sc, "region", [region, "All"])
+sc_region_filtered = filter_df(sc, "region", [REGION, "All"])
 
 # Read time series
 stacked_ts = load_b3_timeseries(os.path.join(raw_path, "feedin_time_series.csv"))
 el_demand = pd.read_csv(os.path.join(raw_path, "2015_entsoe_50Hz_h.csv"))
 
-ts_region_filtered = filter_df(stacked_ts, "region", [region, "All"])
+ts_region_filtered = filter_df(stacked_ts, "region", [REGION, "All"])
 
 # Get wind profile
 ts_region_wind_filtered = filter_df(ts_region_filtered, "var_name", "wind-profile")
@@ -88,10 +88,10 @@ el_demand_norm = np.divide(
 
 # TODO: Only to sample time series - To be deleted after:
 if TS_TEST:
-    assert steps >= 240
-    ts_wind = np.zeros(steps)
-    ts_pv = np.zeros(steps)
-    el_demand = np.zeros(steps)
+    assert STEPS >= 240
+    ts_wind = np.zeros(STEPS)
+    ts_pv = np.zeros(STEPS)
+    el_demand = np.zeros(STEPS)
 
     ts_wind[24:72] = 0.4
     el_demand[180:220] = 0.1
@@ -99,7 +99,7 @@ if TS_TEST:
     el_demand_norm = el_demand / sum(el_demand)
 
 # Make time index
-timeindex = pd.date_range(str(year) + "-01-01", periods=steps, freq="H")
+timeindex = pd.date_range(str(YEAR) + "-01-01", periods=STEPS, freq="H")
 
 # Add energy system
 es = EnergySystem(timeindex=timeindex)
@@ -118,7 +118,7 @@ wind_source = Source(
     outputs={
         el_bus: Flow(
             fixed=True,
-            actual_value=ts_wind[0:steps],
+            actual_value=ts_wind[0:STEPS],
             nominal_value=CAP_WIND,
             variable_costs=VAR_COST_WIND,
         )
@@ -130,7 +130,7 @@ pv_source = Source(
     outputs={
         el_bus: Flow(
             fixed=True,
-            actual_value=ts_pv[0:steps],
+            actual_value=ts_pv[0:STEPS],
             nominal_value=CAP_PV,
             variable_costs=VAR_COST_PV,
         )
@@ -143,7 +143,7 @@ el_demand = Sink(
     inputs={
         el_bus: Flow(
             fixed=True,
-            actual_value=el_demand_norm[0:steps],
+            actual_value=el_demand_norm[0:STEPS],
             nominal_value=DEMAND_EL,
             variable_costs=VAR_COST_EL_DEMAND,
         )
