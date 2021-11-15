@@ -6,8 +6,6 @@ import pandas as pd
 from oemof.outputlib.processing import convert_keys_to_strings
 from oemof.solph import Bus, EnergySystem, Flow, Model, Sink, Source, Transformer
 from oemof.tabular.tools import postprocessing as postpro
-from oemoflex.tools import plots
-
 from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.facades import MethanisationReactor
 from oemof_b3.tools.data_processing import (
@@ -16,6 +14,7 @@ from oemof_b3.tools.data_processing import (
     load_b3_timeseries,
     unstack_timeseries,
 )
+from oemoflex.tools import plots
 
 # Constants
 year = 2018
@@ -337,11 +336,11 @@ plt.savefig(f"example_methanisation_reactor_option_{METHANATION_OPTION}.png")
 
 # Get scalar results
 select_scalars = [
-    ('electricity-electrolyzer', 'h2'),
-    ('m_reactor-storage_products', 'ch4'),
-    ('electricity', 'electricity-curtailment'),
-    ('electricity-shortage', 'electricity'),
-    ('ch4-gt', 'electricity'),
+    ("electricity-electrolyzer", "h2"),
+    ("m_reactor-storage_products", "ch4"),
+    ("electricity", "electricity-curtailment"),
+    ("electricity-shortage", "electricity"),
+    ("ch4-gt", "electricity"),
 ]
 
 summed_sequences = sequences.sum().round(2)
@@ -361,7 +360,7 @@ files_sum = sorted([f for f in files if "sums_of_interest" in f])
 all_sums = pd.DataFrame()
 for f in files_sum:
     df = pd.read_csv(f, header=0, index_col=[0, 1])
-    df.columns = [f.split('.')[0]]
+    df.columns = [f.split(".")[0]]
     all_sums = pd.concat([all_sums, df], 1)
 
 print(all_sums)
