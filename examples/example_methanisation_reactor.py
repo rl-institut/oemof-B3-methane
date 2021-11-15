@@ -81,7 +81,7 @@ el_demand_norm = np.divide(
     sum(el_demand["Actual Total Load [MW] - CTA|DE(50Hertz)"]),
 )
 
-# TODO: Only to sample time series - To be deleted after:
+# Define test timeseries
 if TS_TEST:
     assert STEPS >= 240
     ts_wind = np.zeros(STEPS)
