@@ -10,7 +10,6 @@ from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.facades import MethanisationReactor
 from oemof_b3.tools.data_processing import (
     filter_df,
-    load_b3_scalars,
     load_b3_timeseries,
     unstack_timeseries,
 )
@@ -62,10 +61,6 @@ schema_path = os.path.abspath(
     os.path.join(path_file, os.pardir, os.pardir, "oemof_b3", "schema")
 )
 
-# Read scalars
-sc = load_b3_scalars(os.path.join(raw_path, "scalars.csv"))
-sc_region_filtered = filter_df(sc, "region", [REGION, "All"])
-
 # Read time series
 stacked_ts = load_b3_timeseries(os.path.join(raw_path, "feedin_time_series.csv"))
 el_demand = pd.read_csv(os.path.join(raw_path, "2015_entsoe_50Hz_h.csv"))
@@ -109,8 +104,6 @@ h2_bus = Bus(label="h2")
 co2_bus = Bus(label="co2", balanced=False)
 ch4_bus = Bus(label="ch4")
 el_bus = Bus(label="electricity")
-# heat_cen_bus = Bus(label="heat_central")
-# heat_dec_bus = Bus(label="heat_decentral")
 
 # Add Sources
 wind_source = Source(
@@ -149,18 +142,6 @@ el_demand = Sink(
         )
     },
 )
-
-# ch4_demand = Sink(
-#     label="ch4_demand",
-#     inputs={
-#         ch4_bus: Flow(
-#             fixed=True,
-#             actual_valueed=True,
-#             nominal_value=100,
-#             actual_value=[0.1, 0.2, 0.1],
-#         )
-#     },
-# )
 
 # Add Shortages
 el_shortage = Source(
