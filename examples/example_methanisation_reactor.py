@@ -93,255 +93,280 @@ if TS_TEST:
 
     el_demand_norm = el_demand / sum(el_demand)
 
-# Make time index
-timeindex = pd.date_range(str(YEAR) + "-01-01", periods=STEPS, freq="H")
 
-# Add energy system
-es = EnergySystem(timeindex=timeindex)
+def run_model():
+    # Make time index
+    timeindex = pd.date_range(str(YEAR) + "-01-01", periods=STEPS, freq="H")
 
-# Add busses
-h2_bus = Bus(label="h2")
-co2_bus = Bus(label="co2", balanced=False)
-ch4_bus = Bus(label="ch4")
-el_bus = Bus(label="electricity")
+    # Add energy system
+    es = EnergySystem(timeindex=timeindex)
 
-# Add Sources
-wind_source = Source(
-    label="wind-onshore",
-    outputs={
-        el_bus: Flow(
-            fixed=True,
-            actual_value=ts_wind[0:STEPS],
-            nominal_value=CAP_WIND,
-            variable_costs=VAR_COST_WIND,
-        )
-    },
-)
+    # Add busses
+    h2_bus = Bus(label="h2")
+    co2_bus = Bus(label="co2", balanced=False)
+    ch4_bus = Bus(label="ch4")
+    el_bus = Bus(label="electricity")
 
-pv_source = Source(
-    label="solar-pv",
-    outputs={
-        el_bus: Flow(
-            fixed=True,
-            actual_value=ts_pv[0:STEPS],
-            nominal_value=CAP_PV,
-            variable_costs=VAR_COST_PV,
-        )
-    },
-)
-
-# Add Sinks
-el_demand = Sink(
-    label="electricity-demand",
-    inputs={
-        el_bus: Flow(
-            fixed=True,
-            actual_value=el_demand_norm[0:STEPS],
-            nominal_value=DEMAND_EL,
-            variable_costs=VAR_COST_EL_DEMAND,
-        )
-    },
-)
-
-# Add Shortages
-el_shortage = Source(
-    label="electricity-shortage",
-    outputs={el_bus: Flow(variable_costs=VAR_COST_EL_SHORTAGE)},
-)
-ch4_shortage = Source(
-    label="ch4-shortage", outputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_SHORTAGE)}
-)
-
-# Add Excesses
-el_excess = Sink(
-    label="electricity-curtailment",
-    inputs={el_bus: Flow(variable_costs=VAR_COST_EL_EXCESS)},
-)
-ch4_excess = Sink(
-    label="ch4-excess", inputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_EXCESS)}
-)
-
-# Add Transformers
-ch4_power_plant = Transformer(
-    label="ch4-gt",
-    inputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_PP_INPUT)},
-    outputs={el_bus: Flow(nominal_value=CAP_CH4)},
-    conversion_factors={el_bus: EFF_CH4_PP},
-)
-
-electrolyzer = Transformer(
-    label="electricity-electrolyzer",
-    inputs={el_bus: Flow(variable_costs=VAR_COST_ELY_INPUT)},
-    outputs={h2_bus: Flow(nominal_value=CAP_ELY)},
-    conversion_factors={h2_bus: EFF_ELY},
-)
-
-m_reactor = MethanisationReactor(
-    label="m_reactor",
-    carrier="h2_co2",
-    tech="methanisation_reactor",
-    h2_bus=h2_bus,
-    co2_bus=co2_bus,
-    ch4_bus=ch4_bus,
-    capacity_charge=CAP_CHARGE_M_REAC,
-    capacity_discharge=CAP_DISCHARGE_M_REAC,
-    efficiency_charge=1,
-    efficiency_discharge=1,
-    methanisation_rate=METHANATION_RATE,  # TODO: Passing lists does not work here yet.
-    efficiency_methanisation=EFF_METHANATION,
-    methanisation_option=METHANATION_OPTION,
-)
-
-es.add(
-    h2_bus,
-    co2_bus,
-    ch4_bus,
-    el_bus,
-    wind_source,
-    pv_source,
-    el_demand,
-    el_shortage,
-    ch4_shortage,
-    el_excess,
-    ch4_excess,
-    # ch4_demand,
-    ch4_power_plant,
-    electrolyzer,
-    m_reactor,
-)
-
-m = Model(es)
-
-lp_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "lp-file.lp")
-m.write(lp_file_path, io_options={"symbolic_solver_labels": True})
-
-m.solve()
-
-results = m.results()
-
-str_results = convert_keys_to_strings(results)
-seq_dict = {k: v["sequences"] for k, v in str_results.items() if "sequences" in v}
-sequences = pd.concat(seq_dict.values(), 1)
-
-# drop status variable of integer variable if present
-if "status" in sequences.columns:
-    sequences.drop("status", axis=1, inplace=True)
-
-sequences.columns = seq_dict.keys()
-
-bus_sequences = postpro.bus_results(es, results, select="sequences", concat=False)
-
-bus_name = ["electricity", "ch4"]
-
-fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
-fig.set_size_inches(12, 8, forward=True)
-fig.subplots_adjust(hspace=0.5)
-
-for bus in bus_name:
-    df = bus_sequences[bus]
-
-    # labels to strings
-    df.to_csv("test.csv")
-    df = pd.read_csv("test.csv", header=[0, 1, 2], index_col=0)
-
-    if bus == "electricity":
-        ax = ax1
-    if bus == "ch4":
-        df.loc[:, ("ch4", "ch4-demand", "flow")] = 0
-        ax = ax2
-
-    df, df_demand = plots.prepare_dispatch_data(
-        df,
-        bus_name=bus,
-        demand_name="demand",
-        labels_dict=labels_dict,
+    # Add Sources
+    wind_source = Source(
+        label="wind-onshore",
+        outputs={
+            el_bus: Flow(
+                fixed=True,
+                actual_value=ts_wind[0:STEPS],
+                nominal_value=CAP_WIND,
+                variable_costs=VAR_COST_WIND,
+            )
+        },
     )
 
-    plots.plot_dispatch(
-        ax=ax,
-        df=df,
-        df_demand=df_demand,
-        unit="MW",
-        colors_odict=colors_odict,
+    pv_source = Source(
+        label="solar-pv",
+        outputs={
+            el_bus: Flow(
+                fixed=True,
+                actual_value=ts_pv[0:STEPS],
+                nominal_value=CAP_PV,
+                variable_costs=VAR_COST_PV,
+            )
+        },
     )
 
-    for tick in ax.get_xticklabels():
-        tick.set_rotation(45)
+    # Add Sinks
+    el_demand = Sink(
+        label="electricity-demand",
+        inputs={
+            el_bus: Flow(
+                fixed=True,
+                actual_value=el_demand_norm[0:STEPS],
+                nominal_value=DEMAND_EL,
+                variable_costs=VAR_COST_EL_DEMAND,
+            )
+        },
+    )
+
+    # Add Shortages
+    el_shortage = Source(
+        label="electricity-shortage",
+        outputs={el_bus: Flow(variable_costs=VAR_COST_EL_SHORTAGE)},
+    )
+    ch4_shortage = Source(
+        label="ch4-shortage",
+        outputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_SHORTAGE)},
+    )
+
+    # Add Excesses
+    el_excess = Sink(
+        label="electricity-curtailment",
+        inputs={el_bus: Flow(variable_costs=VAR_COST_EL_EXCESS)},
+    )
+    ch4_excess = Sink(
+        label="ch4-excess", inputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_EXCESS)}
+    )
+
+    # Add Transformers
+    ch4_power_plant = Transformer(
+        label="ch4-gt",
+        inputs={ch4_bus: Flow(variable_costs=VAR_COST_CH4_PP_INPUT)},
+        outputs={el_bus: Flow(nominal_value=CAP_CH4)},
+        conversion_factors={el_bus: EFF_CH4_PP},
+    )
+
+    electrolyzer = Transformer(
+        label="electricity-electrolyzer",
+        inputs={el_bus: Flow(variable_costs=VAR_COST_ELY_INPUT)},
+        outputs={h2_bus: Flow(nominal_value=CAP_ELY)},
+        conversion_factors={h2_bus: EFF_ELY},
+    )
+
+    m_reactor = MethanisationReactor(
+        label="m_reactor",
+        carrier="h2_co2",
+        tech="methanisation_reactor",
+        h2_bus=h2_bus,
+        co2_bus=co2_bus,
+        ch4_bus=ch4_bus,
+        capacity_charge=CAP_CHARGE_M_REAC,
+        capacity_discharge=CAP_DISCHARGE_M_REAC,
+        efficiency_charge=1,
+        efficiency_discharge=1,
+        methanisation_rate=METHANATION_RATE,  # TODO: Passing lists does not work here yet.
+        efficiency_methanisation=EFF_METHANATION,
+        methanisation_option=METHANATION_OPTION,
+    )
+
+    es.add(
+        h2_bus,
+        co2_bus,
+        ch4_bus,
+        el_bus,
+        wind_source,
+        pv_source,
+        el_demand,
+        el_shortage,
+        ch4_shortage,
+        el_excess,
+        ch4_excess,
+        ch4_power_plant,
+        electrolyzer,
+        m_reactor,
+    )
+
+    m = Model(es)
+
+    lp_file_path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)), "lp-file.lp"
+    )
+    m.write(lp_file_path, io_options={"symbolic_solver_labels": True})
+
+    m.solve()
+
+    es.results = m.results()
+
+    return es
 
 
-ax3.plot(
-    sequences[("m_reactor-storage_products", "None")],
-    c="r",
-    label="Storage Level Products",
-)
-ax3.plot(
-    sequences[("m_reactor-storage_educts", "None")], c="b", label="Storage Level Educts"
-)
+def postprocess(es):
+    results = es.results
 
-methanation = sequences[("m_reactor", "m_reactor-storage_products")]
-ax4.fill_between(
-    methanation.index,
-    0,
-    methanation,
-    label="Methanation",
-    color=colors_odict["Methanation"],
-)
+    str_results = convert_keys_to_strings(results)
+    seq_dict = {k: v["sequences"] for k, v in str_results.items() if "sequences" in v}
+    sequences = pd.concat(seq_dict.values(), 1)
 
-h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
-handles = [item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist]
-labels = [item for sublist in list(map(lambda x: x[1], h_l)) for item in sublist]
+    # drop status variable of integer variable if present
+    if "status" in sequences.columns:
+        sequences.drop("status", axis=1, inplace=True)
 
-ax4.legend(
-    handles=handles,
-    labels=labels,
-    loc="upper center",
-    bbox_to_anchor=(0.5, -0.5),
-    fancybox=True,
-    ncol=4,
-    fontsize=14,
-)
+    sequences.columns = seq_dict.keys()
 
-ax1.set_ylabel("Power")
-ax2.set_ylabel("Power")
-ax3.set_ylabel("Storage level / MWh")
-ax4.set_ylabel("Power / MW")
-ax4.set_xlabel("Time")
+    bus_sequences = postpro.bus_results(es, results, select="sequences", concat=False)
 
-ax1.axes.get_xaxis().set_visible(False)
-ax2.axes.get_xaxis().set_visible(False)
-ax3.axes.get_xaxis().set_visible(False)
+    return sequences, bus_sequences
 
-fig.tight_layout()
 
-plt.savefig(f"example_methanisation_reactor_option_{METHANATION_OPTION}.png")
+def plot_dispatch(bus_sequences):
 
-# Get scalar results
-select_scalars = [
-    ("electricity-electrolyzer", "h2"),
-    ("m_reactor-storage_products", "ch4"),
-    ("electricity", "electricity-curtailment"),
-    ("electricity-shortage", "electricity"),
-    ("ch4-gt", "electricity"),
-]
+    bus_name = ["electricity", "ch4"]
 
-summed_sequences = sequences.sum().round(2)
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
+    fig.set_size_inches(12, 8, forward=True)
+    fig.subplots_adjust(hspace=0.5)
 
-summed_sequences.index.names = ["from", "to"]
+    for bus in bus_name:
+        df = bus_sequences[bus]
 
-summed_sequences.name = "annual_sum"
+        # labels to strings
+        df.to_csv("test.csv")
+        df = pd.read_csv("test.csv", header=[0, 1, 2], index_col=0)
 
-sums_of_interest = summed_sequences.loc[select_scalars]
+        if bus == "electricity":
+            ax = ax1
+        if bus == "ch4":
+            df.loc[:, ("ch4", "ch4-demand", "flow")] = 0
+            ax = ax2
 
-sums_of_interest.to_csv(f"sums_of_interest_{METHANATION_OPTION}.csv", header=True)
+        df, df_demand = plots.prepare_dispatch_data(
+            df,
+            bus_name=bus,
+            demand_name="demand",
+            labels_dict=labels_dict,
+        )
 
-# join scalar results
-files = os.listdir(os.path.dirname(path_file))
+        plots.plot_dispatch(
+            ax=ax,
+            df=df,
+            df_demand=df_demand,
+            unit="MW",
+            colors_odict=colors_odict,
+        )
 
-files_sum = sorted([f for f in files if "sums_of_interest" in f])
-all_sums = pd.DataFrame()
-for f in files_sum:
-    df = pd.read_csv(f, header=0, index_col=[0, 1])
-    df.columns = [f.split(".")[0]]
-    all_sums = pd.concat([all_sums, df], 1)
+        for tick in ax.get_xticklabels():
+            tick.set_rotation(45)
 
-print(all_sums)
+    ax3.plot(
+        sequences[("m_reactor-storage_products", "None")],
+        c="r",
+        label="Storage Level Products",
+    )
+    ax3.plot(
+        sequences[("m_reactor-storage_educts", "None")],
+        c="b",
+        label="Storage Level Educts",
+    )
+
+    methanation = sequences[("m_reactor", "m_reactor-storage_products")]
+    ax4.fill_between(
+        methanation.index,
+        0,
+        methanation,
+        label="Methanation",
+        color=colors_odict["Methanation"],
+    )
+
+    h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
+    handles = [item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist]
+    labels = [item for sublist in list(map(lambda x: x[1], h_l)) for item in sublist]
+
+    ax4.legend(
+        handles=handles,
+        labels=labels,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.5),
+        fancybox=True,
+        ncol=4,
+        fontsize=14,
+    )
+
+    ax1.set_ylabel("Power")
+    ax2.set_ylabel("Power")
+    ax3.set_ylabel("Storage level / MWh")
+    ax4.set_ylabel("Power / MW")
+    ax4.set_xlabel("Time")
+
+    ax1.axes.get_xaxis().set_visible(False)
+    ax2.axes.get_xaxis().set_visible(False)
+    ax3.axes.get_xaxis().set_visible(False)
+
+    fig.tight_layout()
+
+    plt.savefig(f"example_methanisation_reactor_option_{METHANATION_OPTION}.png")
+
+
+def get_scalar_results(sequences):
+    # Get scalar results
+    select_scalars = [
+        ("electricity-electrolyzer", "h2"),
+        ("m_reactor-storage_products", "ch4"),
+        ("electricity", "electricity-curtailment"),
+        ("electricity-shortage", "electricity"),
+        ("ch4-gt", "electricity"),
+    ]
+
+    summed_sequences = sequences.sum().round(2)
+
+    summed_sequences.index.names = ["from", "to"]
+
+    summed_sequences.name = "annual_sum"
+
+    sums_of_interest = summed_sequences.loc[select_scalars]
+
+    sums_of_interest.to_csv(f"sums_of_interest_{METHANATION_OPTION}.csv", header=True)
+
+    # join scalar results
+    files = os.listdir(os.path.dirname(path_file))
+
+    files_sum = sorted([f for f in files if "sums_of_interest" in f])
+    all_sums = pd.DataFrame()
+    for f in files_sum:
+        df = pd.read_csv(f, header=0, index_col=[0, 1])
+        df.columns = [f.split(".")[0]]
+        all_sums = pd.concat([all_sums, df], 1)
+
+    print(all_sums)
+
+
+if __name__ == "__main__":
+    es = run_model()
+    sequences, bus_sequences = postprocess(es)
+    plot_dispatch(bus_sequences)
+    get_scalar_results(sequences)
