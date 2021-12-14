@@ -9,7 +9,7 @@ from oemof.network import Node
 from oemof.tools import helpers
 import oemof.solph as solph
 
-from oemof_b3.facades import MethanisationReactor
+from oemof_b3.facades import MethanationReactor
 
 
 def chop_trailing_whitespace(lines):
@@ -107,7 +107,7 @@ class TestConstraints:
             with open(ref_filepath) as ref_file:
                 compare_lp_files(new_file, ref_file)
 
-    def test_methanisation_reactor(self):
+    def test_methanation_reactor(self):
 
         h2_bus = solph.Bus(label="h2_co2")
 
@@ -115,10 +115,10 @@ class TestConstraints:
 
         ch4_bus = solph.Bus(label="ch4")
 
-        m_reactor = MethanisationReactor(
+        m_reactor = MethanationReactor(
             label="m_reactor",
             carrier="h2_co2",
-            tech="methanisation_reactor",
+            tech="methanation_reactor",
             h2_bus=h2_bus,
             co2_bus=co2_bus,
             ch4_bus=ch4_bus,
@@ -126,8 +126,8 @@ class TestConstraints:
             capacity_discharge=50,
             efficiency_charge=1,
             efficiency_discharge=1,
-            methanisation_rate=5,  # TODO: Passing lists does not work here yet.
-            efficiency_methanisation=0.93,
+            methanation_rate=5,  # TODO: Passing lists does not work here yet.
+            efficiency_methanation=0.93,
         )
 
         self.compare_to_reference_lp("methanation_reactor.lp")
