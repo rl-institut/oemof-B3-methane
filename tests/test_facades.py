@@ -3,10 +3,10 @@ import os
 import pandas as pd
 from oemof.solph import Bus, EnergySystem, Flow, Model, Sink, Source
 
-from oemof_b3.facades import MethanisationReactor
+from oemof_b3.facades import MethanationReactor
 
 
-def test_methanisation_reactor():
+def test_methanation_reactor():
     timeindex = pd.date_range("2020-01-01", periods=3, freq="H")
 
     es = EnergySystem(timeindex=timeindex)
@@ -35,10 +35,10 @@ def test_methanisation_reactor():
 
     ch4_excess = Sink(label="ch4_excess", inputs={ch4_bus: Flow(variable_costs=0.0001)})
 
-    m_reactor = MethanisationReactor(
+    m_reactor = MethanationReactor(
         label="m_reactor",
         carrier="h2_co2",
-        tech="methanisation_reactor",
+        tech="methanation_reactor",
         h2_bus=h2_bus,
         co2_bus=co2_bus,
         ch4_bus=ch4_bus,
@@ -46,8 +46,8 @@ def test_methanisation_reactor():
         capacity_discharge=50,
         efficiency_charge=1,
         efficiency_discharge=1,
-        methanisation_rate=5,  # TODO: Passing lists does not work here yet.
-        efficiency_methanisation=0.93,
+        methanation_rate=5,  # TODO: Passing lists does not work here yet.
+        efficiency_methanation=0.93,
     )
 
     es.add(
@@ -79,4 +79,4 @@ def test_methanisation_reactor():
 
 
 if __name__ == "__main__":
-    test_methanisation_reactor()
+    test_methanation_reactor()

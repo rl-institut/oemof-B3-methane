@@ -7,7 +7,7 @@ from oemof.outputlib.processing import convert_keys_to_strings
 from oemof.solph import Bus, EnergySystem, Flow, Model, Sink, Source, Transformer
 from oemof.tabular.tools import postprocessing as postpro
 from oemof_b3 import colors_odict, labels_dict
-from oemof_b3.facades import MethanisationReactor
+from oemof_b3.facades import MethanationReactor
 from oemof_b3.tools.data_processing import (
     filter_df,
     load_b3_timeseries,
@@ -179,10 +179,10 @@ def run_model():
         conversion_factors={h2_bus: EFF_ELY},
     )
 
-    m_reactor = MethanisationReactor(
+    m_reactor = MethanationReactor(
         label="m_reactor",
         carrier="h2_co2",
-        tech="methanisation_reactor",
+        tech="methanation_reactor",
         h2_bus=h2_bus,
         co2_bus=co2_bus,
         ch4_bus=ch4_bus,
@@ -190,9 +190,9 @@ def run_model():
         capacity_discharge=CAP_DISCHARGE_M_REAC,
         efficiency_charge=1,
         efficiency_discharge=1,
-        methanisation_rate=METHANATION_RATE,  # TODO: Passing lists does not work here yet.
-        efficiency_methanisation=EFF_METHANATION,
-        methanisation_option=METHANATION_OPTION,
+        methanation_rate=METHANATION_RATE,  # TODO: Passing lists does not work here yet.
+        efficiency_methanation=EFF_METHANATION,
+        methanation_option=METHANATION_OPTION,
     )
 
     es.add(
@@ -339,7 +339,7 @@ def plot_dispatch(bus_sequences):
 
     fig.tight_layout()
 
-    plt.savefig(f"example_methanisation_reactor_option_{METHANATION_OPTION}.png")
+    plt.savefig(f"example_methanation_reactor_option_{METHANATION_OPTION}.png")
 
 
 def get_scalar_results(sequences):

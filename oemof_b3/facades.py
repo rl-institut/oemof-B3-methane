@@ -3,8 +3,8 @@ from oemof.solph.components import GenericStorage
 from oemoflex.facades import TYPEMAP, Facade
 
 
-class MethanisationReactor(Transformer, Facade):
-    r"""A methanisation reactor that transforms e.g. H2 and CO2 to CH4.
+class MethanationReactor(Transformer, Facade):
+    r"""A methanation reactor that transforms e.g. H2 and CO2 to CH4.
 
     Note that investment is currently not implemented for this facade.
 
@@ -19,17 +19,17 @@ class MethanisationReactor(Transformer, Facade):
 
     Examples
     --------
-    Basic usage example of the MethanisationReactor class with arbitrary values for the parameters.
+    Basic usage example of the MethanationReactor class with arbitrary values for the parameters.
 
     >>> from oemof import solph
     >>> from oemof_b3 import facades
     >>> bus_h2 = solph.Bus('h2')
     >>> bus_co2 = solph.Bus('hco2')
     >>> bus_ch4 = solph.Bus('ch4')
-    >>> m_reactor = MethanisationReactor(
+    >>> m_reactor = MethanationReactor(
     ...     name='m_reactor',
     ...     carrier='h2_co2',
-    ...     tech='methanisation_reactor',
+    ...     tech='methanation_reactor',
     ...     h2_bus=bus_h2,
     ...     c02_bus=bus_co2,
     ...     ch4_bus=bus_ch4,
@@ -46,8 +46,8 @@ class MethanisationReactor(Transformer, Facade):
     ...     # ? max_storage_level_a=[0.9, 0.95, 0.92],
     ...     # ? min_storage_level_b=[0.1, 0.2, 0.15],
     ...     # ? max_storage_level_b=[0.9, 0.95, 0.92],
-    ...     methanisation_rate=[0.3, 0.2, 0.5],
-    ...     efficiency_methanisation=0.93
+    ...     methanation_rate=[0.3, 0.2, 0.5],
+    ...     efficiency_methanation=0.93
     ...     )
     """
 
@@ -74,9 +74,9 @@ class MethanisationReactor(Transformer, Facade):
 
         self.efficiency_discharging = kwargs.get("efficiency_discharging", 1)
 
-        self.methanisation_rate = kwargs.get("methanisation_rate")
+        self.methanation_rate = kwargs.get("methanation_rate")
 
-        self.efficiency_methanisation = kwargs.get("efficiency_methanisation")
+        self.efficiency_methanation = kwargs.get("efficiency_methanation")
 
         self.marginal_cost = kwargs.get("marginal_cost", 0)
 
@@ -86,7 +86,7 @@ class MethanisationReactor(Transformer, Facade):
 
         self.expandable = bool(kwargs.get("expandable", False))
 
-        self.methanisation_option = kwargs.get("methanisation_option", 0)
+        self.methanation_option = kwargs.get("methanation_option", 0)
 
         self.build_solph_components()
 
@@ -137,34 +137,34 @@ class MethanisationReactor(Transformer, Facade):
 
         self.inputs.update({storage_educts: Flow()})
 
-        methanisation_implementation = {}
+        methanation_implementation = {}
         # 0. No constraints on methanation
-        methanisation_implementation[0] = {storage_products: Flow()}
+        methanation_implementation[0] = {storage_products: Flow()}
         # 1. Fixed methanation rate
-        methanisation_implementation[1] = {
+        methanation_implementation[1] = {
             storage_products: Flow(
                 fixed=True,
                 actual_value=sequence(1),
-                nominal_value=self.methanisation_rate,
+                nominal_value=self.methanation_rate,
             )
         }
         # 2. Methanation rate can be optimized
-        methanisation_implementation[2] = {
-            storage_products: Flow(nominal_value=self.methanisation_rate)
+        methanation_implementation[2] = {
+            storage_products: Flow(nominal_value=self.methanation_rate)
         }
         # 3. Methanation rate can be optimized and has a "minimum load".
-        methanisation_implementation[3] = {
+        methanation_implementation[3] = {
             storage_products: Flow(
-                nominal_value=self.methanisation_rate,
+                nominal_value=self.methanation_rate,
                 min=0.5,
                 nonconvex=NonConvex(),
             )
         }
         # 4. Methanation rate can be optimized,
         # has a "minimum load" and constraints on ramping up and down
-        methanisation_implementation[4] = {
+        methanation_implementation[4] = {
             storage_products: Flow(
-                nominal_value=self.methanisation_rate,
+                nominal_value=self.methanation_rate,
                 min=0.1,
                 positive_gradient={"ub": 0.01, "costs": 0},
                 negative_gradient={"ub": 0.01, "costs": 0},
@@ -172,9 +172,9 @@ class MethanisationReactor(Transformer, Facade):
         }
         # 5. Methanation rate can be optimized
         # and has constraints on ramping up and down
-        methanisation_implementation[5] = {
+        methanation_implementation[5] = {
             storage_products: Flow(
-                nominal_value=self.methanisation_rate,
+                nominal_value=self.methanation_rate,
                 positive_gradient={"ub": 0.01, "costs": 0},
                 negative_gradient={"ub": 0.05, "costs": 0},
             )
@@ -183,11 +183,11 @@ class MethanisationReactor(Transformer, Facade):
         # reactor volume.
         # TODO: Linear dependency on storage level (via extra constraint?)
 
-        self.outputs.update(methanisation_implementation[self.methanisation_option])
+        self.outputs.update(methanation_implementation[self.methanation_option])
 
         self.conversion_factors = {
             storage_educts: sequence(1),
-            storage_products: sequence(self.efficiency_methanisation),
+            storage_products: sequence(self.efficiency_methanation),
         }
 
         self.subnodes = (combine_educts, storage_educts, storage_products)
@@ -195,6 +195,6 @@ class MethanisationReactor(Transformer, Facade):
 
 TYPEMAP.update(
     {
-        "methanisation_reactor": MethanisationReactor,
+        "methanation_reactor": MethanationReactor,
     }
 )
