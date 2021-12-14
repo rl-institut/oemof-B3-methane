@@ -253,11 +253,21 @@ def plot_dispatch(bus_sequences):
     fig.subplots_adjust(hspace=0.5)
 
     for bus in bus_name:
-        df = bus_sequences[bus]
+        # Get raw Dataframe with bus data
+        bus_sequences_dict = convert_keys_to_strings(bus_sequences)
+        df_raw = bus_sequences_dict[bus]
 
-        # labels to strings
-        df.to_csv("test.csv")
-        df = pd.read_csv("test.csv", header=[0, 1, 2], index_col=0)
+        # Get MultiIndex of raw Dataframe with values as str only
+        column_list = []
+        for index_column, column in enumerate(df_raw.columns):
+            column_array_tuple = tuple()
+            for index_item, item in enumerate(column):
+                column_array_tuple = column_array_tuple + (str(item),)
+            column_list.append(column_array_tuple)
+        pd_columns = pd.MultiIndex.from_tuples(column_list)
+
+        # Add data and preprocessed MultiIndex to Dataframe
+        df = pd.DataFrame(data=df_raw.values, columns=pd_columns)
 
         if bus == "electricity":
             ax = ax1
