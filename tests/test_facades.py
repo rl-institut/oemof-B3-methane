@@ -115,7 +115,7 @@ class TestConstraints:
 
         ch4_bus = solph.Bus(label="ch4")
 
-        m_reactor = MethanationReactor(
+        MethanationReactor(
             label="m_reactor",
             carrier="h2_co2",
             tech="methanation_reactor",
