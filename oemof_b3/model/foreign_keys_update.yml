@@ -29,6 +29,18 @@
     'h2-bpchp',
 ]
 
+'h2_bus': [
+    'h2-methanation',
+]
+
+'co2_bus': [
+    'h2-methanation',
+]
+
+'ch4_bus': [
+    'h2-methanation',
+]
+
 'efficiency': [
     'electricity-heatpump_small',
 ]

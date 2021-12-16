@@ -27,7 +27,7 @@ from oemof.outputlib import processing
 # DONT REMOVE THIS LINE!
 # pylint: disable=unusedimport
 from oemof.tabular import datapackage  # noqa
-from oemof.tabular.facades import TYPEMAP
+from oemof_b3.facades import TYPEMAP
 
 
 if __name__ == "__main__":
