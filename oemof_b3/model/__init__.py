@@ -10,3 +10,5 @@ component_attrs_update = load_yaml(os.path.join(here, "component_attrs_update.ym
 bus_attrs_update = load_yaml(os.path.join(here, "bus_attrs_update.yml"))
 
 foreign_keys_update = load_yaml(os.path.join(here, "foreign_keys_update.yml"))
+
+facade_attsr_update = os.path.join(here, "facade_attrs")

@@ -25,7 +25,12 @@ import pandas as pd
 from oemoflex.model.datapackage import EnergyDataPackage
 from oemoflex.tools.helpers import load_yaml
 
-from oemof_b3.model import bus_attrs_update, component_attrs_update, foreign_keys_update
+from oemof_b3.model import (
+    bus_attrs_update,
+    component_attrs_update,
+    foreign_keys_update,
+    facade_attsr_update,
+)
 from oemof_b3.tools.data_processing import (
     filter_df,
     load_b3_scalars,
@@ -232,6 +237,7 @@ if __name__ == "__main__":
         datetimeindex=datetimeindex,
         bus_attrs_update=bus_attrs_update,
         component_attrs_update=component_attrs_update,
+        facade_attrs_update=facade_attsr_update,
         name=scenario_specs["name"],
         regions=scenario_specs["regions"],
         links=scenario_specs["links"],
