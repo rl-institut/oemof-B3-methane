@@ -135,3 +135,13 @@ electricity-pth:
   defaults:
     output_parameters: "{}"
 
+methanation_reactor:
+  carrier: h2
+  tech: methanation
+  type: methanation_reactor
+  foreign_keys:
+    h2_bus: h2
+    co2_bus: co2
+    ch4_bus: ch4
+  defaults:
+    output_parameters: "{}"
