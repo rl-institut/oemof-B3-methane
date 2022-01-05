@@ -9,3 +9,7 @@ heat_central:
 heat_decentral:
   balanced:
     True
+
+co2:
+  balanced:
+    False

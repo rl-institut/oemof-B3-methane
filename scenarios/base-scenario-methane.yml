@@ -19,6 +19,7 @@ busses:
   - heat_central
   - heat_decentral
   - biomass
+  - co2
 
 components:
   - biomass-gt
