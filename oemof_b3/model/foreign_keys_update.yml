@@ -29,15 +29,7 @@
     'h2-bpchp',
 ]
 
-'h2_bus': [
-    'h2-methanation',
-]
-
-'co2_bus': [
-    'h2-methanation',
-]
-
-'ch4_bus': [
+'methanation_reactor': [
     'h2-methanation',
 ]
 
