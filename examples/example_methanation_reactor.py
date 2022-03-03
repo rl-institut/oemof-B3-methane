@@ -17,7 +17,7 @@ from oemoflex.tools import plots
 
 # Constants
 YEAR = 2018
-REGION = "BE"
+REGION = "B"
 STEPS = 240  # time steps of simulation
 
 # Demands
@@ -62,18 +62,22 @@ schema_path = os.path.abspath(
 )
 
 # Read time series
-stacked_ts = load_b3_timeseries(os.path.join(raw_path, "feedin_time_series.csv"))
 el_demand = pd.read_csv(os.path.join(raw_path, "2015_entsoe_50Hz_h.csv"))
+stacked_ts = load_b3_timeseries(os.path.join(raw_path, "ts_feedin.csv"))
 
-ts_region_filtered = filter_df(stacked_ts, "region", [REGION, "All"])
+ts_scenarioy_key_filtered = filter_df(stacked_ts, "scenario_key", f"ts_{YEAR}")
+ts_region_filtered = filter_df(ts_scenarioy_key_filtered, "region", [REGION, "All"])
 
 # Get wind profile
-ts_region_wind_filtered = filter_df(ts_region_filtered, "var_name", "wind-profile")
-ts_wind = unstack_timeseries(ts_region_wind_filtered)["wind-profile"]
+ts_region_wind_filtered = filter_df(
+    ts_region_filtered, "var_name", "wind-onshore-profile"
+)
+print(ts_region_wind_filtered)
+ts_wind = unstack_timeseries(ts_region_wind_filtered)["wind-onshore-profile"]
 
 # Get pv profile
-ts_region_pv_filtered = filter_df(ts_region_filtered, "var_name", "pv-profile")
-ts_pv = unstack_timeseries(ts_region_pv_filtered)["pv-profile"]
+ts_region_pv_filtered = filter_df(ts_region_filtered, "var_name", "solar-pv-profile")
+ts_pv = unstack_timeseries(ts_region_pv_filtered)["solar-pv-profile"]
 
 # Get electricity demand
 el_demand_norm = np.divide(
