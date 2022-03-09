@@ -139,9 +139,9 @@ class MethanationReactor(Transformer, Facade):
 
         methanation_implementation = {}
         # 0. No constraints on methanation
-        methanation_implementation[0] = {storage_products: Flow()}
+        methanation_implementation["no_constraints"] = {storage_products: Flow()}
         # 1. Fixed methanation rate
-        methanation_implementation[1] = {
+        methanation_implementation["fixed_rate"] = {
             storage_products: Flow(
                 fixed=True,
                 actual_value=sequence(1),
@@ -149,11 +149,11 @@ class MethanationReactor(Transformer, Facade):
             )
         }
         # 2. Methanation rate can be optimized
-        methanation_implementation[2] = {
+        methanation_implementation["variable_rate"] = {
             storage_products: Flow(nominal_value=self.methanation_rate)
         }
         # 3. Methanation rate can be optimized and has a "minimum load".
-        methanation_implementation[3] = {
+        methanation_implementation["variable_rate_with_min"] = {
             storage_products: Flow(
                 nominal_value=self.methanation_rate,
                 min=0.5,
@@ -162,7 +162,7 @@ class MethanationReactor(Transformer, Facade):
         }
         # 4. Methanation rate can be optimized,
         # has a "minimum load" and constraints on ramping up and down
-        methanation_implementation[4] = {
+        methanation_implementation["variable_rate_with_min_and_ramping"] = {
             storage_products: Flow(
                 nominal_value=self.methanation_rate,
                 min=0.1,
@@ -172,7 +172,7 @@ class MethanationReactor(Transformer, Facade):
         }
         # 5. Methanation rate can be optimized
         # and has constraints on ramping up and down
-        methanation_implementation[5] = {
+        methanation_implementation["variable_rate_with_ramping"] = {
             storage_products: Flow(
                 nominal_value=self.methanation_rate,
                 positive_gradient={"ub": 0.01, "costs": 0},

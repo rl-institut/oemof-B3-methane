@@ -349,7 +349,14 @@ def save_scalar_results(sequences, path):
 
 
 if __name__ == "__main__":
-    METHANATION_OPTIONS = [1, 2, 3, 4, 5]
+    METHANATION_OPTIONS = [
+        "no_constraints",
+        "fixed_rate",
+        "variable_rate",
+        "variable_rate_with_min",
+        "variable_rate_with_min_and_ramping",
+        "variable_rate_with_ramping",
+    ]
     for methanation_option in METHANATION_OPTIONS:
         es = run_model(methanation_option)
         sequences, bus_sequences = postprocess(es)
