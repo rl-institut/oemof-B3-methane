@@ -32,7 +32,6 @@ CAP_CHARGE_M_REAC = 2.8
 CAP_DISCHARGE_M_REAC = 7.7
 METHANATION_RATE = 2
 
-METHANATION_OPTION = 1
 TS_TEST = False
 
 # Costs
@@ -82,7 +81,7 @@ def normalize(series):
 el_demand_norm = normalize(el_demand)
 
 
-def run_model():
+def run_model(methanation_option):
     # Make time index
     timeindex = pd.date_range(str(YEAR) + "-01-01", periods=STEPS, freq="H")
 
@@ -180,7 +179,7 @@ def run_model():
         efficiency_discharge=1,
         methanation_rate=METHANATION_RATE,  # TODO: Passing lists does not work here yet.
         efficiency_methanation=EFF_METHANATION,
-        methanation_option=METHANATION_OPTION,
+        methanation_option=methanation_option,
     )
 
     es.add(
@@ -325,10 +324,10 @@ def plot_dispatch(bus_sequences):
 
     fig.tight_layout()
 
-    plt.savefig(f"example_methanation_reactor_option_{METHANATION_OPTION}.png")
+    return fig
 
 
-def get_scalar_results(sequences):
+def save_scalar_results(sequences, path):
     # Get scalar results
     select_scalars = [
         ("electricity-electrolyzer", "h2"),
@@ -346,23 +345,28 @@ def get_scalar_results(sequences):
 
     sums_of_interest = summed_sequences.loc[select_scalars]
 
-    sums_of_interest.to_csv(f"sums_of_interest_{METHANATION_OPTION}.csv", header=True)
+    sums_of_interest.to_csv(path, header=True)
+
+
+if __name__ == "__main__":
+    METHANATION_OPTIONS = [1, 2, 3, 4, 5]
+    for methanation_option in METHANATION_OPTIONS:
+        es = run_model(methanation_option)
+        sequences, bus_sequences = postprocess(es)
+        plot_dispatch(bus_sequences)
+        plt.savefig(f"example_methanation_reactor_option_{methanation_option}.png")
+        save_scalar_results(sequences, f"sums_of_interest_{methanation_option}.csv")
 
     # join scalar results
-    files = os.listdir(path_examples)
 
-    files_sum = sorted([f for f in files if "sums_of_interest" in f])
+    files_sum = [
+        f"sums_of_interest_{methanation_option}.csv"
+        for methanation_option in METHANATION_OPTIONS
+    ]
     all_sums = pd.DataFrame()
     for f in files_sum:
         df = pd.read_csv(f, header=0, index_col=[0, 1])
         df.columns = [f.split(".")[0]]
         all_sums = pd.concat([all_sums, df], 1)
 
-    print(all_sums)
-
-
-if __name__ == "__main__":
-    es = run_model()
-    sequences, bus_sequences = postprocess(es)
-    plot_dispatch(bus_sequences)
-    get_scalar_results(sequences)
+    all_sums.to_csv("sums_of_interest_all.csv")
