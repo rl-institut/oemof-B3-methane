@@ -103,7 +103,7 @@ class MethanationReactor(Transformer, Facade):
             label=self.label + "-storage_educts",
             inflow_conversion_factor=self.efficiency_charge,
             nominal_storage_capacity=1000,
-            loss_rate=0.001,
+            loss_rate=0,
         )
 
         combine_educts = Transformer(
