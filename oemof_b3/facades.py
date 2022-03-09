@@ -50,6 +50,8 @@ class MethanationReactor(Transformer, Facade):
     ...     efficiency_methanation=0.93
     ...     )
     """
+    MIX_RATIO_CO2 = 0.2
+    MIX_RATIO_H2 = 0.8
 
     def __init__(self, *args, **kwargs):
 
@@ -117,7 +119,10 @@ class MethanationReactor(Transformer, Facade):
                     nominal_value=self.capacity_charge, **self.input_parameters
                 )
             },
-            conversion_factors={self.co2_bus: 0.2, self.h2_bus: 0.8},
+            conversion_factors={
+                self.co2_bus: self.MIX_RATIO_CO2,
+                self.h2_bus: self.MIX_RATIO_H2,
+            },
         )
 
         storage_products = GenericStorage(
