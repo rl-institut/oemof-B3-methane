@@ -128,6 +128,7 @@ class TestConstraints:
             efficiency_discharge=1,
             methanation_rate=5,  # TODO: Passing lists does not work here yet.
             efficiency_methanation=0.93,
+            methanation_option="variable_rate",
         )
 
         self.compare_to_reference_lp("methanation_reactor.lp")
