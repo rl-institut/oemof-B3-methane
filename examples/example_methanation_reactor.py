@@ -52,18 +52,11 @@ EFF_ELY = 0.73
 EFF_METHANATION = 0.93
 
 # Set paths
-path_file = os.path.abspath(__file__)
-raw_path = os.path.abspath(os.path.join(path_file, os.pardir, os.pardir, "raw"))
-examples_path = os.path.abspath(
-    os.path.join(path_file, os.pardir, os.pardir, "examples")
-)
-schema_path = os.path.abspath(
-    os.path.join(path_file, os.pardir, os.pardir, "oemof_b3", "schema")
-)
+path_examples = os.path.dirname(os.path.abspath(__file__))
 
 # Read time series
-el_demand = pd.read_csv(os.path.join(raw_path, "2015_entsoe_50Hz_h.csv"))
-stacked_ts = load_b3_timeseries(os.path.join(raw_path, "ts_feedin.csv"))
+el_demand = pd.read_csv(os.path.join(path_examples, "2015_entsoe_50Hz_h.csv"))
+stacked_ts = load_b3_timeseries(os.path.join(path_examples, "ts_feedin.csv"))
 
 ts_scenarioy_key_filtered = filter_df(stacked_ts, "scenario_key", f"ts_{YEAR}")
 ts_region_filtered = filter_df(ts_scenarioy_key_filtered, "region", [REGION, "All"])
@@ -72,7 +65,6 @@ ts_region_filtered = filter_df(ts_scenarioy_key_filtered, "region", [REGION, "Al
 ts_region_wind_filtered = filter_df(
     ts_region_filtered, "var_name", "wind-onshore-profile"
 )
-print(ts_region_wind_filtered)
 ts_wind = unstack_timeseries(ts_region_wind_filtered)["wind-onshore-profile"]
 
 # Get pv profile
@@ -84,18 +76,6 @@ el_demand_norm = np.divide(
     el_demand["Actual Total Load [MW] - CTA|DE(50Hertz)"],
     sum(el_demand["Actual Total Load [MW] - CTA|DE(50Hertz)"]),
 )
-
-# Define test timeseries
-if TS_TEST:
-    assert STEPS >= 240
-    ts_wind = np.zeros(STEPS)
-    ts_pv = np.zeros(STEPS)
-    el_demand = np.zeros(STEPS)
-
-    ts_wind[24:72] = 0.4
-    el_demand[180:220] = 0.1
-
-    el_demand_norm = el_demand / sum(el_demand)
 
 
 def run_model():
@@ -218,9 +198,7 @@ def run_model():
 
     m = Model(es)
 
-    lp_file_path = os.path.join(
-        os.path.abspath(os.path.dirname(__file__)), "lp-file.lp"
-    )
+    lp_file_path = os.path.join(path_examples, "lp-file.lp")
     m.write(lp_file_path, io_options={"symbolic_solver_labels": True})
 
     m.solve()
@@ -367,7 +345,7 @@ def get_scalar_results(sequences):
     sums_of_interest.to_csv(f"sums_of_interest_{METHANATION_OPTION}.csv", header=True)
 
     # join scalar results
-    files = os.listdir(os.path.dirname(path_file))
+    files = os.listdir(path_examples)
 
     files_sum = sorted([f for f in files if "sums_of_interest" in f])
     all_sums = pd.DataFrame()
