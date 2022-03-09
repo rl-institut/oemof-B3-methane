@@ -1,7 +1,7 @@
 import os
 
 import matplotlib.pyplot as plt
-import numpy as np
+
 import pandas as pd
 from oemof.outputlib.processing import convert_keys_to_strings
 from oemof.solph import Bus, EnergySystem, Flow, Model, Sink, Source, Transformer
@@ -55,7 +55,9 @@ EFF_METHANATION = 0.93
 path_examples = os.path.dirname(os.path.abspath(__file__))
 
 # Read time series
-el_demand = pd.read_csv(os.path.join(path_examples, "2015_entsoe_50Hz_h.csv"))
+el_demand = pd.read_csv(os.path.join(path_examples, "2015_entsoe_50Hz_h.csv"))[
+    "Actual Total Load [MW] - CTA|DE(50Hertz)"
+]
 stacked_ts = load_b3_timeseries(os.path.join(path_examples, "ts_feedin.csv"))
 
 ts_scenarioy_key_filtered = filter_df(stacked_ts, "scenario_key", f"ts_{YEAR}")
@@ -71,11 +73,13 @@ ts_wind = unstack_timeseries(ts_region_wind_filtered)["wind-onshore-profile"]
 ts_region_pv_filtered = filter_df(ts_region_filtered, "var_name", "solar-pv-profile")
 ts_pv = unstack_timeseries(ts_region_pv_filtered)["solar-pv-profile"]
 
-# Get electricity demand
-el_demand_norm = np.divide(
-    el_demand["Actual Total Load [MW] - CTA|DE(50Hertz)"],
-    sum(el_demand["Actual Total Load [MW] - CTA|DE(50Hertz)"]),
-)
+
+# Normalize electricity demand
+def normalize(series):
+    return series / sum(series)
+
+
+el_demand_norm = normalize(el_demand)
 
 
 def run_model():
