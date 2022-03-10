@@ -109,7 +109,9 @@ class MethanationReactor(Transformer, Facade):
     def build_solph_components(self):
 
         if self.expandable:
-            raise NotImplementedError("Investment for bev class is not implemented.")
+            raise NotImplementedError(
+                "Investment for methanation class is not implemented."
+            )
 
         storage_educts = GenericStorage(
             carrier=self.carrier,
