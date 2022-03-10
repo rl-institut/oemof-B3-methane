@@ -72,6 +72,10 @@ class MethanationReactor(Transformer, Facade):
 
         self.capacity_discharge = kwargs.get("capacity_discharge")
 
+        self.storage_capacity_educts = kwargs.get("storage_capacity_educts")
+
+        self.storage_capacity_products = kwargs.get("storage_capacity_products")
+
         self.efficiency_charge = kwargs.get("efficiency_charge", 1)
 
         self.efficiency_discharge = kwargs.get("efficiency_discharge", 1)
@@ -102,7 +106,7 @@ class MethanationReactor(Transformer, Facade):
             tech=self.tech,
             label=self.label + "-storage_educts",
             inflow_conversion_factor=self.efficiency_charge,
-            nominal_storage_capacity=1000,
+            nominal_storage_capacity=self.storage_capacity_educts,
             loss_rate=0,
         )
 
@@ -137,7 +141,7 @@ class MethanationReactor(Transformer, Facade):
                 )
             },
             outflow_conversion_factor=self.efficiency_discharge,
-            nominal_storage_capacity=1000,
+            nominal_storage_capacity=self.storage_capacity_products,
         )
 
         self.inputs.update({storage_educts: Flow()})

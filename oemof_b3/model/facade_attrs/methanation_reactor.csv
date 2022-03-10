@@ -9,6 +9,8 @@ co2_bus,str,n/a,CO2 bus
 ch4_bus,str,n/a,CH4 bus
 capacity_charge,float,MW,Installed capacity for charging
 capacity_discharge,float,MW,Installed capacity for discharging
+storage_capacity_educts,float,MWh,Storage capacity for educts
+storage_capacity_products,float,MWh,Storage capacity for products
 efficiency_charge,float,unitless,Efficiency of charging
 efficiency_discharge,float,unitless,Efficiency of discharging
 availability,float,unitless,Availability of charge/discharge

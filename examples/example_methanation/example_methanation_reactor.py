@@ -31,6 +31,8 @@ CAP_CH4 = 20  # CH4 Power plant
 CAP_CHARGE_M_REAC = 2.8
 CAP_DISCHARGE_M_REAC = 7.7
 METHANATION_RATE = 2
+STORAGE_CAPACITY_EDUCTS = 24e3
+STORAGE_CAPACITY_PRODUCTS = 110e3
 
 TS_TEST = False
 
@@ -175,6 +177,8 @@ def run_model(methanation_option):
         ch4_bus=ch4_bus,
         capacity_charge=CAP_CHARGE_M_REAC,
         capacity_discharge=CAP_DISCHARGE_M_REAC,
+        storage_capacity_educts=STORAGE_CAPACITY_EDUCTS,
+        storage_capacity_products=STORAGE_CAPACITY_EDUCTS,
         efficiency_charge=1,
         efficiency_discharge=1,
         methanation_rate=METHANATION_RATE,  # TODO: Passing lists does not work here yet.
