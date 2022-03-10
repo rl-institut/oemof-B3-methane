@@ -124,6 +124,8 @@ class TestConstraints:
             ch4_bus=ch4_bus,
             capacity_charge=50,
             capacity_discharge=50,
+            storage_capacity_educts=100,
+            storage_capacity_products=1000,
             efficiency_charge=1,
             efficiency_discharge=1,
             methanation_rate=5,  # TODO: Passing lists does not work here yet.

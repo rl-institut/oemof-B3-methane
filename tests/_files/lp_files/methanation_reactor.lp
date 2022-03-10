@@ -149,12 +149,12 @@ bounds
    0 <= flow(m_reactor_storage_products_ch4_0) <= 50
    0 <= flow(m_reactor_storage_products_ch4_1) <= 50
    0 <= flow(m_reactor_storage_products_ch4_2) <= 50
-   0 <= GenericStorageBlock_capacity(m_reactor_storage_educts_0) <= 1000
-   0 <= GenericStorageBlock_capacity(m_reactor_storage_educts_1) <= 1000
-   0 <= GenericStorageBlock_capacity(m_reactor_storage_educts_2) <= 1000
+   0 <= GenericStorageBlock_capacity(m_reactor_storage_educts_0) <= 100
+   0 <= GenericStorageBlock_capacity(m_reactor_storage_educts_1) <= 100
+   0 <= GenericStorageBlock_capacity(m_reactor_storage_educts_2) <= 100
    0 <= GenericStorageBlock_capacity(m_reactor_storage_products_0) <= 1000
    0 <= GenericStorageBlock_capacity(m_reactor_storage_products_1) <= 1000
    0 <= GenericStorageBlock_capacity(m_reactor_storage_products_2) <= 1000
-   0 <= GenericStorageBlock_init_cap(m_reactor_storage_educts) <= 1000
+   0 <= GenericStorageBlock_init_cap(m_reactor_storage_educts) <= 100
    0 <= GenericStorageBlock_init_cap(m_reactor_storage_products) <= 1000
 end
