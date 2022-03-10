@@ -10,8 +10,24 @@ class MethanationReactor(Transformer, Facade):
 
     Parameters
     ----------
-
-
+    h2_bus : oemof.solph.Bus
+    co2_bus : oemof.solph.Bus
+    ch4_bus : oemof.solph.Bus
+    carrier : str
+    tech : str
+    capacity_charge : numeric
+    capacity_discharge : numeric
+    storage_capacity_educts : numeric
+    storage_capacity_products : numeric
+    efficiency_charge : numeric
+    efficiency_discharge : numeric
+    methanation_rate : numeric
+    efficiency_methanation : numeric
+    marginal_cost : numeric
+    input_parameters : numeric
+    output_parameters : numeric
+    expandable : boolean
+    methanation_option : str
 
     The reactor is modelled as two storages connected by a transformer with a fixed flow:
 
