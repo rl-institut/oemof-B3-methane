@@ -28,6 +28,8 @@ ch4-export: CH4 Export
 ch4-import: CH4 Import
 h2-export: H2 Export
 h2-import: H2 Import
+h2-excess: H2 Export
+h2-shortage: H2 Import
 ch4-excess: CH4 excess
 ch4-shortage: CH4 shortage
 ch4-demand: CH4 demand
