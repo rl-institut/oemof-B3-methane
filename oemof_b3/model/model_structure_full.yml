@@ -43,6 +43,7 @@ components:
   - h2-export
   - h2-gt
   - h2-import
+  - h2-methanation
   - h2-shortage
   - heat_central-demand
   - heat_central-excess
