@@ -3,10 +3,10 @@ r"""
 Inputs
 -------
 opsd_ts_data : str
-    raw opsd timeseries data including electricty load as .csv
+    raw opsd timeseries data including electricity load as .csv.
 output_file : str
     ``results/_resources/ts_load_electricity.csv``: path of output file with prepared
-    data as .csv
+    timeseries data as .csv.
 
 Outputs
 ---------
@@ -84,7 +84,9 @@ def prepare_load_profile_time_series(ts_raw, year, region):
     ts_prepared.loc[:, "var_name"] = "electricity-demand-profile"
     ts_prepared.loc[:, "source"] = TS_SOURCE
     ts_prepared.loc[:, "comment"] = TS_COMMENT
-    ts_prepared.loc[:, "scenario_key"] = f"ts_{year}"
+    ts_prepared.loc[
+        :, "scenario_key"
+    ] = "ALL"  # The profile is not varied in different scenarios
 
     return ts_prepared
 

@@ -1,3 +1,20 @@
+# coding: utf-8
+r"""
+Inputs
+-------
+HEADER_B3_SCAL : pandas.DataFrame
+``oemof_b3/schema/scalars.csv``: Header of scalars template
+
+HEADER_B3_TS : pandas.DataFrame
+``oemof_b3/schema/timeseries.csv``: Header of timeseries template
+
+Description
+-------------
+This script contains some helper functions for processing the data in oemof-B3, such as loading,
+filtering, sorting, merging, aggregating and saving.
+
+"""
+
 import os
 import ast
 import pandas as pd
@@ -251,6 +268,8 @@ def aggregate_scalars(df, columns_to_aggregate, agg_method=None):
         Aggregated data.
     """
     _df = df.copy()
+
+    _df = format_header(_df, HEADER_B3_SCAL, "id_scal")
 
     if not isinstance(columns_to_aggregate, list):
         columns_to_aggregate = [columns_to_aggregate]
@@ -603,6 +622,27 @@ def stack_var_name(df):
     return stacked
 
 
+def round_setting_int(df, decimals):
+    r"""
+    Rounds the columns of a DataFrame to the specified decimals. For zero decimals,
+    it changes the dtype to Int64. Tolerates NaNs.
+    """
+    _df = df.copy()
+
+    for col, dec in decimals.items():
+        if col not in _df.columns:
+            print(f"No column named '{col}' found when trying to round.")
+            continue
+        elif dec == 0:
+            dtype = "Int64"
+        else:
+            dtype = float
+
+        _df[col] = pd.to_numeric(_df[col], errors="coerce").round(dec).astype(dtype)
+
+    return _df
+
+
 class ScalarProcessor:
     r"""
     This class allows to filter and unstack scalar data in a way that makes processing simpler.
@@ -655,6 +695,8 @@ class ScalarProcessor:
         -------
         None
         """
+        assert not data.isna().all(), "Cannot append all NaN data."
+
         _df = data.copy()
 
         if isinstance(_df, pd.Series):

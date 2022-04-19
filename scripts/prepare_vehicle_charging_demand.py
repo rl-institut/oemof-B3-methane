@@ -3,15 +3,15 @@ r"""
 Inputs
 -------
 input_dir : str
-    ``raw/time_series/vehicle_charging``: Path to directory where csv files containing electric
+    ``raw/time_series/vehicle_charging``: Path of directory where csv files containing electric
     vehicle charging demand profiles are placed
 output_file : str
-    ``results/_resources/ts_load_electricity_vehicles.csv``: Path incl. file name to prepared time
+    ``results/_resources/ts_load_electricity_vehicles.csv``: Path incl. file name of prepared time
     series
 
 Outputs
 ---------
-pandas.DataFrame
+pd.DataFrame
     Normalized electric vehicle charging demand profiles for regions "B" and "BB" for all years
     provided in `input_dir`.
 
@@ -114,9 +114,11 @@ def prepare_vehicle_charging_demand(input_dir, balanced=True):
         ts_total_norm = ts_total_demand / ts_total_demand.sum()
 
         # stack time series and add region
-        ts_stacked = dp.stack_timeseries(ts_total_norm).rename(
-            columns={"var_name": "scenario_key"}
-        )
+        ts_stacked = dp.stack_timeseries(ts_total_norm)
+
+        # The profile is not varied in different scenarios
+        ts_stacked.loc[:, "scenario_key"] = "ALL"
+
         ts_stacked.loc[:, "region"] = region
 
         # add to `df`

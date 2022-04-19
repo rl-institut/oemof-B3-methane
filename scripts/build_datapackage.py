@@ -6,12 +6,14 @@ scenario_specs : str
     ``scenarios/{scenario}.yml``: path of input file (.yml) containing scenario specifications
 destination : str
     ``results/{scenario}/preprocessed``: path of output directory
+logfile : str
+    ``logs/{scenario}.log``: path to logfile
 
 Outputs
 ---------
 oemoflex.EnergyDatapackage
-    EnergyDatapackage in the correct structure, with data (scalars and timeseries) as csv and
-    metadata (describing resources and foreign key relations) as json.
+    EnergyDatapackage that can be read by oemof.tabular, with data (scalars and timeseries)
+    as csv and metadata (describing resources and foreign key relations) as json.
 
 Description
 -------------
@@ -29,6 +31,7 @@ from oemoflex.model.datapackage import EnergyDataPackage
 from oemoflex.tools.helpers import load_yaml
 
 from oemof_b3.model import (
+    model_structures,
     bus_attrs_update,
     component_attrs_update,
     foreign_keys_update,
@@ -254,6 +257,8 @@ if __name__ == "__main__":
 
     scenario_specs = load_yaml(scenario_specs)
 
+    model_structure = model_structures[scenario_specs["model_structure"]]
+
     # setup empty EnergyDataPackage
     datetimeindex = pd.date_range(
         start=scenario_specs["datetimeindex"]["start"],
@@ -269,10 +274,10 @@ if __name__ == "__main__":
         component_attrs_update=component_attrs_update,
         facade_attrs_update=facade_attsr_update,
         name=scenario_specs["name"],
-        regions=scenario_specs["regions"],
-        links=scenario_specs["links"],
-        busses=scenario_specs["busses"],
-        components=scenario_specs["components"],
+        regions=model_structure["regions"],
+        links=model_structure["links"],
+        busses=model_structure["busses"],
+        components=model_structure["components"],
     )
 
     # parametrize scalars
@@ -281,7 +286,7 @@ if __name__ == "__main__":
     scalars = multi_load_b3_scalars(paths_scalars)
 
     # Replace 'ALL' in the column regions by the actual regions
-    scalars = expand_regions(scalars, scenario_specs["regions"])
+    scalars = expand_regions(scalars, model_structure["regions"])
 
     # Drop those scalars that do not belong to a specific component
     scalars = scalars.loc[~scalars["name"].isna()]
