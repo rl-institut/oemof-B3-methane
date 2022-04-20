@@ -196,7 +196,7 @@ if __name__ == "__main__":
     target = sys.argv[2]
 
     # User input
-    CARRIERS = ["electricity", "heat_central", "heat_decentral", "h2"]
+    CARRIERS = ["electricity", "heat_central", "heat_decentral", "ch4", "h2"]
     REGIONS = ["BB", "B"]  # BE_BB
     MW_TO_W = 1e6
 
