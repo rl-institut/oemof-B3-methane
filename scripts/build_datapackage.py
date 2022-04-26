@@ -35,7 +35,6 @@ from oemof_b3.model import (
     bus_attrs_update,
     component_attrs_update,
     foreign_keys_update,
-    foreign_key_descriptors_update,
     facade_attsr_update,
 )
 from oemof_b3.tools.data_processing import (
@@ -313,5 +312,4 @@ if __name__ == "__main__":
     # add metadata
     edp.infer_metadata(
         foreign_keys_update=foreign_keys_update,
-        foreign_key_descriptors_update=foreign_key_descriptors_update,
     )

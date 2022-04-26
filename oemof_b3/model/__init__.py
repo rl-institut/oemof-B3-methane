@@ -17,8 +17,4 @@ model_structures = {
     s: load_yaml(os.path.join(here, s + ".yml")) for s in MODEL_STRUCTURES
 }
 
-foreign_key_descriptors_update = load_yaml(
-    os.path.join(here, "foreign_key_descriptors_update.yml")
-)
-
 facade_attsr_update = os.path.join(here, "facade_attrs")
