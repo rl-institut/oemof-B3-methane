@@ -26,6 +26,8 @@ import sys
 import os
 from collections import OrderedDict
 
+from oemof_b3.config import config  # load config before loading oemof.tabular config
+
 import pandas as pd
 from oemoflex.model.datapackage import EnergyDataPackage
 from oemoflex.tools.helpers import load_yaml
@@ -46,7 +48,6 @@ from oemof_b3.tools.data_processing import (
     HEADER_B3_SCAL,
     save_df,
 )
-from oemof_b3.config import config
 
 logger = logging.getLogger()
 
