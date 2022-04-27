@@ -101,8 +101,7 @@ def run_model(methanation_option):
         label="wind-onshore",
         outputs={
             el_bus: Flow(
-                fixed=True,
-                actual_value=ts_wind[0:STEPS],
+                fix=ts_wind[0:STEPS],
                 nominal_value=CAP_WIND,
                 variable_costs=VAR_COST_WIND,
             )
@@ -113,8 +112,7 @@ def run_model(methanation_option):
         label="solar-pv",
         outputs={
             el_bus: Flow(
-                fixed=True,
-                actual_value=ts_pv[0:STEPS],
+                fix=ts_pv[0:STEPS],
                 nominal_value=CAP_PV,
                 variable_costs=VAR_COST_PV,
             )
@@ -126,8 +124,7 @@ def run_model(methanation_option):
         label="electricity-demand",
         inputs={
             el_bus: Flow(
-                fixed=True,
-                actual_value=el_demand_norm[0:STEPS],
+                fix=el_demand_norm[0:STEPS],
                 nominal_value=DEMAND_EL,
                 variable_costs=VAR_COST_EL_DEMAND,
             )

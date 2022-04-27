@@ -165,7 +165,7 @@ class MethanationReactor(Transformer, Facade):
         methanation_implementation["fixed_rate"] = {
             storage_products: Flow(
                 fixed=True,
-                actual_value=sequence(1),
+                fix=sequence(1),
                 nominal_value=self.methanation_rate,
             )
         }
@@ -187,8 +187,8 @@ class MethanationReactor(Transformer, Facade):
             storage_products: Flow(
                 nominal_value=self.methanation_rate,
                 min=0.1,
-                positive_gradient={"ub": 0.01, "costs": 0},
-                negative_gradient={"ub": 0.01, "costs": 0},
+                positive_gradient={"ub": 0.01},
+                negative_gradient={"ub": 0.01},
             )
         }
         # 5. Methanation rate can be optimized
@@ -196,8 +196,8 @@ class MethanationReactor(Transformer, Facade):
         methanation_implementation["variable_rate_with_ramping"] = {
             storage_products: Flow(
                 nominal_value=self.methanation_rate,
-                positive_gradient={"ub": 0.01, "costs": 0},
-                negative_gradient={"ub": 0.05, "costs": 0},
+                positive_gradient={"ub": 0.01},
+                negative_gradient={"ub": 0.05},
             )
         }
         # 6. Methanation rate depends on available educts but is constrained by active
