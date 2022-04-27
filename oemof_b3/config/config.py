@@ -6,7 +6,9 @@ from dynaconf import Dynaconf
 
 CONFIG_PATH = pathlib.Path(__file__).parent
 
-os.environ["OEMOF_TABULAR_FOREIGN_KEY_DESCRIPTORS_FILE"] = str(CONFIG_PATH.parent / "model" / "foreign_key_descriptors.json")
+os.environ["OEMOF_TABULAR_FOREIGN_KEY_DESCRIPTORS_FILE"] = str(
+    CONFIG_PATH.parent / "model" / "foreign_key_descriptors.json"
+)
 
 settings = Dynaconf(
     envvar_prefix="DYNACONF",
