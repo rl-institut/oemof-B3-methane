@@ -11,10 +11,11 @@ bus_attrs_update = load_yaml(os.path.join(here, "bus_attrs_update.yml"))
 
 foreign_keys_update = load_yaml(os.path.join(here, "foreign_keys_update.yml"))
 
-MODEL_STRUCTURES = ["model_structure_full", "model_structure_el_only"]
+MODEL_STRUCTURE_DIR = os.path.join(here, "model_structure")
 
 model_structures = {
-    s: load_yaml(os.path.join(here, s + ".yml")) for s in MODEL_STRUCTURES
+    os.path.splitext(f_name)[0]: load_yaml(os.path.join(MODEL_STRUCTURE_DIR, f_name))
+    for f_name in os.listdir(MODEL_STRUCTURE_DIR)
 }
 
 facade_attsr_update = os.path.join(here, "facade_attrs")
