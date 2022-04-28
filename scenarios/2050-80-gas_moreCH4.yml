@@ -14,7 +14,7 @@ datetimeindex:
     8760
 
 model_structure:
-  model_structure_full
+  model_structure_full_methanation
 
 # parametrize
 
@@ -22,11 +22,13 @@ paths_scalars:
   - raw/scalars/capacities.csv
   - raw/scalars/potentials.csv
   - raw/scalars/carrier_costs.csv
+  - raw/scalars/import_export_prices.csv
   - raw/scalars/demands.csv
   - raw/scalars/emission_constraint.csv
   - raw/scalars/el_gas_constraint.csv
   - results/_resources/scal_costs_efficiencies.csv
   - results/_resources/scal_load_heat.csv
+  - raw/scalars_methanation.csv
 
 filter_scalars:
   1:
@@ -35,6 +37,7 @@ filter_scalars:
       - "2050-gas_moreCH4"
       - "2050-base"
       - "reduction_80"
+      - "2050-methanation"
 
 paths_timeseries:
   - raw/time_series/ts_load_ch4.csv
