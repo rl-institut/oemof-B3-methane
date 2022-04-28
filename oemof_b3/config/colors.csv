@@ -52,6 +52,7 @@ Heat pump (domestic),#2ca00c
 res. PtH,#ff7f0e
 
 CH4 excess,red
+CH4 Import,red
 
 Electrolyzer,yellow
 
@@ -61,6 +62,7 @@ Hard coal,black
 Lignite,saddlebrown
 Oil,#9467bd
 Other,#7f7f7f
+Methanation,#9467bd
 CH4 shortage,#cfcfcf
 CH4 demand,saddlebrown
 H2 Import,green

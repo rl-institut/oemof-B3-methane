@@ -16,3 +16,5 @@ MODEL_STRUCTURES = ["model_structure_full", "model_structure_el_only"]
 model_structures = {
     s: load_yaml(os.path.join(here, s + ".yml")) for s in MODEL_STRUCTURES
 }
+
+facade_attsr_update = os.path.join(here, "facade_attrs")
