@@ -14,7 +14,7 @@ datetimeindex:
     8760
 
 model_structure:
-  model_structure_full
+  model_structure_full_methanation
 
 # parametrize
 
@@ -28,6 +28,7 @@ paths_scalars:
   - raw/scalars/el_gas_constraint.csv
   - results/_resources/scal_costs_efficiencies.csv
   - results/_resources/scal_load_heat.csv
+  - raw/scalars_methanation.csv
 
 filter_scalars:
   1:
@@ -35,6 +36,7 @@ filter_scalars:
       - "ALL"
       - "2050-el_eff"
       - "2050-base"
+      - "2050-methanation"
 
 paths_timeseries:
   - raw/time_series/ts_load_ch4.csv
