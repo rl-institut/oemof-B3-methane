@@ -114,11 +114,17 @@ if __name__ == "__main__":
 
     bus_directory = os.path.join(postprocessed, "sequences", "bus")
 
+    component_directory = os.path.join(postprocessed, "sequences", "component")
+
     # create the directory plotted where all plots are saved
     if not os.path.exists(target):
         os.makedirs(target)
 
     bus_sequences = load_results_sequences(bus_directory)
+
+    methanation_sequences = load_results_sequences(component_directory)[
+        "methanation_reactor"
+    ]
 
     plot_dispatch(bus_sequences)
 
