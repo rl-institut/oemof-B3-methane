@@ -10,6 +10,7 @@ class MethanationReactor(Transformer, Facade):
 
     Parameters
     ----------
+    label : str
     h2_bus : oemof.solph.Bus
     co2_bus : oemof.solph.Bus
     ch4_bus : oemof.solph.Bus
@@ -43,21 +44,21 @@ class MethanationReactor(Transformer, Facade):
     >>> bus_co2 = solph.Bus('hco2')
     >>> bus_ch4 = solph.Bus('ch4')
     >>> m_reactor = MethanationReactor(
-    ...     name='m_reactor',
-    ...     carrier='h2_co2',
-    ...     tech='methanation_reactor',
-    ...     h2_bus=bus_h2,
-    ...     co2_bus=bus_co2,
-    ...     ch4_bus=bus_ch4,
-    ...     capacity_charge=50,
-    ...     capacity_discharge=50,
-    ...     storage_capacity_educts=100,
-    ...     storage_capacity_products=1000,
+    ...     label="m_reactor",
+    ...     carrier="h2_co2",
+    ...     tech="methanation_reactor",
+    ...     h2_bus=h2_bus,
+    ...     co2_bus=co2_bus,
+    ...     ch4_bus=ch4_bus,
+    ...     capacity_charge=2.8,
+    ...     capacity_discharge=7.7,
+    ...     storage_capacity_educts=24e3,
+    ...     storage_capacity_products=24e3,
     ...     efficiency_charge=1,
     ...     efficiency_discharge=1,
-    ...     availability=[0.8, 0.7, 0.6],
-    ...     methanation_rate=[0.3, 0.2, 0.5],
-    ...     efficiency_methanation=0.93
+    ...     methanation_rate=2,
+    ...     efficiency_methanation=0.93,
+    ...     methanation_option=methanation_option,
     ...     )
     """
     MIX_RATIO_CO2 = 0.2
