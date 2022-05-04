@@ -47,12 +47,14 @@ Heat dec. storage in,#9467bd
 Heat dec. storage,#9467bd
 
 CH4 boiler,#d62728
+CH4 boiler in,#d62728
 Heat pump (DH),#2ca02c
 Heat pump (domestic),#2ca00c
 res. PtH,#ff7f0e
 
 CH4 excess,red
 CH4 import,red
+CH4 export,red
 
 Electrolyzer,yellow
 
