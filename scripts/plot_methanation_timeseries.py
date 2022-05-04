@@ -10,23 +10,21 @@ from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.config import config
 
 
-def load_bus_sequences(bus_directory):
-    bus_files = os.listdir(bus_directory)
+def load_results_sequences(directory):
+    files = os.listdir(directory)
 
-    bus_sequences = {}
+    sequences = {}
 
-    for bus_file in bus_files:
-        bus_name = os.path.splitext(bus_file)[0]
+    for file in files:
+        name = os.path.splitext(file)[0]
 
-        bus_path = os.path.join(bus_directory, bus_file)
+        path = os.path.join(directory, file)
 
-        sequences = pd.read_csv(
-            bus_path, header=[0, 1, 2], parse_dates=[0], index_col=[0]
-        )
+        df = pd.read_csv(path, header=[0, 1, 2], parse_dates=[0], index_col=[0])
 
-        bus_sequences[bus_name] = sequences
+        sequences[name] = df
 
-    return bus_sequences
+    return sequences
 
 
 def plot_dispatch(bus_sequences):
@@ -120,7 +118,7 @@ if __name__ == "__main__":
     if not os.path.exists(target):
         os.makedirs(target)
 
-    bus_sequences = load_bus_sequences(bus_directory)
+    bus_sequences = load_results_sequences(bus_directory)
 
     plot_dispatch(bus_sequences)
 
