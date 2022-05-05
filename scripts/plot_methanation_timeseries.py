@@ -3,7 +3,6 @@ import sys
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from oemof.solph.processing import convert_keys_to_strings
 from oemoflex.tools import plots
 
 from oemof_b3 import colors_odict, labels_dict
@@ -27,7 +26,7 @@ def load_results_sequences(directory):
     return sequences
 
 
-def plot_dispatch(bus_sequences):
+def plot_methanation_operation(sequences_el, sequences_heat, methanation):
 
     bus_name = ["B-electricity", "B-ch4"]
 
@@ -35,32 +34,13 @@ def plot_dispatch(bus_sequences):
     fig.set_size_inches(12, 8, forward=True)
     fig.subplots_adjust(hspace=0.5)
 
-    for bus in bus_name:
-        # Get raw Dataframe with bus data
-        bus_sequences_dict = convert_keys_to_strings(bus_sequences)
-        df_raw = bus_sequences_dict[bus]
-
-        # Get MultiIndex of raw Dataframe with values as str only
-        column_list = []
-        for index_column, column in enumerate(df_raw.columns):
-            column_array_tuple = tuple()
-            for index_item, item in enumerate(column):
-                column_array_tuple = column_array_tuple + (str(item),)
-            column_list.append(column_array_tuple)
-        pd_columns = pd.MultiIndex.from_tuples(column_list)
-
-        # Add data and preprocessed MultiIndex to Dataframe
-        df = pd.DataFrame(data=df_raw.values, columns=pd_columns)
-
-        if bus == "B-electricity":
-            ax = ax1
-        if bus == "B-ch4":
-            df.loc[:, ("ch4", "ch4-demand", "flow")] = 0
-            ax = ax2
+    for bus_name, df, ax in zip(
+        ["electricity", "heat"], [sequences_el, sequences_heat], (ax1, ax2)
+    ):
 
         df, df_demand = plots.prepare_dispatch_data(
             df,
-            bus_name=bus,
+            bus_name=bus_name,
             demand_name="demand",
             labels_dict=labels_dict,
         )
@@ -126,6 +106,10 @@ if __name__ == "__main__":
         "methanation_reactor"
     ]
 
-    plot_dispatch(bus_sequences)
+    plot_methanation_operation(
+        bus_sequences["B-electricity"],
+        bus_sequences["B-heat_central"],
+        methanation_sequences,
+    )
 
     plt.savefig(os.path.join(target, "methanation_operation.png"))
