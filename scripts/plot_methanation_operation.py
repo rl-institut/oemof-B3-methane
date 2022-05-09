@@ -34,16 +34,15 @@ def load_results_sequences(directory):
 
 def plot_methanation_operation(sequences_el, sequences_heat, methanation):
 
-    bus_name = ["B-electricity", "B-ch4"]
+    bus_name = ["B-electricity", "B-heat_central"]
 
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
     fig.set_size_inches(12, 8, forward=True)
     fig.subplots_adjust(hspace=0.5)
 
     for bus_name, df, ax in zip(
-        ["electricity", "heat"], [sequences_el, sequences_heat], (ax1, ax2)
+        bus_name, [sequences_el, sequences_heat], (ax1, ax2)
     ):
-
         df, df_demand = plots.prepare_dispatch_data(
             df,
             bus_name=bus_name,
@@ -111,6 +110,7 @@ if __name__ == "__main__":
     methanation_sequences = load_results_sequences(component_directory)[
         "methanation_reactor"
     ]
+
 
     plot_methanation_operation(
         bus_sequences["B-electricity"],
