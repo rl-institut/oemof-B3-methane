@@ -8,6 +8,10 @@ from oemoflex.tools import plots
 from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.config import config
 
+def drop_near_zeros(df, tolerance=1e-3):
+    # drop data that is almost zero
+    df = df.loc[:, df.abs().sum() > tolerance]
+    return df
 
 def load_results_sequences(directory):
     files = os.listdir(directory)
@@ -20,6 +24,8 @@ def load_results_sequences(directory):
         path = os.path.join(directory, file)
 
         df = pd.read_csv(path, header=[0, 1, 2], parse_dates=[0], index_col=[0])
+
+        df = drop_near_zeros(df)
 
         sequences[name] = df
 
