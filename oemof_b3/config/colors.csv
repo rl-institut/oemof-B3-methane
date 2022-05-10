@@ -64,7 +64,8 @@ Hard coal,black
 Lignite,saddlebrown
 Oil,#9467bd
 Other,#7f7f7f
-Methanation,#9467bd
+Methanation products,#9467bd
+Methanation educts,saddlebrown
 CH4 shortage,#cfcfcf
 CH4 demand,saddlebrown
 H2 import,green

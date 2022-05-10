@@ -40,4 +40,5 @@ heat_central-shortage: Heat cen. shortage
 heat_decentral-excess: Heat dec. excess
 heat_decentral-storage: Heat dec. storage
 heat_decentral-shortage: Heat dec. shortage
-methanation-storage_products: Methanation
+h2-methanation-storage_products: Methanation prodcuts
+h2-methanation-storage_educts: Methanation educts
