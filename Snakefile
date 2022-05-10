@@ -224,7 +224,7 @@ rule plot_methanation_operation:
     params:
         logfile="logs/{scenario}.log"
     shell:
-        "python scripts/plot_methanation_timeseries.py {input} {output} {params.logfile}"
+        "python scripts/plot_methanation_operation.py {input} {output} {params.logfile}"
 
 rule plot_conv_pp_scalars:
     input:
