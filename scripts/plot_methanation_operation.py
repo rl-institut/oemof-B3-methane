@@ -8,10 +8,12 @@ from oemoflex.tools import plots
 from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.config import config
 
+
 def drop_near_zeros(df, tolerance=1e-3):
     # drop data that is almost zero
     df = df.loc[:, df.abs().sum() > tolerance]
     return df
+
 
 def load_results_sequences(directory):
     files = os.listdir(directory)
@@ -31,13 +33,15 @@ def load_results_sequences(directory):
 
     return sequences
 
+
 def load_storage_sequences(directory, file):
 
     path = os.path.join(directory, file)
 
-    df = pd.read_csv(path, header=[0,1,2], parse_dates=[0], index_col=[0])
+    df = pd.read_csv(path, header=[0, 1, 2], parse_dates=[0], index_col=[0])
 
     return df
+
 
 def filter_storage_sequences(df, region, bus, component):
 
@@ -51,12 +55,16 @@ def filter_storage_sequences(df, region, bus, component):
     df = df.droplevel(["to", "type"], axis=1)
     df.columns = df.columns.str.strip(region + "-")
 
- #   df = plots.map_labels(df, labels_dict=labels_dict) # the labels are not found despite being in the yml file (?!)
+    #   df = plots.map_labels(df, labels_dict=labels_dict) # the labels are not found despite being in the yml file (?!)
     return df
 
 
-def plot_methanation_operation(sequences_el, sequences_heat, sequences_methanation_reaction,
-                               sequences_methanation_storage):
+def plot_methanation_operation(
+    sequences_el,
+    sequences_heat,
+    sequences_methanation_reaction,
+    sequences_methanation_storage,
+):
 
     bus_name = ["B-electricity", "B-heat_central"]
 
@@ -64,34 +72,27 @@ def plot_methanation_operation(sequences_el, sequences_heat, sequences_methanati
     fig.set_size_inches(12, 8, forward=True)
     fig.subplots_adjust(hspace=0.5)
 
-    for bus_name, df, ax in zip(
-        bus_name, [sequences_el, sequences_heat], (ax1, ax2)
-    ):
+    for bus_name, df, ax in zip(bus_name, [sequences_el, sequences_heat], (ax1, ax2)):
         df, df_demand = plots.prepare_dispatch_data(
-            df,
-            bus_name=bus_name,
-            demand_name="demand",
-            labels_dict=labels_dict,
+            df, bus_name=bus_name, demand_name="demand", labels_dict=labels_dict,
         )
 
         plots.plot_dispatch(
-            ax=ax,
-            df=df,
-            df_demand=df_demand,
-            unit="MW",
-            colors_odict=colors_odict,
+            ax=ax, df=df, df_demand=df_demand, unit="MW", colors_odict=colors_odict,
         )
 
         for tick in ax.get_xticklabels():
             tick.set_rotation(45)
 
-    methanation = sequences_methanation_reaction[("B-h2-methanation", "B-h2-methanation-storage_products", "flow")]
+    methanation = sequences_methanation_reaction[
+        ("B-h2-methanation", "B-h2-methanation-storage_products", "flow")
+    ]
     ax3.fill_between(
         methanation.index,
         0,
         methanation,
         label="Methanation",
-#        color=colors_odict["Methanation"],
+        #        color=colors_odict["Methanation"],
     )
 
     ax4.plot(
@@ -105,10 +106,8 @@ def plot_methanation_operation(sequences_el, sequences_heat, sequences_methanati
         label="Storage Level Educts",
     )
 
-
- #   plots.plot_dispatch(ax4, sequences_methanation_storage, df_demand=pd.DataFrame(), unit="MWh")
+    #   plots.plot_dispatch(ax4, sequences_methanation_storage, df_demand=pd.DataFrame(), unit="MWh")
     # This shall replace the two above sections when labels and colors are being found.
-
 
     h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
     handles = [item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist]
@@ -161,11 +160,13 @@ if __name__ == "__main__":
     methanation_reaction_sequences = load_results_sequences(component_directory)[
         "methanation_reactor"
     ]
-    storage_sequences = load_storage_sequences(variable_directory, "storage_content.csv")
+    storage_sequences = load_storage_sequences(
+        variable_directory, "storage_content.csv"
+    )
 
-    methanation_storage_sequences = filter_storage_sequences(storage_sequences, "B" , "h2", "methanation")
-
-
+    methanation_storage_sequences = filter_storage_sequences(
+        storage_sequences, "B", "h2", "methanation"
+    )
 
     plot_methanation_operation(
         bus_sequences["B-electricity"],
