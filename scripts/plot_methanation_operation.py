@@ -124,6 +124,9 @@ def plot_methanation_operation(
     handles = [item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist]
     labels = [item for sublist in list(map(lambda x: x[1], h_l)) for item in sublist]
 
+    # The last two labels are identical with the previous two and are therefore removed.
+    labels = labels[:-2]
+
     ax4.legend(
         handles=handles,
         labels=labels,
