@@ -75,10 +75,17 @@ def plot_methanation_operation(
 
     for bus_name, df, ax in zip(bus_name, [sequences_el, sequences_heat], (ax1, ax2)):
         df, df_demand = plots.prepare_dispatch_data(
-            df, bus_name=bus_name, demand_name="demand", labels_dict=labels_dict,
+            df,
+            bus_name=bus_name,
+            demand_name="demand",
+            labels_dict=labels_dict,
         )
         plots.plot_dispatch(
-            ax=ax, df=df, df_demand=df_demand, unit="MW", colors_odict=colors_odict,
+            ax=ax,
+            df=df,
+            df_demand=df_demand,
+            unit="MW",
+            colors_odict=colors_odict,
         )
 
         for tick in ax.get_xticklabels():
@@ -95,7 +102,13 @@ def plot_methanation_operation(
         #        color=colors_odict["Methanation"],
     )
 
-    plots.plot_dispatch(ax4, sequences_methanation_storage, df_demand=pd.DataFrame(), unit="MWh", colors_odict=colors_odict)
+    plots.plot_dispatch(
+        ax4,
+        sequences_methanation_storage,
+        df_demand=pd.DataFrame(),
+        unit="MWh",
+        colors_odict=colors_odict,
+    )
 
     h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
     handles = [item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist]
