@@ -60,6 +60,16 @@ def filter_storage_sequences(df, region, bus, component):
     return df
 
 
+def prepare_reaction_data(df, bus_name, labels_dict=labels_dict):
+    # This script is a copy of plots.prepare_dispatch_data without excluding lines on demand
+    df.columns = df.columns.to_flat_index()
+    for i in df.columns:
+        if i[0] == bus_name:
+            df[i] = df[i] * -1
+    df = plots.map_labels(df, labels_dict)
+    return df
+
+
 def plot_methanation_operation(
     sequences_el,
     sequences_heat,
@@ -74,12 +84,14 @@ def plot_methanation_operation(
     fig.subplots_adjust(hspace=0.5)
 
     for bus_name, df, ax in zip(bus_name, [sequences_el, sequences_heat], (ax1, ax2)):
+
         df, df_demand = plots.prepare_dispatch_data(
             df,
             bus_name=bus_name,
             demand_name="demand",
             labels_dict=labels_dict,
         )
+
         plots.plot_dispatch(
             ax=ax,
             df=df,
@@ -91,15 +103,13 @@ def plot_methanation_operation(
         for tick in ax.get_xticklabels():
             tick.set_rotation(45)
 
-    methanation = sequences_methanation_reaction[
-        ("B-h2-methanation", "B-h2-methanation-storage_products", "flow")
-    ]
-    ax3.fill_between(
-        methanation.index,
-        0,
-        methanation,
-        label="Methanation",
-        #        color=colors_odict["Methanation"],
+    df = prepare_reaction_data(sequences_methanation_reaction, "B-h2-methanation")
+    plots.plot_dispatch(
+        ax3,
+        df,
+        df_demand=pd.DataFrame(),
+        unit="MW",
+        colors_odict=colors_odict,
     )
 
     plots.plot_dispatch(
