@@ -69,17 +69,6 @@ def annuise_investment_cost(sc):
         ]
     )
 
-
-if __name__ == "__main__":
-    in_path = sys.argv[1]  # path to raw scalar data
-    out_path = sys.argv[2]  # path to destination
-
-    df = load_b3_scalars(in_path)
-
-    sc = ScalarProcessor(df)
-
-    annuise_investment_cost(sc)
-
     sc.scalars = sc.scalars.sort_values(
         by=["carrier", "tech", "var_name", "scenario_key"]
     )
@@ -88,4 +77,26 @@ if __name__ == "__main__":
 
     sc.scalars.index.name = "id_scal"
 
-    save_df(sc.scalars, out_path)
+
+def load_process_save(path_source, path_target, func):
+    df = load_b3_scalars(path_source)
+
+    sc = ScalarProcessor(df)
+
+    func(sc)
+
+    save_df(sc.scalars, path_target)
+
+
+if __name__ == "__main__":
+    raw_scalars_costs_eff = sys.argv[1]  # path to raw scalar data
+    raw_scalars_methanation = sys.argv[2]  # path to raw scalar data
+    resources_costs_eff = sys.argv[3]  # path to destination
+    resources_methanation = sys.argv[4]  # path to destination
+
+    load_process_save(
+        raw_scalars_costs_eff, resources_costs_eff, func=annuise_investment_cost
+    )
+    load_process_save(
+        raw_scalars_methanation, resources_methanation, func=annuise_investment_cost
+    )
