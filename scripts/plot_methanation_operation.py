@@ -55,7 +55,8 @@ def filter_storage_sequences(df, region, bus, component):
     df = df.droplevel(["to", "type"], axis=1)
     df.columns = df.columns.str.strip(region + "-")
 
-    #   df = plots.map_labels(df, labels_dict=labels_dict) # the labels are not found despite being in the yml file (?!)
+    df = plots.map_labels(df, labels_dict=labels_dict)
+
     return df
 
 
@@ -76,7 +77,6 @@ def plot_methanation_operation(
         df, df_demand = plots.prepare_dispatch_data(
             df, bus_name=bus_name, demand_name="demand", labels_dict=labels_dict,
         )
-
         plots.plot_dispatch(
             ax=ax, df=df, df_demand=df_demand, unit="MW", colors_odict=colors_odict,
         )
@@ -95,19 +95,7 @@ def plot_methanation_operation(
         #        color=colors_odict["Methanation"],
     )
 
-    ax4.plot(
-        sequences_methanation_storage[("h2-methanation-storage_products")],
-        c="r",
-        label="Storage Level Products",
-    )
-    ax4.plot(
-        sequences_methanation_storage[("h2-methanation-storage_educts")],
-        c="b",
-        label="Storage Level Educts",
-    )
-
-    #   plots.plot_dispatch(ax4, sequences_methanation_storage, df_demand=pd.DataFrame(), unit="MWh")
-    # This shall replace the two above sections when labels and colors are being found.
+    plots.plot_dispatch(ax4, sequences_methanation_storage, df_demand=pd.DataFrame(), unit="MWh", colors_odict=colors_odict)
 
     h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
     handles = [item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist]
