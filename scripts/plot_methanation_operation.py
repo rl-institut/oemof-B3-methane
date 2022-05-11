@@ -10,7 +10,7 @@ from oemof_b3.config import config
 
 
 def drop_near_zeros(df, tolerance=1e-3):
-    # drop data that is almost zero
+    # drop columns with data that is almost zero using the sum of the absolute values
     df = df.loc[:, df.abs().sum() > tolerance]
     return df
 
@@ -35,6 +35,8 @@ def load_results_sequences(directory):
 
 
 def load_storage_sequences(directory, file):
+    # similar to the function above but for only one file and without dropping near zeros,
+    # because the storage filling level shall also be displayed if it is empty.
 
     path = os.path.join(directory, file)
 
@@ -44,7 +46,26 @@ def load_storage_sequences(directory, file):
 
 
 def filter_storage_sequences(df, region, bus, component):
+    """
+    Columns matching the specified region, bus and component are filtered
+    from the storage level data.
 
+    Parameters
+    ----------
+    df: pandas.DataFrame
+        DataFrame with storage filling levels
+    region: str
+        short name for the region that shall be filtered
+    bus: str
+        bus that shall be filtered
+    component: str
+        component that shall be filtered
+
+    Returns
+    -------
+    df: pandas.DataFrame
+        DataFrame that contains only the selected storage
+    """
     columns = []
     str = region + "-" + bus + "-" + component
     for i in df.columns:
@@ -61,7 +82,7 @@ def filter_storage_sequences(df, region, bus, component):
 
 
 def prepare_reaction_data(df, bus_name, labels_dict=labels_dict):
-    # This script is a copy of plots.prepare_dispatch_data without excluding lines on demand
+    # This script is a copy of plots.prepare_dispatch_data excluding lines on demand
     df.columns = df.columns.to_flat_index()
     for i in df.columns:
         if i[0] == bus_name:
