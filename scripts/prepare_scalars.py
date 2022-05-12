@@ -50,6 +50,9 @@ def annuise_investment_cost(sc):
         scenario_keys = invest_data.index.get_level_values("scenario_key")
         invest_data["wacc"] = wacc.loc[scenario_keys].values
 
+        # keep rows where all necessary values are given
+        invest_data = invest_data.loc[~invest_data.isna().any(1)]
+
         annuised_investment_cost = invest_data.apply(
             lambda x: annuity(x[var_name_cost], x["lifetime"], x["wacc"])
             + x[var_name_fixom_cost],
