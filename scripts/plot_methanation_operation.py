@@ -38,40 +38,41 @@ def load_results_sequences(directory):
     return sequences
 
 
-def filter_storage_sequences(df, region, bus, component):
+def filter_results_sequences(df, region=None, carrier=None, tech=None):
     """
-    Columns matching the specified region, bus and component are filtered
-    from the storage level data.
+    Filters data for the specified region, carrier and tech from
+    results sequences.
 
     Parameters
     ----------
     df: pandas.DataFrame
-        DataFrame with storage filling levels
+        DataFrame containing results sequences
     region: str
         short name for the region that shall be filtered
-    bus: str
-        bus that shall be filtered
-    component: str
-        component that shall be filtered
+    carrier: str
+        carrier that shall be filtered
+    tech: str
+        tech that shall be filtered
 
     Returns
     -------
     df: pandas.DataFrame
-        DataFrame that contains only the selected storage
+        DataFrame that contains only the selected sequences
     """
     columns = []
-    str = region + "-" + bus + "-" + component
-    for i in df.columns:
-        if i[0].startswith(str):
-            columns.append(i)
+    regex = "^" + "-".join([item for item in [region, carrier, tech] if item])
+
+    # append '-' if only region is given
+    if not (carrier or tech):
+        regex = regex + "-"
+
+    for col in df.columns:
+        if re.search(regex, col[0]) or re.search(regex, col[1]):
+            columns.append(col)
+
     df = df[columns]
 
     return df
-
-
-def filter_region_ts(df, region):
-    columns = [col for col in df.columns if re.search(region, col[0])]
-    return df.loc[:, columns]
 
 
 def prepare_reaction_data(df, bus_name, labels_dict=labels_dict):
@@ -201,11 +202,9 @@ if __name__ == "__main__":
         os.path.join(variable_directory, "storage_content.csv")
     )
 
-    methanation_reaction_sequences = filter_region_ts(
-        methanation_reaction_sequences, "^B-"
-    )
+    methanation_reaction_sequences = filter_results_sequences(storage_sequences, "B")
 
-    methanation_storage_sequences = filter_storage_sequences(
+    methanation_storage_sequences = filter_results_sequences(
         storage_sequences, "B", "h2", "methanation"
     )
 
