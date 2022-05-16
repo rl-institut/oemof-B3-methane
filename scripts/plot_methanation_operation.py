@@ -66,11 +66,6 @@ def filter_storage_sequences(df, region, bus, component):
             columns.append(i)
     df = df[columns]
 
-    df = df.droplevel(["to", "type"], axis=1)
-    df.columns = df.columns.str.strip(region + "-")
-
-    df = plots.map_labels(df, labels_dict=labels_dict)
-
     return df
 
 
@@ -86,6 +81,13 @@ def prepare_reaction_data(df, bus_name, labels_dict=labels_dict):
         if i[0] == bus_name:
             df[i] = df[i] * -1
     df = plots.map_labels(df, labels_dict)
+    return df
+
+
+def prepare_storage_data(df, labels_dict=labels_dict):
+
+    df = plots.map_labels(df, labels_dict=labels_dict)
+
     return df
 
 
@@ -131,9 +133,10 @@ def plot_methanation_operation(
         colors_odict=colors_odict,
     )
 
+    df = prepare_storage_data(sequences_methanation_storage)
     plots.plot_dispatch(
         ax4,
-        sequences_methanation_storage,
+        df,
         df_demand=pd.DataFrame(),
         unit="MWh",
         colors_odict=colors_odict,
