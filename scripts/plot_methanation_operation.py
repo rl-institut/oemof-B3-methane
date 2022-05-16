@@ -202,7 +202,9 @@ if __name__ == "__main__":
         os.path.join(variable_directory, "storage_content.csv")
     )
 
-    methanation_reaction_sequences = filter_results_sequences(storage_sequences, "B")
+    methanation_reaction_sequences = filter_results_sequences(
+        methanation_reaction_sequences, "B"
+    )
 
     methanation_storage_sequences = filter_results_sequences(
         storage_sequences, "B", "h2", "methanation"
