@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -79,6 +80,11 @@ def filter_storage_sequences(df, region, bus, component):
     df = plots.map_labels(df, labels_dict=labels_dict)
 
     return df
+
+
+def filter_region_ts(df, region):
+    columns = [col for col in df.columns if re.search(region, col[0])]
+    return df.loc[:, columns]
 
 
 def prepare_reaction_data(df, bus_name, labels_dict=labels_dict):
@@ -197,6 +203,10 @@ if __name__ == "__main__":
     ]
     storage_sequences = load_storage_sequences(
         variable_directory, "storage_content.csv"
+    )
+
+    methanation_reaction_sequences = filter_region_ts(
+        methanation_reaction_sequences, "^B-"
     )
 
     methanation_storage_sequences = filter_storage_sequences(
