@@ -16,6 +16,11 @@ def drop_near_zeros(df, tolerance=1e-3):
     return df
 
 
+def load_results_sequence(file_path):
+    df = pd.read_csv(file_path, header=[0, 1, 2], parse_dates=[0], index_col=[0])
+    return df
+
+
 def load_results_sequences(directory):
     files = os.listdir(directory)
 
@@ -26,24 +31,11 @@ def load_results_sequences(directory):
 
         path = os.path.join(directory, file)
 
-        df = pd.read_csv(path, header=[0, 1, 2], parse_dates=[0], index_col=[0])
-
-        df = drop_near_zeros(df)
+        df = load_results_sequence(path)
 
         sequences[name] = df
 
     return sequences
-
-
-def load_storage_sequences(directory, file):
-    # similar to the function above but for only one file and without dropping near zeros,
-    # because the storage filling level shall also be displayed if it is empty.
-
-    path = os.path.join(directory, file)
-
-    df = pd.read_csv(path, header=[0, 1, 2], parse_dates=[0], index_col=[0])
-
-    return df
 
 
 def filter_storage_sequences(df, region, bus, component):
@@ -198,11 +190,12 @@ if __name__ == "__main__":
 
     bus_sequences = load_results_sequences(bus_directory)
 
-    methanation_reaction_sequences = load_results_sequences(component_directory)[
-        "methanation_reactor"
-    ]
-    storage_sequences = load_storage_sequences(
-        variable_directory, "storage_content.csv"
+    methanation_reaction_sequences = load_results_sequence(
+        os.path.join(component_directory, "methanation_reactor.csv")
+    )
+
+    storage_sequences = load_results_sequence(
+        os.path.join(variable_directory, "storage_content.csv")
     )
 
     methanation_reaction_sequences = filter_region_ts(
