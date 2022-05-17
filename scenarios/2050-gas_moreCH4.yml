@@ -28,7 +28,6 @@ paths_scalars:
   - raw/scalars/el_gas_constraint.csv
   - results/_resources/scal_costs_efficiencies.csv
   - results/_resources/scal_load_heat.csv
-  - raw/scalars_methanation.csv
 
 filter_scalars:
   1:
