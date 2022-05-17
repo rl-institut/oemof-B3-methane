@@ -38,6 +38,16 @@ def get_scenario_pairs(scenarios):
     return pairs
 
 
+def delta_scenarios(df, pairs):
+    a = df.loc[[p[0] for p in pairs]]
+    b = df.loc[[p[1] for p in pairs]].rename(index={b: a for a, b in pairs})
+    delta = a - b
+    delta = delta.rename(columns={"var_value": "delta (a - b)"})
+    delta = delta.unstack("var_name")
+
+    return delta
+
+
 def create_total_system_cost_table(scalars):
     df = scalars.copy()
 
@@ -81,4 +91,5 @@ if __name__ == "__main__":
         os.makedirs(out_path)
 
     df = create_total_system_cost_table(scalars)
+    df = delta_scenarios(df, scenario_pairs)
     dp.save_df(df, os.path.join(out_path, "methanation_results.csv"))
