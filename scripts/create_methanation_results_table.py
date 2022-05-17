@@ -34,6 +34,7 @@ def create_total_system_cost_table(scalars):
     curtailment = dp.multi_filter_df(
         df, var_name="flow_in_electricity", tech="curtailment"
     )
+    curtailment = dp.aggregate_scalars(curtailment, "region")
     curtailment["var_name"] = "curtailment"
 
     df = pd.concat([total_system_cost, curtailment])
