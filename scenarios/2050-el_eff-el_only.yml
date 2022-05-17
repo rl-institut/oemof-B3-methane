@@ -3,7 +3,7 @@
 
 # build_datapackage
 
-name: 2050-el_eff-el_only-methanation
+name: 2050-el_eff-el_only
 
 datetimeindex:
   start:
