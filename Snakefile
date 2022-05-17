@@ -216,6 +216,16 @@ rule create_joined_results_table:
     shell:
         "python scripts/create_results_table.py {input} {output} {params.logfile}"
 
+rule create_methanation_results_table:
+    input:
+        "results/joined_scenarios/{scenario_group}/joined/"
+    output:
+        directory("results/joined_scenarios/{scenario_group}/joined_tables_methanation/")
+    params:
+        logfile="logs/{scenario_group}.log"
+    shell:
+        "python scripts/create_methanation_results_table.py {input} {output} {params.logfile}"
+
 rule plot_dispatch:
     input:
         "results/{scenario}/postprocessed/"
