@@ -26,6 +26,18 @@ import oemof_b3.tools.data_processing as dp
 from oemof_b3.config import config
 
 
+def get_scenario_pairs(scenarios):
+    scenarios_methanation = [scen for scen in scenarios if "methanation" in scen]
+    pairs = [(scen.strip("-methanation"), scen) for scen in scenarios_methanation]
+
+    for pair in pairs:
+        if pair[0] not in scenarios:
+            print(f"{pair[1]} is missing partner. Drop.")
+            pairs.remove(pair)
+
+    return pairs
+
+
 def create_total_system_cost_table(scalars):
     df = scalars.copy()
 
@@ -56,6 +68,11 @@ if __name__ == "__main__":
     logger = config.add_snake_logger(logfile, "create_results_table")
 
     scalars = pd.read_csv(os.path.join(in_path, "scalars.csv"))
+
+    # get scenario pairs
+    scenarios = list(scalars["scenario"].unique())
+
+    scenario_pairs = get_scenario_pairs(scenarios)
 
     # Workaround to conform to oemof-b3 format
     scalars.rename(columns={"scenario": "scenario_key"}, inplace=True)
