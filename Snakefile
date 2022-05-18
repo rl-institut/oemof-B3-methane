@@ -113,10 +113,12 @@ rule prepare_vehicle_charging_demand:
 rule prepare_scalars:
     input:
         raw_scalars="raw/scalars/costs_efficiencies.csv",
+        raw_scalars_methanation="raw/scalars_methanation.csv",
     output:
-        "results/_resources/scal_costs_efficiencies.csv"
+        costs_eff="results/_resources/scal_costs_efficiencies.csv",
+        methanation="results/_resources/scal_methanation.csv",
     shell:
-        "python scripts/prepare_scalars.py {input.raw_scalars} {output}"
+        "python scripts/prepare_scalars.py {input.raw_scalars} {input.raw_scalars_methanation} {output.costs_eff} {output.methanation}"
 
 rule prepare_heat_demand:
     input:
