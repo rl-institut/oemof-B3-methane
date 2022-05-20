@@ -307,7 +307,7 @@ if __name__ == "__main__":
     logger = config.add_snake_logger(logfile, "plot_scalar_results")
 
     # User input
-    CARRIERS = ["electricity", "heat_central", "heat_decentral", "h2"]
+    CARRIERS = ["electricity", "heat_central", "heat_decentral", "h2", "ch4"]
     MW_TO_W = 1e6
 
     # create the directory plotted where all plots are saved
