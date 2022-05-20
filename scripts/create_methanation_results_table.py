@@ -42,11 +42,13 @@ def get_scenario_pairs(scenarios):
 
 
 def delta_scenarios(df, pairs):
-    a = df.loc[[p[0] for p in pairs]]
-    b = df.loc[[p[1] for p in pairs]].rename(index={b: a for a, b in pairs})
+    a = df.loc[[p[0] for p in pairs]].unstack("var_name")
+
+    b = df.loc[[p[1] for p in pairs]].unstack("var_name")
+
+    b = b.rename(index={b: a for a, b in pairs})
+
     delta = a - b
-    delta = delta.rename(columns={"var_value": "delta (a - b)"})
-    delta = delta.unstack("var_name")
 
     return delta
 
