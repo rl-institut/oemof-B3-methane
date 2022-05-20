@@ -42,13 +42,17 @@ def get_scenario_pairs(scenarios):
 
 
 def delta_scenarios(df, pairs):
+    r"""
+    Calculates delta (b - a) of scalar results between scenario pairs (a, b). If results for b are
+    smaller, the delta is negative.
+    """
     a = df.loc[[p[0] for p in pairs]].unstack("var_name")
 
     b = df.loc[[p[1] for p in pairs]].unstack("var_name")
 
     b = b.rename(index={b: a for a, b in pairs})
 
-    delta = a - b
+    delta = b - a
 
     return delta
 
@@ -125,5 +129,5 @@ if __name__ == "__main__":
     df = create_total_system_cost_table(scalars)
     df = add_methanation_cost(df, methanation_cost)
     df = delta_scenarios(df, scenario_pairs)
-
+    print(df)
     dp.save_df(df, os.path.join(out_path, "methanation_results.csv"))
