@@ -218,13 +218,14 @@ rule create_joined_results_table:
 
 rule create_methanation_results_table:
     input:
-        "results/joined_scenarios/{scenario_group}/joined/"
+        joined="results/joined_scenarios/{scenario_group}/joined/",
+        methanation_cost="results/_resources/scal_methanation.csv"
     output:
         directory("results/joined_scenarios/{scenario_group}/joined_tables_methanation/")
     params:
         logfile="logs/{scenario_group}.log"
     shell:
-        "python scripts/create_methanation_results_table.py {input} {output} {params.logfile}"
+        "python scripts/create_methanation_results_table.py {input.joined} {input.methanation_cost} {output} {params.logfile}"
 
 rule plot_dispatch:
     input:

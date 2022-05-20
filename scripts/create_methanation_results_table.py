@@ -2,10 +2,13 @@
 r"""
 Inputs
 ------
-in_path : str
+in_path1 : str
     ``results/joined_scenarios/{scenario_group}/joined/scalars.csv``: path to scalar results.
+in_path2 : str
+    ``results/_resources/scal_methanation.csv``: path to methanation cost data.
 out_path : str
-    ``results/joined_scenarios/{scenario_group}/joined_tables/``: target path for results tables.
+    ``results/joined_scenarios/{scenario_group}/joined_methanation_tables/``: target path for
+    results tables.
 logfile : str
     ``logs/{scenario}.log``: path to logfile
 
@@ -71,13 +74,14 @@ def create_total_system_cost_table(scalars):
 
 
 if __name__ == "__main__":
-    in_path = sys.argv[1]  # input data
-    out_path = sys.argv[2]
-    logfile = sys.argv[3]
+    in_path1 = sys.argv[1]  # input data
+    in_path2 = sys.argv[2]  # input data
+    out_path = sys.argv[3]
+    logfile = sys.argv[4]
 
     logger = config.add_snake_logger(logfile, "create_results_table")
 
-    scalars = pd.read_csv(os.path.join(in_path, "scalars.csv"))
+    scalars = pd.read_csv(os.path.join(in_path1, "scalars.csv"))
 
     # get scenario pairs
     scenarios = list(scalars["scenario"].unique())
