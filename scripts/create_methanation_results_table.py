@@ -73,6 +73,30 @@ def create_total_system_cost_table(scalars):
     return df
 
 
+def add_methanation_cost(df, methanation_cost):
+
+    idx = pd.IndexSlice
+
+    methanation_cost = (
+        dp.multi_filter_df(methanation_cost, var_name="storage_capacity_cost")
+        .set_index("scenario_key")
+        .loc[:, "var_value"]
+    )
+
+    def index_is_methanation_and_year(year):
+        return [(str(year) in id[0] and "methanation" in id[0]) for id in df.index]
+
+    df.loc[
+        idx[index_is_methanation_and_year(2040), "total_system_cost"], "var_value"
+    ] += int(methanation_cost["2040-methanation"])
+
+    df.loc[
+        idx[index_is_methanation_and_year(2050), "total_system_cost"], "var_value"
+    ] += int(methanation_cost["2050-methanation"])
+
+    return df
+
+
 if __name__ == "__main__":
     in_path1 = sys.argv[1]  # input data
     in_path2 = sys.argv[2]  # input data
@@ -82,6 +106,8 @@ if __name__ == "__main__":
     logger = config.add_snake_logger(logfile, "create_results_table")
 
     scalars = pd.read_csv(os.path.join(in_path1, "scalars.csv"))
+
+    methanation_cost = dp.load_b3_scalars(in_path2)
 
     # get scenario pairs
     scenarios = list(scalars["scenario"].unique())
@@ -95,5 +121,7 @@ if __name__ == "__main__":
         os.makedirs(out_path)
 
     df = create_total_system_cost_table(scalars)
+    df = add_methanation_cost(df, methanation_cost)
     df = delta_scenarios(df, scenario_pairs)
+
     dp.save_df(df, os.path.join(out_path, "methanation_results.csv"))
