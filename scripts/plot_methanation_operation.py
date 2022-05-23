@@ -101,78 +101,110 @@ def plot_methanation_operation(
 
     bus_name = ["B-electricity", "B-heat_central"]
 
-    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
-    fig.set_size_inches(12, 8, forward=True)
-    fig.subplots_adjust(hspace=0.5)
+    # plot one winter and one summer month
+    # select timeframe
+    year = sequences_el.index[0].year
+    timeframe = [
+        (f"{year}-01-01 00:00:00", f"{year}-01-31 23:00:00"),
+        (f"{year}-07-01 00:00:00", f"{year}-07-31 23:00:00"),
+    ]
 
-    for bus_name, df, ax in zip(bus_name, [sequences_el, sequences_heat], (ax1, ax2)):
-
-        df, df_demand = plots.prepare_dispatch_data(
-            df,
-            bus_name=bus_name,
-            demand_name="demand",
-            labels_dict=labels_dict,
+    for start_date, end_date in timeframe:
+        sequences_el_filtered = plots.filter_timeseries(
+            sequences_el, start_date, end_date
+        )
+        sequences_heat_filtered = plots.filter_timeseries(
+            sequences_heat, start_date, end_date
+        )
+        sequences_methanation_storage_filtered = plots.filter_timeseries(
+            sequences_methanation_storage, start_date, end_date
+        )
+        sequences_methanation_reaction_filtered = plots.filter_timeseries(
+            sequences_methanation_reaction, start_date, end_date
         )
 
+        fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
+        fig.set_size_inches(12, 8, forward=True)
+        fig.subplots_adjust(hspace=0.5)
+
+        for bus_name, df, ax in zip(
+            bus_name, [sequences_el_filtered, sequences_heat_filtered], (ax1, ax2)
+        ):
+
+            df, df_demand = plots.prepare_dispatch_data(
+                df,
+                bus_name=bus_name,
+                demand_name="demand",
+                labels_dict=labels_dict,
+            )
+
+            plots.plot_dispatch(
+                ax=ax,
+                df=df,
+                df_demand=df_demand,
+                unit="MW",
+                colors_odict=colors_odict,
+            )
+
+            for tick in ax.get_xticklabels():
+                tick.set_rotation(45)
+
+        df = prepare_reaction_data(
+            sequences_methanation_reaction_filtered, "B-h2-methanation"
+        )
         plots.plot_dispatch(
-            ax=ax,
-            df=df,
-            df_demand=df_demand,
+            ax3,
+            df,
+            df_demand=pd.DataFrame(),
             unit="MW",
             colors_odict=colors_odict,
         )
 
-        for tick in ax.get_xticklabels():
-            tick.set_rotation(45)
+        df = prepare_storage_data(sequences_methanation_storage_filtered)
+        plots.plot_dispatch(
+            ax4,
+            df,
+            df_demand=pd.DataFrame(),
+            unit="MWh",
+            colors_odict=colors_odict,
+        )
 
-    df = prepare_reaction_data(sequences_methanation_reaction, "B-h2-methanation")
-    plots.plot_dispatch(
-        ax3,
-        df,
-        df_demand=pd.DataFrame(),
-        unit="MW",
-        colors_odict=colors_odict,
-    )
+        h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
+        handles = [
+            item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist
+        ]
+        labels = [
+            item for sublist in list(map(lambda x: x[1], h_l)) for item in sublist
+        ]
 
-    df = prepare_storage_data(sequences_methanation_storage)
-    plots.plot_dispatch(
-        ax4,
-        df,
-        df_demand=pd.DataFrame(),
-        unit="MWh",
-        colors_odict=colors_odict,
-    )
+        # The last two labels are identical with the previous two and are therefore removed.
+        labels = labels[:-2]
 
-    h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
-    handles = [item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist]
-    labels = [item for sublist in list(map(lambda x: x[1], h_l)) for item in sublist]
+        ax4.legend(
+            handles=handles,
+            labels=labels,
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.5),
+            fancybox=True,
+            ncol=4,
+            fontsize=14,
+        )
 
-    # The last two labels are identical with the previous two and are therefore removed.
-    labels = labels[:-2]
+        ax1.set_ylabel("Power")
+        ax2.set_ylabel("Power")
+        ax3.set_ylabel("Power / MW")
+        ax4.set_ylabel("Storage level / MWh")
+        ax4.set_xlabel("Time")
 
-    ax4.legend(
-        handles=handles,
-        labels=labels,
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.5),
-        fancybox=True,
-        ncol=4,
-        fontsize=14,
-    )
+        ax1.axes.get_xaxis().set_visible(False)
+        ax2.axes.get_xaxis().set_visible(False)
+        ax3.axes.get_xaxis().set_visible(False)
 
-    ax1.set_ylabel("Power")
-    ax2.set_ylabel("Power")
-    ax3.set_ylabel("Power / MW")
-    ax4.set_ylabel("Storage level / MWh")
-    ax4.set_xlabel("Time")
+        fig.tight_layout()
 
-    ax1.axes.get_xaxis().set_visible(False)
-    ax2.axes.get_xaxis().set_visible(False)
-    ax3.axes.get_xaxis().set_visible(False)
+        file_name = "methanation_operation" + "_" + start_date[5:7] + ".png"
 
-    fig.tight_layout()
-
-    return fig
+        plt.savefig(os.path.join(target, file_name))
 
 
 if __name__ == "__main__":
@@ -216,5 +248,3 @@ if __name__ == "__main__":
         methanation_reaction_sequences,
         methanation_storage_sequences,
     )
-
-    plt.savefig(os.path.join(target, "methanation_operation.png"))
