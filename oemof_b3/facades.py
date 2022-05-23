@@ -87,6 +87,9 @@ class MethanationReactor(Transformer, Facade):
     ...     efficiency_discharge=1,
     ...     methanation_rate=2,
     ...     efficiency_methanation=0.93,
+    ...     marginal_cost=0,
+    ...     input_parameters={},
+    ...     output_parameters={},
     ...     methanation_option=methanation_option,
     ...     )
     """
