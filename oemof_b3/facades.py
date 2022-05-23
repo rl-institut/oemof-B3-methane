@@ -3,6 +3,35 @@ from oemof.solph.components import GenericStorage
 from oemoflex.facades import TYPEMAP, Facade
 
 
+class GenericStorage(GenericStorage):
+    r"""
+    Supplement GenericStorage with carrier and tech properties to work with labeling in
+    postprocessing.
+
+    Needed for GenericStorage subnodes in MethanationReactor
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.carrier = kwargs.get("carrier", None)
+        self.tech = kwargs.get("tech", None)
+
+
+class Transformer(Transformer):
+    r"""
+    Supplement Transformer with carrier and tech properties to work with labeling in postprocessing.
+
+    Needed for Transformer subnodes in MethanationReactor
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.carrier = kwargs.get("carrier", None)
+        self.tech = kwargs.get("tech", None)
+
+
 class MethanationReactor(Transformer, Facade):
     r"""A methanation reactor that transforms e.g. H2 and CO2 to CH4.
 
