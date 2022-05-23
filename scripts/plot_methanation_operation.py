@@ -99,8 +99,6 @@ def plot_methanation_operation(
     sequences_methanation_storage,
 ):
 
-    bus_name = ["B-electricity", "B-heat_central"]
-
     # plot one winter and one summer month
     # select timeframe
     year = sequences_el.index[0].year
@@ -113,6 +111,7 @@ def plot_methanation_operation(
         sequences_el_filtered = plots.filter_timeseries(
             sequences_el, start_date, end_date
         )
+
         sequences_heat_filtered = plots.filter_timeseries(
             sequences_heat, start_date, end_date
         )
@@ -122,6 +121,7 @@ def plot_methanation_operation(
         sequences_methanation_reaction_filtered = plots.filter_timeseries(
             sequences_methanation_reaction, start_date, end_date
         )
+        bus_name = ["B-electricity", "B-heat_central"]
 
         fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
         fig.set_size_inches(12, 8, forward=True)
