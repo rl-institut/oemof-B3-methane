@@ -123,6 +123,17 @@ rule prepare_scalars:
     shell:
         "python scripts/prepare_scalars.py {input.raw_scalars} {input.raw_scalars_methanation} {output.costs_eff} {output.methanation}"
 
+rule prepare_cop_timeseries:
+    input:
+        scalars="raw/scalars/demands.csv",
+        weather="raw/weatherdata"
+    output:
+        ts_efficiency_small="results/_resources/ts_efficiency_heatpump_small.csv",
+    params:
+        logfile="logs/prepare_cop_timeseries.log"
+    shell:
+         "python scripts/prepare_cop_timeseries.py {input.scalars} {input.weather} {output.ts_efficiency_small} {params.logfile}"
+
 rule prepare_heat_demand:
     input:
         weather="raw/weatherdata",
