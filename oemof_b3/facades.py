@@ -63,6 +63,23 @@ class MethanationReactor(Transformer, Facade):
 
     .. math::
 
+        x^{level, educts}(t) =
+        x^{level, educts}(t-1) \cdot (1 - c^{loss\_rate, educts}(t))
+        + x^{profile, educts}(t) - \frac{x^{flow, out, educts}(t)}{c^{efficiency, educts}(t)}
+        \qquad \forall t \in T
+
+    .. math::
+        x^{flow, from, H2}(t) \cdot c^{efficiency, H2}(t) + x^{flow, from, CO2}(t) \cdot
+        c^{efficiency, CO2}(t) = x^{flow, to}(t)
+        \qquad \forall t \in T
+
+    .. math::
+
+        x^{level, products}(t) =
+        x^{level, products}(t-1) \cdot (1 - c^{loss\_rate, products}(t))
+        + x^{profile, products}(t) - \frac{x^{flow, out, products}(t)}{c^{efficiency, products}(t)}
+        \qquad \forall t \in T
+
     Examples
     --------
     Basic usage example of the MethanationReactor class with arbitrary values for the parameters.
