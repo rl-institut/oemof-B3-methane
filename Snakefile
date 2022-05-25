@@ -105,18 +105,34 @@ rule prepare_electricity_demand:
 rule prepare_vehicle_charging_demand:
     input:
         input_dir="raw/time_series/vehicle_charging",
+        scalars="raw/scalars/demands.csv",
     output:
         "results/_resources/ts_load_electricity_vehicles.csv"
+    params:
+        logfile="logs/prepare_vehicle_charging_demand.log"
     shell:
-        "python scripts/prepare_vehicle_charging_demand.py {input.input_dir} {output}"
+        "python scripts/prepare_vehicle_charging_demand.py {input.input_dir} {input.scalars} {output} {params.logfile}"
 
 rule prepare_scalars:
     input:
         raw_scalars="raw/scalars/costs_efficiencies.csv",
+        raw_scalars_methanation="raw/scalars_methanation.csv",
     output:
-        "results/_resources/scal_costs_efficiencies.csv"
+        costs_eff="results/_resources/scal_costs_efficiencies.csv",
+        methanation="results/_resources/scal_methanation.csv",
     shell:
-        "python scripts/prepare_scalars.py {input.raw_scalars} {output}"
+        "python scripts/prepare_scalars.py {input.raw_scalars} {input.raw_scalars_methanation} {output.costs_eff} {output.methanation}"
+
+rule prepare_cop_timeseries:
+    input:
+        scalars="raw/scalars/demands.csv",
+        weather="raw/weatherdata"
+    output:
+        ts_efficiency_small="results/_resources/ts_efficiency_heatpump_small.csv",
+    params:
+        logfile="logs/prepare_cop_timeseries.log"
+    shell:
+         "python scripts/prepare_cop_timeseries.py {input.scalars} {input.weather} {output.ts_efficiency_small} {params.logfile}"
 
 rule prepare_heat_demand:
     input:
@@ -206,6 +222,16 @@ rule create_results_table:
     shell:
         "python scripts/create_results_table.py {input} {output} {params.logfile}"
 
+rule create_joined_results_table:
+    input:
+        "results/joined_scenarios/{scenario_group}/joined/"
+    output:
+        directory("results/joined_scenarios/{scenario_group}/joined_tables/")
+    params:
+        logfile="logs/{scenario_group}.log"
+    shell:
+        "python scripts/create_results_table.py {input} {output} {params.logfile}"
+
 rule plot_dispatch:
     input:
         "results/{scenario}/postprocessed/"
@@ -246,11 +272,11 @@ rule plot_scalar_results:
 
 rule plot_joined_scalars:
     input:
-        "results/joined_scenarios/{scenario_list}/joined/"
+        "results/joined_scenarios/{scenario_group}/joined/"
     output:
-        directory("results/joined_scenarios/{scenario_list}/joined_plotted/")
+        directory("results/joined_scenarios/{scenario_group}/joined_plotted/")
     params:
-        logfile="logs/{scenario_list}.log"
+        logfile="logs/{scenario_group}.log"
     shell:
         "python scripts/plot_scalar_results.py {input} {output} {params.logfile}"
 

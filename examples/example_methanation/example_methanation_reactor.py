@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 
 import pandas as pd
-from oemof.outputlib.processing import convert_keys_to_strings
+from oemof.solph.processing import convert_keys_to_strings
 from oemof.solph import Bus, EnergySystem, Flow, Model, Sink, Source, Transformer
 from oemof.tabular.tools import postprocessing as postpro
 from oemof_b3 import colors_odict, labels_dict
@@ -175,7 +175,7 @@ def run_model(methanation_option):
         capacity_charge=CAP_CHARGE_M_REAC,
         capacity_discharge=CAP_DISCHARGE_M_REAC,
         storage_capacity_educts=STORAGE_CAPACITY_EDUCTS,
-        storage_capacity_products=STORAGE_CAPACITY_EDUCTS,
+        storage_capacity_products=STORAGE_CAPACITY_PRODUCTS,
         efficiency_charge=1,
         efficiency_discharge=1,
         methanation_rate=METHANATION_RATE,  # TODO: Passing lists does not work here yet.

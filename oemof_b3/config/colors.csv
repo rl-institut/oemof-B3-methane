@@ -53,9 +53,7 @@ Heat pump (DH),#2ca02c
 Heat pump (domestic),#2ca00c
 res. PtH,#ff7f0e
 
-CH4 excess,red
-CH4 import,red
-CH4 export,red
+
 
 Electrolyzer,yellow
 
@@ -69,7 +67,10 @@ Methanation products,#9467bd
 Methanation products in,#9467bd
 Methanation educts,saddlebrown
 Methanation educts out,saddlebrown
+CH4 excess,#cfcfcf
+CH4 export,#cfcfcf
 CH4 shortage,#cfcfcf
+CH4 import,#cfcfcf
 CH4 demand,saddlebrown
 H2 import,green
 H2 demand,darkgreen
