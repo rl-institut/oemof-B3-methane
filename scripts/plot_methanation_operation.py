@@ -152,13 +152,14 @@ def plot_methanation_operation(
         df = prepare_reaction_data(
             sequences_methanation_reaction_filtered, "B-h2-methanation"
         )
-        plots.plot_dispatch(
-            ax3,
-            df,
-            df_demand=pd.DataFrame(),
-            unit="MW",
-            colors_odict=colors_odict,
-        )
+        if not (df.empty or (df == 0).all().all()):
+            plots.plot_dispatch(
+                ax3,
+                df,
+                df_demand=pd.DataFrame(),
+                unit="MW",
+                colors_odict=colors_odict,
+            )
 
         df = prepare_storage_data(sequences_methanation_storage_filtered)
         plots.plot_dispatch(
