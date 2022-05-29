@@ -27,6 +27,7 @@ from oemof_b3.config import config
 from oemoflex.model.datapackage import EnergyDataPackage
 from oemoflex.model.variations import EDPSensitivity
 from oemof_b3.model import foreign_keys_update
+from SALib.sample import latin
 
 
 if __name__ == "__main__":
@@ -54,7 +55,7 @@ if __name__ == "__main__":
     sensitivity = EDPSensitivity(lb, ub)
 
     logger.info(f"Creating {n} samples.")
-    samples = sensitivity.get_linear_slide(n)
+    samples = sensitivity.get_salib_samples(latin.sample, N=n)
 
     for n_sample, sample in samples.items():
 
