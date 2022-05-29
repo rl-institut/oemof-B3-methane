@@ -41,7 +41,7 @@ from oemof.solph import processing
 # DONT REMOVE THIS LINE!
 # pylint: disable=unusedimport
 from oemof.tabular import datapackage  # noqa
-from oemof.tabular.facades import TYPEMAP
+from oemof_b3.facades import TYPEMAP
 
 from oemof_b3.tools import data_processing as dp
 from oemof_b3.tools.equate_flows import equate_flows_by_keyword

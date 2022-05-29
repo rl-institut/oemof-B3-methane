@@ -10,13 +10,8 @@ busses:
   - co2
   - electricity
   - h2
-  - heat_central
-  - heat_decentral
 
 components:
-  - ch4-boiler_large
-  - ch4-boiler_small
-  - ch4-bpchp
   - ch4-demand
   - ch4-excess
   - ch4-export
@@ -28,29 +23,18 @@ components:
   - electricity-demand
   - electricity-electrolyzer
   - electricity-export
-  - electricity-heatpump_large
-  - electricity-heatpump_small
   - electricity-import
   - electricity-liion_battery
-  - electricity-pth
   - electricity-shortage
   - electricity-transmission
-  - h2-bpchp
   - h2-cavern
   - h2-demand
   - h2-excess
   - h2-export
   - h2-gt
   - h2-import
+  - h2-methanation
   - h2-shortage
-  - heat_central-demand
-  - heat_central-excess
-  - heat_central-shortage
-  - heat_central-storage
-  - heat_decentral-demand
-  - heat_decentral-excess
-  - heat_decentral-shortage
-  - heat_decentral-storage
   - hydro-ror
   - solar-pv
   - wind-onshore

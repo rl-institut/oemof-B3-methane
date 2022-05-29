@@ -17,3 +17,5 @@ model_structures = {
     os.path.splitext(f_name)[0]: load_yaml(os.path.join(MODEL_STRUCTURE_DIR, f_name))
     for f_name in os.listdir(MODEL_STRUCTURE_DIR)
 }
+
+facade_attsr_update = os.path.join(here, "facade_attrs")

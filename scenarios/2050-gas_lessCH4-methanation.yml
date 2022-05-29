@@ -3,7 +3,7 @@
 
 # build_datapackage
 
-name: 2050-gas_moreCH4
+name: 2050-gas_lessCH4-methanation
 
 datetimeindex:
   start:
@@ -14,7 +14,7 @@ datetimeindex:
     8760
 
 model_structure:
-  model_structure_full
+  model_structure_full_methanation
 
 # parametrize
 
@@ -28,12 +28,13 @@ paths_scalars:
   - raw/scalars/el_gas_constraint.csv
   - results/_resources/scal_costs_efficiencies.csv
   - results/_resources/scal_load_heat.csv
+  - raw/scalars_methanation.csv
 
 filter_scalars:
   1:
     scenario_key:
       - "ALL"
-      - "2050-gas_moreCH4"
+      - "2050-gas_lessCH4"
       - "2050-base"
       - "2050-methanation"
 
@@ -48,7 +49,7 @@ paths_timeseries:
 
 filter_timeseries:
   scenario_key:
-    - "2050-gas_moreCH4"
+    - "2050-gas_lessCH4"
     - "ALL"
   timeindex_start:
     "2017-01-01 00:00:00"
