@@ -6,7 +6,21 @@ HTTP = HTTPRemoteProvider()
 
 scenario_groups = {
     "examples": ["example_base", "example_more_re", "example_more_re_less_fossil"],
-    "all-scenarios": [os.path.splitext(scenario)[0] for scenario in os.listdir("scenarios")]
+    "all-scenarios": [os.path.splitext(scenario)[0] for scenario in os.listdir("scenarios")],
+    "main-scenarios": [
+        "2050-el_eff",
+        "2050-el_eff-methanation",
+        "2050-gas_lessCH4",
+        "2050-gas_lessCH4-methanation",
+        "2050-gas_moreCH4",
+        "2050-gas_moreCH4-methanation",
+        "2050-80-gas_moreCH4",
+        "2050-80-gas_moreCH4-methanation",
+        "2050-95-gas_moreCH4",
+        "2050-95-gas_moreCH4-methanation",
+        "2050-100-gas_moreCH4",
+        "2050-100-gas_moreCH4-methanation",
+    ]
 }
 
 resource_plots = ['scal_conv_pp-capacity_net_el']
