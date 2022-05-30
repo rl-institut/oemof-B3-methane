@@ -111,10 +111,13 @@ def plot_methanation_operation(
         sequences_el_filtered = plots.filter_timeseries(
             sequences_el, start_date, end_date
         )
+        sequences_el_filtered = drop_near_zeros(sequences_el_filtered)
 
         sequences_heat_filtered = plots.filter_timeseries(
             sequences_heat, start_date, end_date
         )
+        sequences_heat_filtered = drop_near_zeros(sequences_heat_filtered)
+
         sequences_methanation_storage_filtered = plots.filter_timeseries(
             sequences_methanation_storage, start_date, end_date
         )
@@ -124,7 +127,7 @@ def plot_methanation_operation(
         bus_name = ["B-electricity", "B-heat_central"]
 
         fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
-        fig.set_size_inches(12, 8, forward=True)
+        fig.set_size_inches(20, 12, forward=True)
         fig.subplots_adjust(hspace=0.5)
 
         for bus_name, df, ax in zip(
@@ -169,26 +172,14 @@ def plot_methanation_operation(
             colors_odict=colors_odict,
         )
 
-        h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
-        handles = [
-            item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist
-        ]
-        labels = [
-            item for sublist in list(map(lambda x: x[1], h_l)) for item in sublist
-        ]
-
-        # The last two labels are identical with the previous two and are therefore removed.
-        labels = labels[:-2]
-
-        ax4.legend(
-            handles=handles,
-            labels=labels,
-            loc="upper center",
-            bbox_to_anchor=(0.5, -0.5),
-            fancybox=True,
-            ncol=4,
-            fontsize=14,
-        )
+        for ax in [ax1, ax2, ax3, ax4]:
+            ax.legend(
+                loc="center left",
+                bbox_to_anchor=(1.0, 0, 0, 1),
+                fancybox=True,
+                ncol=1,
+                fontsize=14,
+            )
 
         ax1.set_ylabel("Power")
         ax2.set_ylabel("Power")
