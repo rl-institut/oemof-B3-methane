@@ -28,6 +28,7 @@ def load_results_sequences(directory):
 
     for file in files:
         name = os.path.splitext(file)[0]
+        print(name)
 
         path = os.path.join(directory, file)
 
@@ -149,11 +150,14 @@ def plot_methanation_operation(
                 colors_odict=colors_odict,
             )
 
+            ax.set_title(bus_name)
+
             for tick in ax.get_xticklabels():
                 tick.set_rotation(45)
 
+        reaction_plot_name = "B-h2-methanation"
         df = prepare_reaction_data(
-            sequences_methanation_reaction_filtered, "B-h2-methanation"
+            sequences_methanation_reaction_filtered, reaction_plot_name
         )
         plots.plot_dispatch(
             ax3,
@@ -163,6 +167,8 @@ def plot_methanation_operation(
             colors_odict=colors_odict,
         )
 
+        ax3.set_title(reaction_plot_name)
+
         df = prepare_storage_data(sequences_methanation_storage_filtered)
         plots.plot_dispatch(
             ax4,
@@ -171,6 +177,8 @@ def plot_methanation_operation(
             unit="MWh",
             colors_odict=colors_odict,
         )
+
+        ax4.set_title("storage_content B-h2-methanation-storage")
 
         for ax in [ax1, ax2, ax3, ax4]:
             ax.legend(
