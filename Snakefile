@@ -20,6 +20,14 @@ scenario_groups = {
         "2050-95-gas_moreCH4-methanation",
         "2050-100-gas_moreCH4",
         "2050-100-gas_moreCH4-methanation",
+    ],
+    "main-scenarios-methanation": [
+        "2050-el_eff-methanation",
+        "2050-gas_lessCH4-methanation",
+        "2050-gas_moreCH4-methanation",
+        "2050-80-gas_moreCH4-methanation",
+        "2050-95-gas_moreCH4-methanation",
+        "2050-100-gas_moreCH4-methanation",
     ]
 }
 
