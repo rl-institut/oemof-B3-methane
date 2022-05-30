@@ -27,6 +27,8 @@ from oemof_b3.config import config
 from oemoflex.model.datapackage import EnergyDataPackage
 from oemoflex.model.variations import EDPSensitivity
 from oemof_b3.model import foreign_keys_update
+import oemof_b3.tools.data_processing as dp
+from pandas.testing import assert_frame_equal
 from SALib.sample import latin
 
 
@@ -49,6 +51,18 @@ if __name__ == "__main__":
     lb = EnergyDataPackage.from_metadata(os.path.join(path_lb, "datapackage.json"))
     ub = EnergyDataPackage.from_metadata(os.path.join(path_ub, "datapackage.json"))
 
+    # load additional scalars and make sure that they are the same
+    # TODO: Currently, varying the parameters for the constraints is not supported.
+    #  As soon as the additional scalars representing for contraints are part of the
+    #  datapackage, this step can be removed.
+    additional_scalars_lb = dp.load_b3_scalars(
+        os.path.join(path_lb, "additional_scalars.csv")
+    )
+    additional_scalars_ub = dp.load_b3_scalars(
+        os.path.join(path_ub, "additional_scalars.csv")
+    )
+    assert_frame_equal(additional_scalars_lb, additional_scalars_ub)
+
     lb.stack_components()
     ub.stack_components()
 
@@ -66,5 +80,7 @@ if __name__ == "__main__":
         sample.basepath = path
 
         sample.to_csv_dir(path)
+
+        dp.save_df(additional_scalars_lb, os.path.join(path, "additional_scalars.csv"))
 
         sample.infer_metadata(foreign_keys_update)
