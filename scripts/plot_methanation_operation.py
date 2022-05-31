@@ -10,6 +10,9 @@ from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.config import config
 
 
+MW_to_W = 1e6
+
+
 def drop_near_zeros(df, tolerance=1e-3):
     # drop columns with data that is almost zero using the sum of the absolute values
     df = df.loc[:, df.abs().sum() > tolerance]
@@ -75,14 +78,43 @@ def filter_results_sequences(df, region=None, carrier=None, tech=None):
     return df
 
 
-def prepare_reaction_data(df, bus_name, labels_dict=labels_dict):
-    # This script is a copy of plots.prepare_dispatch_data excluding lines on demand
-    df.columns = df.columns.to_flat_index()
-    for i in df.columns:
-        if i[0] == bus_name:
-            df[i] = df[i] * -1
-    df = plots.map_labels(df, labels_dict)
-    return df
+def prepare_methanation_data(flows, region):
+    h2_in = filter_results_sequences(flows, region, "h2", "methanation-combine-educts")
+
+    ch4_out = filter_results_sequences(
+        flows, region, "h2", "methanation-storage_products"
+    )
+
+    ch4_out *= -1
+
+    def map_methanation_labels(col):
+        assert isinstance(col, tuple)
+
+        if "h2" in col[0] and "methanation-combine-educts" in col[1]:
+            return "H2 input"
+        elif "co2" in col[0] and "methanation-combine-educts" in col[1]:
+            return "CO2 input"
+        elif (
+            "methanation-combine-educts" in col[0]
+            and "methanation-storage_educts" in col[1]
+        ):
+            return "H2/CO2 mix input"
+        elif "methanation" in col[0] and "methanation-storage_products" in col[1]:
+            return "Methane production"
+        elif "methanation-storage_products" in col[0] and "ch4" in col[1]:
+            return "CH4 output"
+        else:
+            raise ValueError(f"Column could not be mapped {col}!")
+
+    m_reaction_data = pd.concat([h2_in, ch4_out], 1)
+
+    m_reaction_data.columns = [
+        map_methanation_labels(col) for col in m_reaction_data.columns.to_flat_index()
+    ]
+
+    m_reaction_data = m_reaction_data.loc[:, ["H2 input", "CH4 output"]]
+
+    return m_reaction_data
 
 
 def prepare_storage_data(df, labels_dict=labels_dict):
@@ -95,9 +127,10 @@ def prepare_storage_data(df, labels_dict=labels_dict):
 def plot_methanation_operation(
     sequences_el,
     sequences_heat,
-    sequences_methanation_reaction,
+    sequences_methanation_input_output,
     sequences_methanation_storage,
 ):
+    plot_title = "B-h2-methanation"
 
     # plot one winter and one summer month
     # select timeframe
@@ -121,8 +154,8 @@ def plot_methanation_operation(
         sequences_methanation_storage_filtered = plots.filter_timeseries(
             sequences_methanation_storage, start_date, end_date
         )
-        sequences_methanation_reaction_filtered = plots.filter_timeseries(
-            sequences_methanation_reaction, start_date, end_date
+        sequences_methanation_input_output_filtered = plots.filter_timeseries(
+            sequences_methanation_input_output, start_date, end_date
         )
         bus_name = ["B-electricity", "B-heat_central"]
 
@@ -141,11 +174,14 @@ def plot_methanation_operation(
                 labels_dict=labels_dict,
             )
 
+            # convert to SI-units
+            df *= MW_to_W
+
             plots.plot_dispatch(
                 ax=ax,
                 df=df,
                 df_demand=df_demand,
-                unit="MW",
+                unit="W",
                 colors_odict=colors_odict,
             )
 
@@ -154,27 +190,31 @@ def plot_methanation_operation(
             for tick in ax.get_xticklabels():
                 tick.set_rotation(45)
 
-        reaction_plot_name = "B-h2-methanation"
-        df = prepare_reaction_data(
-            sequences_methanation_reaction_filtered, reaction_plot_name
-        )
+        df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
+            # convert to SI-units
+            df *= MW_to_W
+
             plots.plot_dispatch(
                 ax3,
                 df,
                 df_demand=pd.DataFrame(),
-                unit="MW",
+                unit="W",
                 colors_odict=colors_odict,
             )
 
-        ax3.set_title(reaction_plot_name)
+        ax3.set_title(plot_title)
 
         df = prepare_storage_data(sequences_methanation_storage_filtered)
+
+        # convert to SI-units
+        df *= MW_to_W
+
         plots.plot_dispatch(
             ax4,
             df,
             df_demand=pd.DataFrame(),
-            unit="MWh",
+            unit="Wh",
             colors_odict=colors_odict,
         )
 
@@ -225,16 +265,12 @@ if __name__ == "__main__":
 
     bus_sequences = load_results_sequences(bus_directory)
 
-    methanation_reaction_sequences = load_results_sequence(
-        os.path.join(component_directory, "methanation_reactor.csv")
-    )
+    flows = load_results_sequence(os.path.join(variable_directory, "flow.csv"))
+
+    methanation_input_output_sequences = prepare_methanation_data(flows, "B")
 
     storage_sequences = load_results_sequence(
         os.path.join(variable_directory, "storage_content.csv")
-    )
-
-    methanation_reaction_sequences = filter_results_sequences(
-        methanation_reaction_sequences, "B"
     )
 
     methanation_storage_sequences = filter_results_sequences(
@@ -244,6 +280,6 @@ if __name__ == "__main__":
     plot_methanation_operation(
         bus_sequences["B-electricity"],
         bus_sequences["B-heat_central"],
-        methanation_reaction_sequences,
+        methanation_input_output_sequences,
         methanation_storage_sequences,
     )
