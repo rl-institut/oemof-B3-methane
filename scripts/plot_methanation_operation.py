@@ -10,6 +10,9 @@ from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.config import config
 
 
+MW_to_W = 1e6
+
+
 def drop_near_zeros(df, tolerance=1e-3):
     # drop columns with data that is almost zero using the sum of the absolute values
     df = df.loc[:, df.abs().sum() > tolerance]
@@ -171,11 +174,14 @@ def plot_methanation_operation(
                 labels_dict=labels_dict,
             )
 
+            # convert to SI-units
+            df *= MW_to_W
+
             plots.plot_dispatch(
                 ax=ax,
                 df=df,
                 df_demand=df_demand,
-                unit="MW",
+                unit="W",
                 colors_odict=colors_odict,
             )
 
@@ -186,22 +192,29 @@ def plot_methanation_operation(
 
         df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
+            # convert to SI-units
+            df *= MW_to_W
+
             plots.plot_dispatch(
                 ax3,
                 df,
                 df_demand=pd.DataFrame(),
-                unit="MW",
+                unit="W",
                 colors_odict=colors_odict,
             )
 
         ax3.set_title(plot_title)
 
         df = prepare_storage_data(sequences_methanation_storage_filtered)
+
+        # convert to SI-units
+        df *= MW_to_W
+
         plots.plot_dispatch(
             ax4,
             df,
             df_demand=pd.DataFrame(),
-            unit="MWh",
+            unit="Wh",
             colors_odict=colors_odict,
         )
 
