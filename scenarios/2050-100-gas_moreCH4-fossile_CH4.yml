@@ -37,8 +37,7 @@ filter_scalars:
       - "2050-base"
       - "reduction_100"
       - "2050-methanation"
-      - "2050-mixed_CH4"
-      - "2050-gas_moreCH4-mixed_CH4"
+      - "2050-fossile_CH4"
 
 paths_timeseries:
   - raw/time_series/ts_load_ch4.csv
