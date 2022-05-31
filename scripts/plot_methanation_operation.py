@@ -138,6 +138,7 @@ def plot_methanation_operation(
     timeframe = [
         (f"{year}-01-01 00:00:00", f"{year}-01-31 23:00:00"),
         (f"{year}-07-01 00:00:00", f"{year}-07-31 23:00:00"),
+        (f"{year}-01-01 00:00:00", f"{year}-12-31 23:00:00"),
     ]
 
     for start_date, end_date in timeframe:
@@ -157,6 +158,10 @@ def plot_methanation_operation(
         sequences_methanation_input_output_filtered = plots.filter_timeseries(
             sequences_methanation_input_output, start_date, end_date
         )
+        sequences_methanation_input_output_filtered = plots._replace_near_zeros(
+            sequences_methanation_input_output_filtered
+        )
+
         bus_name = ["B-electricity", "B-heat_central"]
 
         fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
@@ -240,8 +245,12 @@ def plot_methanation_operation(
         ax3.axes.get_xaxis().set_visible(False)
 
         fig.tight_layout()
-
-        file_name = "methanation_operation" + "_" + start_date[5:7] + ".png"
+        plot_name = (
+            start_date[5:7] + "-" + end_date[5:7]
+            if start_date[5:7] != end_date[5:7]
+            else start_date[5:7]
+        )
+        file_name = "methanation_operation_" + plot_name + ".png"
 
         plt.savefig(os.path.join(target, file_name))
 
