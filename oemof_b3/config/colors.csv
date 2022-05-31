@@ -75,3 +75,5 @@ CH4 import,#cfcfcf
 CH4 demand,saddlebrown
 H2 import,green
 H2 demand,darkgreen
+H2 input,#9467bd
+CH4 output,#9467bd
