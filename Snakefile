@@ -7,6 +7,13 @@ HTTP = HTTPRemoteProvider()
 scenario_groups = {
     "examples": ["example_base", "example_more_re", "example_more_re_less_fossil"],
     "all-scenarios": [os.path.splitext(scenario)[0] for scenario in os.listdir("scenarios")],
+    "all-postprocessed": [
+        scenario for scenario in os.listdir("results")
+        if (
+                os.path.exists(os.path.join("results", scenario, "postprocessed"))
+                and not "example_" in scenario
+        )
+    ],
     "main-scenarios": [
         "2050-el_eff",
         "2050-el_eff-methanation",
