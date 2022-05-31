@@ -28,7 +28,6 @@ def load_results_sequences(directory):
 
     for file in files:
         name = os.path.splitext(file)[0]
-        print(name)
 
         path = os.path.join(directory, file)
 
