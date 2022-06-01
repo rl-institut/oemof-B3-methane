@@ -7,7 +7,7 @@ in_path1 : str
 in_path2 : str
     ``results/_resources/scal_methanation.csv``: path to methanation cost data.
 out_path : str
-    ``results/joined_scenarios/{scenario_group}/joined_methanation_tables/``: target path for
+    ``results/joined_scenarios/{scenario_group}/joined_tables_methanation/``: target path for
     results tables.
 logfile : str
     ``logs/{scenario}.log``: path to logfile
