@@ -3,7 +3,7 @@ r"""
 Inputs
 ------
 in_path1 : str
-    ``results/joined_scenarios/{scenario_group}/joined/scalars.csv``: path to scalar results.
+    ``results/joined_scenarios/{scenario_group}/joined/``: path to scalar results.
 in_path2 : str
     ``results/_resources/scal_methanation.csv``: path to methanation cost data.
 out_path : str
@@ -35,7 +35,7 @@ def get_scenario_pairs(scenarios):
 
     for pair in pairs:
         if pair[0] not in scenarios:
-            print(f"{pair[1]} is missing partner. Drop.")
+            print(f"Scenario {pair[1]} is missing partner. Drop.")
             pairs.remove(pair)
 
     return pairs
@@ -117,7 +117,6 @@ if __name__ == "__main__":
 
     # get scenario pairs
     scenarios = list(scalars["scenario"].unique())
-
     scenario_pairs = get_scenario_pairs(scenarios)
 
     # Workaround to conform to oemof-b3 format
