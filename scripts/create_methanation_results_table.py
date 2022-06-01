@@ -61,13 +61,13 @@ def delta_scenarios(df, pairs):
     return delta
 
 
-def create_total_system_cost_table(scalars):
-    df = scalars.copy()
+def create_table_system_cost_curtailment(scalars):
+    # total system cost
+    total_system_cost = dp.filter_df(scalars, "var_name", "total_system_cost")
 
-    total_system_cost = dp.filter_df(df, "var_name", "total_system_cost")
-
+    # curtailment
     curtailment = dp.multi_filter_df(
-        df, var_name="flow_in_electricity", tech="curtailment"
+        scalars, var_name="flow_in_electricity", tech="curtailment"
     )
     curtailment = dp.aggregate_scalars(curtailment, "region")
     curtailment["var_name"] = "curtailment"
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     if not os.path.exists(out_path):
         os.makedirs(out_path)
 
-    df = create_total_system_cost_table(scalars)
+    df = create_table_system_cost_curtailment(scalars)
     df = add_methanation_cost(df, methanation_cost)
     df = delta_scenarios(df, scenario_pairs)
 
