@@ -6,7 +6,36 @@ HTTP = HTTPRemoteProvider()
 
 scenario_groups = {
     "examples": ["example_base", "example_more_re", "example_more_re_less_fossil"],
-    "all-scenarios": [os.path.splitext(scenario)[0] for scenario in os.listdir("scenarios")]
+    "all-scenarios": [os.path.splitext(scenario)[0] for scenario in os.listdir("scenarios")],
+    "all-postprocessed": [
+        scenario for scenario in os.listdir("results")
+        if (
+                os.path.exists(os.path.join("results", scenario, "postprocessed"))
+                and not "example_" in scenario
+        )
+    ],
+    "main-scenarios": [
+        "2050-el_eff",
+        "2050-el_eff-methanation",
+        "2050-gas_lessCH4",
+        "2050-gas_lessCH4-methanation",
+        "2050-gas_moreCH4",
+        "2050-gas_moreCH4-methanation",
+        "2050-80-gas_moreCH4",
+        "2050-80-gas_moreCH4-methanation",
+        "2050-95-gas_moreCH4",
+        "2050-95-gas_moreCH4-methanation",
+        "2050-100-gas_moreCH4",
+        "2050-100-gas_moreCH4-methanation",
+    ],
+    "main-scenarios-methanation": [
+        "2050-el_eff-methanation",
+        "2050-gas_lessCH4-methanation",
+        "2050-gas_moreCH4-methanation",
+        "2050-80-gas_moreCH4-methanation",
+        "2050-95-gas_moreCH4-methanation",
+        "2050-100-gas_moreCH4-methanation",
+    ]
 }
 
 resource_plots = ['scal_conv_pp-capacity_net_el']
@@ -105,18 +134,34 @@ rule prepare_electricity_demand:
 rule prepare_vehicle_charging_demand:
     input:
         input_dir="raw/time_series/vehicle_charging",
+        scalars="raw/scalars/demands.csv",
     output:
         "results/_resources/ts_load_electricity_vehicles.csv"
+    params:
+        logfile="logs/prepare_vehicle_charging_demand.log"
     shell:
-        "python scripts/prepare_vehicle_charging_demand.py {input.input_dir} {output}"
+        "python scripts/prepare_vehicle_charging_demand.py {input.input_dir} {input.scalars} {output} {params.logfile}"
 
 rule prepare_scalars:
     input:
         raw_scalars="raw/scalars/costs_efficiencies.csv",
+        raw_scalars_methanation="raw/scalars_methanation.csv",
     output:
-        "results/_resources/scal_costs_efficiencies.csv"
+        costs_eff="results/_resources/scal_costs_efficiencies.csv",
+        methanation="results/_resources/scal_methanation.csv",
     shell:
-        "python scripts/prepare_scalars.py {input.raw_scalars} {output}"
+        "python scripts/prepare_scalars.py {input.raw_scalars} {input.raw_scalars_methanation} {output.costs_eff} {output.methanation}"
+
+rule prepare_cop_timeseries:
+    input:
+        scalars="raw/scalars/demands.csv",
+        weather="raw/weatherdata"
+    output:
+        ts_efficiency_small="results/_resources/ts_efficiency_heatpump_small.csv",
+    params:
+        logfile="logs/prepare_cop_timeseries.log"
+    shell:
+         "python scripts/prepare_cop_timeseries.py {input.scalars} {input.weather} {output.ts_efficiency_small} {params.logfile}"
 
 rule prepare_heat_demand:
     input:
@@ -236,6 +281,16 @@ rule plot_dispatch:
         logfile="logs/{scenario}.log"
     shell:
         "python scripts/plot_dispatch.py {input} {output} {params.logfile}"
+
+rule plot_methanation_operation:
+    input:
+        "results/{scenario}/postprocessed/"
+    output:
+        directory("results/{scenario}/plotted/methanation")
+    params:
+        logfile="logs/{scenario}.log"
+    shell:
+        "python scripts/plot_methanation_operation.py {input} {output} {params.logfile}"
 
 rule plot_conv_pp_scalars:
     input:

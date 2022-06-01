@@ -20,6 +20,7 @@ BEV,gold
 
 El. transmission in,#8c564b
 El. transmission out,#8c564b
+El. transmission,#8c564b
 
 El. shortage,#cfcfcf
 Curtailment,#cfcfcf
@@ -47,12 +48,12 @@ Heat dec. storage in,#9467bd
 Heat dec. storage,#9467bd
 
 CH4 boiler,#d62728
+CH4 boiler in,#d62728
 Heat pump (DH),#2ca02c
 Heat pump (domestic),#2ca00c
 res. PtH,#ff7f0e
 
-CH4 excess,red
-CH4 import,red
+
 
 Electrolyzer,yellow
 
@@ -62,9 +63,17 @@ Hard coal,black
 Lignite,saddlebrown
 Oil,#9467bd
 Other,#7f7f7f
-Methanation,#9467bd
+Methanation products,#9467bd
+Methanation products in,#9467bd
+Methanation educts,saddlebrown
+Methanation educts out,saddlebrown
+Methanation,saddlebrown
+CH4 excess,#cfcfcf
+CH4 export,#cfcfcf
 CH4 shortage,#cfcfcf
 CH4 import,#cfcfcf
 CH4 demand,saddlebrown
 H2 import,green
 H2 demand,darkgreen
+H2 input,#9467bd
+CH4 output,#9467bd

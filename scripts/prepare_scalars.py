@@ -22,45 +22,9 @@ The script performs the following steps to prepare scalar data for parametrizati
 
 import sys
 
-import pandas as pd
-
 from oemof.tools.economics import annuity
 
 from oemof_b3.tools.data_processing import ScalarProcessor, load_b3_scalars, save_df
-
-
-def fill_na(df):
-    key = "scenario_key"
-
-    value = "None"
-
-    _df = df.copy()
-
-    # save index and columns before resetting index
-    id_names = _df.index.names
-
-    columns = _df.columns
-
-    _df.reset_index(inplace=True)
-
-    # separate data where NaNs should be filled and base
-    df_fill_na = _df.loc[_df[key] != value]
-
-    base = _df.loc[_df[key] == value]
-
-    # merge data on the columns of the data to update
-    df_merged = df_fill_na.drop(columns, 1).merge(base.drop(key, 1), "left")
-
-    # update dataframe NaNs
-    df_fill_na.update(df_merged)
-
-    # combine the filled data with the base data
-    df_fill_na = pd.concat([df_fill_na, base])
-
-    # set index as before
-    df_fill_na = df_fill_na.set_index(id_names)
-
-    return df_fill_na
 
 
 def annuise_investment_cost(sc):
@@ -74,8 +38,9 @@ def annuise_investment_cost(sc):
             [var_name_cost, "lifetime", var_name_fixom_cost]
         )
 
-        # if some value is None in some scenario key, use the values from Base scenario to fill NaNs
-        invest_data = fill_na(invest_data)
+        # TODO: Currently, (storage)_capacity_overnight_cost, (storage)_fixom_cost and lifetime have
+        # to be given for each tech and each scenario, but wacc may change per scenario, but
+        # is defined for all techs uniformly. Could offer a more general and flexible solution.
 
         # wacc is defined per scenario, ignore other index levels
         wacc = sc.get_unstacked_var("wacc")
@@ -84,6 +49,9 @@ def annuise_investment_cost(sc):
         # set wacc per scenario_key
         scenario_keys = invest_data.index.get_level_values("scenario_key")
         invest_data["wacc"] = wacc.loc[scenario_keys].values
+
+        # keep rows where all necessary values are given
+        invest_data = invest_data.loc[~invest_data.isna().any(1)]
 
         annuised_investment_cost = invest_data.apply(
             lambda x: annuity(x[var_name_cost], x["lifetime"], x["wacc"])
@@ -104,17 +72,6 @@ def annuise_investment_cost(sc):
         ]
     )
 
-
-if __name__ == "__main__":
-    in_path = sys.argv[1]  # path to raw scalar data
-    out_path = sys.argv[2]  # path to destination
-
-    df = load_b3_scalars(in_path)
-
-    sc = ScalarProcessor(df)
-
-    annuise_investment_cost(sc)
-
     sc.scalars = sc.scalars.sort_values(
         by=["carrier", "tech", "var_name", "scenario_key"]
     )
@@ -123,4 +80,26 @@ if __name__ == "__main__":
 
     sc.scalars.index.name = "id_scal"
 
-    save_df(sc.scalars, out_path)
+
+def load_process_save(path_source, path_target, func):
+    df = load_b3_scalars(path_source)
+
+    sc = ScalarProcessor(df)
+
+    func(sc)
+
+    save_df(sc.scalars, path_target)
+
+
+if __name__ == "__main__":
+    raw_scalars_costs_eff = sys.argv[1]  # path to raw scalar data
+    raw_scalars_methanation = sys.argv[2]  # path to raw scalar data
+    resources_costs_eff = sys.argv[3]  # path to destination
+    resources_methanation = sys.argv[4]  # path to destination
+
+    load_process_save(
+        raw_scalars_costs_eff, resources_costs_eff, func=annuise_investment_cost
+    )
+    load_process_save(
+        raw_scalars_methanation, resources_methanation, func=annuise_investment_cost
+    )
