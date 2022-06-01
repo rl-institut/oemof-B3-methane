@@ -39,7 +39,6 @@ filter_scalars:
       - "reduction_95"
       - "2050-methanation"
       - "2050-fossile_CH4"
-      - "2050-el_eff-fossile_CH4"
 
 paths_timeseries:
   - raw/time_series/ts_load_ch4.csv
