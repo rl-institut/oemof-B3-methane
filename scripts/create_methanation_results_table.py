@@ -54,6 +54,10 @@ def delta_scenarios(df, pairs):
 
     delta = b - a
 
+    delta = delta.rename(columns={"var_value": "delta"})
+
+    delta.index.name = "scenario"
+
     return delta
 
 
@@ -128,5 +132,11 @@ if __name__ == "__main__":
     df = create_total_system_cost_table(scalars)
     df = add_methanation_cost(df, methanation_cost)
     df = delta_scenarios(df, scenario_pairs)
-    print(df)
+
+    df["installed"] = df[("delta", "total_system_cost")] < 0
+
+    # rename columns
+    df.columns = df.columns.to_flat_index()
+    df = df.rename(columns=lambda x: " ".join(x))
+
     dp.save_df(df, os.path.join(out_path, "methanation_results.csv"))
