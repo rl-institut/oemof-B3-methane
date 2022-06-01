@@ -37,6 +37,8 @@ filter_scalars:
       - "2050-base"
       - "reduction_95"
       - "2050-methanation"
+  2:
+    scenario_key:
       - "2050-green_CH4"
       - "2050-gas_moreCH4-green_CH4"
 
