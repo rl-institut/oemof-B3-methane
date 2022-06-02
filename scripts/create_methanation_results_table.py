@@ -83,6 +83,47 @@ def create_table_system_cost_curtailment(scalars):
     return df
 
 
+def create_flh_table(scalars):
+    capacity_in = 2.8
+    capacity_out = 7.7
+
+    methanation_ch4_out = dp.multi_filter_df(
+        scalars, tech="methanation", var_name="flow_out_ch4"
+    )
+    methanation_h2_in = dp.multi_filter_df(
+        scalars, tech="methanation", var_name="flow_in_h2"
+    )
+
+    # aggregate regions
+    methanation_ch4_out = dp.aggregate_scalars(methanation_ch4_out, "region")
+    methanation_ch4_out["var_name"] = "flow_out_ch4"
+    methanation_ch4_out = methanation_ch4_out.set_index(["scenario_key", "var_name"])
+    methanation_ch4_out = methanation_ch4_out.loc[:, ["var_value"]]
+
+    methanation_h2_in = dp.aggregate_scalars(methanation_h2_in, "region")
+    methanation_h2_in["var_name"] = "flow_in_h2"
+    methanation_h2_in = methanation_h2_in.set_index(["scenario_key", "var_name"])
+    methanation_h2_in = methanation_h2_in.loc[:, ["var_value"]]
+
+    flh_out = methanation_ch4_out / capacity_out
+    flh_out = flh_out.rename({"flow_out_ch4": "flh_out"})
+
+    flh_in = methanation_h2_in / capacity_in
+    flh_in = flh_in.rename({"flow_in_h2": "flh_in"})
+
+    # concat, reorganize
+    df = pd.concat([flh_in, flh_out])
+
+    df = df.unstack("var_name")
+
+    df = dp.round_setting_int(df, decimals={col: 0 for col in df.columns})
+
+    df = df.rename(index=lambda x: x.strip("-methanation"))
+    df.columns = df.columns.get_level_values("var_name")
+
+    return df
+
+
 def add_methanation_cost(df, methanation_cost):
 
     idx = pd.IndexSlice
@@ -129,6 +170,7 @@ if __name__ == "__main__":
     if not os.path.exists(out_path):
         os.makedirs(out_path)
 
+    flh = create_flh_table(scalars)
     df = create_table_system_cost_curtailment(scalars)
     df = add_methanation_cost(df, methanation_cost)
     df = delta_scenarios(df, scenario_pairs)
@@ -138,5 +180,7 @@ if __name__ == "__main__":
     # rename columns
     df.columns = df.columns.to_flat_index()
     df = df.rename(columns=lambda x: " ".join(x))
+
+    df = df.join(flh)
 
     dp.save_df(df, os.path.join(out_path, "methanation_results.csv"))
