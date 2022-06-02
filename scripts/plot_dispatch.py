@@ -28,6 +28,7 @@ The static plots are saved as pdf-files and the interactive plotly plots as html
 in a new directory called plotted.
 Timeframes and the carrier for the plot can be chosen.
 """
+
 import sys
 import os
 import pandas as pd
@@ -37,6 +38,34 @@ import matplotlib.dates as mdates
 
 from oemof_b3 import labels_dict, colors_odict
 from oemof_b3.config import config
+
+
+def reduce_labels(ax, simple_labels_dict):
+    """
+    Replaces two labels by one as defined in a dictionary.
+
+    Parameters
+    ----------
+    ax: matplotlib.axes
+        The axes containing the plot for which the labels shall be simplified
+    simple_labels_dict:
+        dictionary which contains the simplified label as a key
+        and for every key a list of two labels
+        which shall be replaced by the simplified label as value
+
+    Returns
+    -------
+
+    """
+    handles, labels = ax.get_legend_handles_labels()
+
+    for key, value in simple_labels_dict.items():
+        if value[0] in labels and value[1] in labels:
+            labels = [
+                key if item == value[0] else "_Hidden" if item == value[1] else item
+                for item in labels
+            ]
+    return handles, labels
 
 
 if __name__ == "__main__":
@@ -161,18 +190,10 @@ if __name__ == "__main__":
                 "Heat dec. storage": ["Heat dec. storage out", "Heat dec. storage in"],
                 "Heat dec. mismatch": ["Heat dec. excess", "Heat dec. shortage"],
             }
-            handles, labels = ax.get_legend_handles_labels()
 
-            for key, value in simple_labels_dict.items():
-                if value[0] in labels and value[1] in labels:
-                    labels = [
-                        key
-                        if item == value[0]
-                        else "_Hidden"
-                        if item == value[1]
-                        else item
-                        for item in labels
-                    ]
+            handles, labels = reduce_labels(
+                ax=ax, simple_labels_dict=simple_labels_dict
+            )
 
             # Put a legend below current axis
 
