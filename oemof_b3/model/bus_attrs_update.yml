@@ -13,3 +13,8 @@ heat_decentral:
 ch4:
   balanced:
     True
+
+co2:
+  balanced:
+    False
+

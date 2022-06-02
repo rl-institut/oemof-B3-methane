@@ -49,6 +49,10 @@
     'h2-bpchp',
 ]
 
+'methanation_reactor': [
+    'h2-methanation',
+]
+
 'efficiency': [
     'electricity-heatpump_small',
 ]

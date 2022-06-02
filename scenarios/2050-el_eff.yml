@@ -35,11 +35,12 @@ filter_scalars:
       - "ALL"
       - "2050-el_eff"
       - "2050-base"
+      - "2050-methanation"
 
 paths_timeseries:
   - raw/time_series/ts_load_ch4.csv
   - raw/time_series/ts_load_h2.csv
-  - raw/time_series/ts_efficiency_heatpump_small.csv
+  - results/_resources/ts_efficiency_heatpump_small.csv
   - results/_resources/ts_feedin.csv
   - results/_resources/ts_load_electricity.csv
   - results/_resources/ts_load_heat.csv

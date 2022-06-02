@@ -286,6 +286,73 @@ def filter_df(df, column_name, values, inverse=False):
     return df_filtered
 
 
+def multi_filter_df(df, **kwargs):
+    r"""
+    Applies several filters in a row to a DataFrame.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data in oemof_b3 format.
+    kwargs : Additional keyword arguments
+        Filters to apply
+
+    Returns
+    -------
+    filtered_df : pd.DataFrame
+        Filtered data
+    """
+    filtered_df = df.copy()
+    for key, value in kwargs.items():
+        filtered_df = filter_df(filtered_df, key, value)
+    return filtered_df
+
+
+def update_filtered_df(df, filters):
+    r"""
+    Accepts an oemof-b3 Dataframe, filters it, subsequently update
+    the result with data filtered with other filters.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Scalar data in oemof-b3 format to filter
+    filters : dict of dict
+        Several filters to be applied subsequently
+
+    Returns
+    -------
+    filtered : pd.DataFrame
+    """
+    assert isinstance(filters, dict)
+    for value in filters.values():
+        assert isinstance(value, dict)
+
+    # Prepare empty dataframe to be updated with filtered data
+    filtered_updated = pd.DataFrame(columns=HEADER_B3_SCAL)
+    filtered_updated.index.name = "id_scal"
+
+    for iteration, filter in filters.items():
+        print(f"Applying set of filters no {iteration}.")
+
+        # Apply set of filters
+        filtered = multi_filter_df(df, **filter)
+
+        # Update result with new filtered data
+        filtered_updated = merge_a_into_b(
+            filtered,
+            filtered_updated,
+            how="outer",
+            on=["name", "region", "carrier", "tech", "var_name"],
+            verbose=False,
+        )
+
+        # inform about filtering updating
+        print(f"Updated data with data filtered by {filter}")
+
+    return filtered_updated
+
+
 def isnull_any(df):
     return df.isna().any().any()
 
@@ -425,7 +492,7 @@ def expand_regions(scalars, regions, where="ALL"):
     return sc_with_region
 
 
-def merge_a_into_b(df_a, df_b, on, how="left", indicator=False):
+def merge_a_into_b(df_a, df_b, on, how="left", indicator=False, verbose=True):
     r"""
     Writes scalar data from df_a into df_b, according to 'on'. Where df_a provides no data,
     the values of df_b are used. If how='outer', data from df_a that is not in df_b will be
@@ -462,24 +529,27 @@ def merge_a_into_b(df_a, df_b, on, how="left", indicator=False):
     set_index_a = set(map(tuple, pd.Index(_df_a.loc[:, on].replace(np.nan, "NaN"))))
     set_index_b = set(map(tuple, pd.Index(_df_b.loc[:, on].replace(np.nan, "NaN"))))
 
-    a_not_b = set_index_a.difference(set_index_b)
-    if a_not_b:
-        if how == "left":
-            print(
-                f"There are {len(a_not_b)} elements in df_a but not in df_b"
-                f" and are lost (choose how='outer' to keep them): {a_not_b}"
-            )
-        elif how == "outer":
-            print(
-                f"There are {len(a_not_b)} elements in df_a that are"
-                f" added to df_b: {a_not_b}"
-            )
+    if verbose:
+        a_not_b = set_index_a.difference(set_index_b)
+        if a_not_b:
+            if how == "left":
+                print(
+                    f"There are {len(a_not_b)} elements in df_a but not in df_b"
+                    f" and are lost (choose how='outer' to keep them): {a_not_b}"
+                )
+            elif how == "outer":
+                print(
+                    f"There are {len(a_not_b)} elements in df_a that are"
+                    f" added to df_b: {a_not_b}"
+                )
 
-    a_and_b = set_index_a.intersection(set_index_b)
-    print(f"There are {len(a_and_b)} elements in df_b that are updated by df_a.")
+        a_and_b = set_index_a.intersection(set_index_b)
+        print(f"There are {len(a_and_b)} elements in df_b that are updated by df_a.")
 
-    b_not_a = set_index_b.difference(set_index_a)
-    print(f"There are {len(b_not_a)} elements in df_b that are unchanged: {b_not_a}")
+        b_not_a = set_index_b.difference(set_index_a)
+        print(
+            f"There are {len(b_not_a)} elements in df_b that are unchanged: {b_not_a}"
+        )
 
     # Merge a with b, ignoring all data in b
     merged = _df_b.drop(columns=_df_b.columns.drop(on)).merge(
@@ -752,6 +822,38 @@ def round_setting_int(df, decimals):
         _df[col] = pd.to_numeric(_df[col], errors="coerce").round(dec).astype(dtype)
 
     return _df
+
+
+def prepare_b3_timeseries(df_year, **kwargs):
+    """
+    This function takes time series in column format, stacks them, assigns
+    values to additional columns and formats the header in order to prepare data in a b3 time
+    series format
+
+    Parameters
+    ----------
+    df_year : pd.Dataframe
+        DataFrame with total normalized data in year to be processed
+    kwargs : Additional keyword arguments
+        time series data (region, scenario key and unit)
+
+    Returns
+    -------
+    df_stacked : pd.DataFrame
+         DataFrame that contains stacked time series
+
+    """
+    # Stack time series with data of a year
+    df_year_stacked = stack_timeseries(df_year)
+
+    # Add region, scenario key and unit to stacked time series
+    for key, value in kwargs.items():
+        df_year_stacked[key] = value
+
+    # Make sure that header is in correct format
+    df_year_stacked = format_header(df_year_stacked, HEADER_B3_TS, "id_ts")
+
+    return df_year_stacked
 
 
 class ScalarProcessor:

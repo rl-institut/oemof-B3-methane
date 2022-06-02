@@ -1,0 +1,22 @@
+attribute,type,unit,description
+region,str,n/a,Country code
+name,str,n/a,Name
+type,str,n/a,Type
+carrier,str,n/a,Energy carrier
+tech,str,n/a,Technology
+h2_bus,str,n/a,H2 bus
+co2_bus,str,n/a,CO2 bus
+ch4_bus,str,n/a,CH4 bus
+capacity_charge,float,MW,Installed capacity for charging
+capacity_discharge,float,MW,Installed capacity for discharging
+storage_capacity_educts,float,MWh,Storage capacity for educts
+storage_capacity_products,float,MWh,Storage capacity for products
+efficiency_charge,float,unitless,Efficiency of charging
+efficiency_discharge,float,unitless,Efficiency of discharging
+availability,float,unitless,Availability of charge/discharge
+marginal_cost,float,Eur/MWh,Marginal cost of charging/discharging
+methanation_rate,float,MW,Maximum methanation
+efficiency_methanation,float,unitless,Efficiency of methanation
+input_parameters,dict,n/a,Optional parameters passed to oemof-solph's input flow
+output_parameters,dict,n/a,Optional parameters passed to oemof-solph's output flow
+methanation_option,int,n/a,Select formulation

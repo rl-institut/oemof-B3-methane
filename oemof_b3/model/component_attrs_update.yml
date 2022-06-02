@@ -266,3 +266,16 @@ electricity-bev_charging:
   foreign_keys:
     bus: electricity
     profile: electricity-bev_charging-profile
+
+h2-methanation:
+  carrier: h2
+  tech: methanation
+  type: methanation_reactor
+  foreign_keys:
+    h2_bus: h2
+    co2_bus: co2
+    ch4_bus: ch4
+  defaults:
+    input_parameters: "{}"
+    output_parameters: "{}"
+

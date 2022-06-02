@@ -42,6 +42,7 @@ Heat dec. storage in,#e2c319
 Heat dec. storage,#e2c319
 
 CH4 boiler,#e5194d
+CH4 boiler in,#d62728
 Heat pump (DH),#da19e5
 Heat pump (domestic),#f288e3
 res. PtH,#e58a19
@@ -50,8 +51,6 @@ CH4 excess,#DBDBDB
 
 Electrolyzer,#1984e5
 CH4,#bcf927
-
-Other,#7f7f7f
 
 CH4 shortage,#DBDBDB
 CH4 import,#cfcfcf
@@ -66,4 +65,19 @@ Biomass GT,#007000
 Hard coal,black
 Lignite,saddlebrown
 Oil,#9467bd
-Nuclear ST,pink
+Other,#7f7f7f
+Methanation products,#9467bd
+Methanation products in,#9467bd
+Methanation educts,saddlebrown
+Methanation educts out,saddlebrown
+Methanation,saddlebrown
+CH4 excess,#cfcfcf
+CH4 export,#cfcfcf
+CH4 shortage,#cfcfcf
+CH4 import,#cfcfcf
+CH4 demand,saddlebrown
+H2 import,green
+H2 demand,darkgreen
+H2 input,#9467bd
+H2 export,green
+CH4 output,#9467bd
