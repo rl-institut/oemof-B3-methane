@@ -15,13 +15,14 @@ BEV,#e55c19
 
 El. transmission in,#9db69a
 El. transmission out,#9db69a
+El. transmission,#9db69a
 
 El. shortage,#DADADA
 Curtailment,#DADADA
 
 El. demand,#3e89f4
-El. export,#9ca4b8
-El. import,#9ca4b8
+El. export,#737a8c
+El. import,#737a8c
 BEV charging,#e55c19
 
 H2 backpressure CHP,#19e5ba
@@ -66,18 +67,15 @@ Hard coal,black
 Lignite,saddlebrown
 Oil,#9467bd
 Other,#7f7f7f
-Methanation products,#9467bd
-Methanation products in,#9467bd
-Methanation educts,saddlebrown
-Methanation educts out,saddlebrown
-Methanation,saddlebrown
+Methanation products,#1474b8
+Methanation products in,#1474b8
+Methanation educts,#b85814
+Methanation educts out,#b85814
+Methanation,#b85814
 CH4 excess,#cfcfcf
 CH4 export,#cfcfcf
-CH4 shortage,#cfcfcf
-CH4 import,#cfcfcf
-CH4 demand,saddlebrown
 H2 import,green
 H2 demand,darkgreen
-H2 input,#9467bd
+H2 input,#b85814
 H2 export,green
-CH4 output,#9467bd
+CH4 output,#1474b8
