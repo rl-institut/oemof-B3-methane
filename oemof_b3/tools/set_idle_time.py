@@ -34,9 +34,9 @@ def set_idle_time(model, f1, f2, n, name_constraint="constraint_idle_time"):
         # for f2 to be active
         for ts in list(m.TIMESTEPS)[:n]:
             expr = (
-                m.NonConvexFlowBlock.status[f2[0], f2[1], ts]
+                m.NonConvexFlow.status[f2[0], f2[1], ts]
                 * sum(
-                    m.NonConvexFlowBlock.status[f1[0], f1[1], t] for t in range(ts + 1)
+                    m.NonConvexFlow.status[f1[0], f1[1], t] for t in range(ts + 1)
                 )
                 == 0
             )
@@ -47,9 +47,9 @@ def set_idle_time(model, f1, f2, n, name_constraint="constraint_idle_time"):
         # window of n timesteps for f2 to be active
         for ts in list(m.TIMESTEPS)[n:]:
             expr = (
-                m.NonConvexFlowBlock.status[f2[0], f2[1], ts]
+                m.NonConvexFlow.status[f2[0], f2[1], ts]
                 * sum(
-                    m.NonConvexFlowBlock.status[f1[0], f1[1], t]
+                    m.NonConvexFlow.status[f1[0], f1[1], t]
                     for t in range(ts - n, ts + 1)
                 )
                 == 0
