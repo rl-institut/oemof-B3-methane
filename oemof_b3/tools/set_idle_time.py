@@ -35,9 +35,7 @@ def set_idle_time(model, f1, f2, n, name_constraint="constraint_idle_time"):
         for ts in list(m.TIMESTEPS)[:n]:
             expr = (
                 m.NonConvexFlow.status[f2[0], f2[1], ts]
-                * sum(
-                    m.NonConvexFlow.status[f1[0], f1[1], t] for t in range(ts + 1)
-                )
+                * sum(m.NonConvexFlow.status[f1[0], f1[1], t] for t in range(ts + 1))
                 == 0
             )
             if expr is not True:
