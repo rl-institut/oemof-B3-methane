@@ -161,7 +161,10 @@ class MethanationReactor(Transformer, Facade):
             },
             outputs={
                 storage_educts: Flow(
-                    nominal_value=self.capacity_charge, **self.input_parameters
+                    nominal_value=self.capacity_charge,
+                    min=0.2,
+                    nonconvex=NonConvex(),
+                    **self.input_parameters
                 )
             },
             conversion_factors={
@@ -178,6 +181,8 @@ class MethanationReactor(Transformer, Facade):
                 self.ch4_bus: Flow(
                     nominal_value=self.capacity_discharge,
                     variable_cost=self.marginal_cost,
+                    min=0.2,
+                    nonconvex=NonConvex(),
                     **self.output_parameters
                 )
             },
