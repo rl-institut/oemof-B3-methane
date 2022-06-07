@@ -30,6 +30,7 @@ scenario_groups = {
         "2050-100-gas_moreCH4-methanation",
     ],
     "all-reduction-fossil_mixed_green": [
+        "2050-80-el_eff-mixed_CH4-methanation",
         # "2050-95-el_eff-mixed_CH4",
         "2050-95-el_eff-mixed_CH4-methanation",
         # "2050-100-el_eff-mixed_CH4",
