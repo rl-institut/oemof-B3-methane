@@ -134,3 +134,32 @@ class TestConstraints:
         )
 
         self.compare_to_reference_lp("methanation_reactor.lp")
+
+    def test_methanation_reactor_nonconvex(self):
+
+        h2_bus = solph.Bus(label="h2_co2")
+
+        co2_bus = solph.Bus(label="co2", balanced=False)
+
+        ch4_bus = solph.Bus(label="ch4")
+
+        MethanationReactor(
+            label="m_reactor",
+            carrier="h2_co2",
+            tech="methanation_reactor",
+            h2_bus=h2_bus,
+            co2_bus=co2_bus,
+            ch4_bus=ch4_bus,
+            capacity_charge=50,
+            capacity_discharge=50,
+            storage_capacity_educts=100,
+            storage_capacity_products=1000,
+            efficiency_charge=1,
+            efficiency_discharge=1,
+            methanation_rate=5,  # TODO: Passing lists does not work here yet.
+            efficiency_methanation=0.93,
+            methanation_option="variable_rate",
+            nonconvex=True,
+        )
+
+        self.compare_to_reference_lp("methanation_reactor_nonconvex.lp")

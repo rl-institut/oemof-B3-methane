@@ -11,6 +11,8 @@ optimize:
   el_gas_relation: electricity_gas_relation  # appears in build_datapackage as well
   el_key: electricity  # prefix of keywords for gas electricity relation
   gas_key: gas  # prefix of keywords for gas electricity relation
+  set_idle_time: true
+  idle_time: 504  # 504 h = 3 weeks
 
 
 plot_scalar_results:

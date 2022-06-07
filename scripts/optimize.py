@@ -45,6 +45,7 @@ from oemof_b3.facades import TYPEMAP
 
 from oemof_b3.tools import data_processing as dp
 from oemof_b3.tools.equate_flows import equate_flows_by_keyword
+from oemof_b3.tools.set_idle_time import set_idle_time
 from oemof_b3.config import config
 
 
@@ -243,6 +244,21 @@ if __name__ == "__main__":
             add_electricity_gas_relation_constraints(
                 model=m, relations=el_gas_relations
             )
+
+        # set idle time between storage input and output
+        if config.settings.optimize.set_idle_time:
+            a = [f for f in m.flows if f[0].label == "B-h2-methanation-combine-educts"][
+                0
+            ]
+            b = [
+                f
+                for f in m.flows
+                if (
+                    f[0].label == "B-h2-methanation-storage_products"
+                    and f[1].label == "B-ch4"
+                )
+            ][0]
+            set_idle_time(m, a, b, config.settings.optimize.idle_time)
 
         # tell the model to get the dual variables when solving
         if config.settings.optimize.receive_duals:
