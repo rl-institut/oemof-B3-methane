@@ -155,10 +155,12 @@ class MethanationReactor(Transformer, Facade):
         )
 
         if self.nonconvex:
-            self.input_parameters.update({
-                "min": self.MIN_FLOW,
-                "nonconvex": NonConvex(),
-            })
+            self.input_parameters.update(
+                {
+                    "min": self.MIN_FLOW,
+                    "nonconvex": NonConvex(),
+                }
+            )
 
         combine_educts = Transformer(
             carrier=self.carrier,
@@ -170,8 +172,7 @@ class MethanationReactor(Transformer, Facade):
             },
             outputs={
                 storage_educts: Flow(
-                    nominal_value=self.capacity_charge,
-                    **self.input_parameters
+                    nominal_value=self.capacity_charge, **self.input_parameters
                 )
             },
             conversion_factors={
@@ -181,10 +182,12 @@ class MethanationReactor(Transformer, Facade):
         )
 
         if self.nonconvex:
-            self.output_parameters.update({
-                "min": self.MIN_FLOW,
-                "nonconvex": NonConvex(),
-            })
+            self.output_parameters.update(
+                {
+                    "min": self.MIN_FLOW,
+                    "nonconvex": NonConvex(),
+                }
+            )
 
         storage_products = GenericStorage(
             carrier=self.carrier,
