@@ -691,11 +691,22 @@ if __name__ == "__main__":
         )
         plot = ScalarPlot(scalars)
         plot.select_data(var_name=var_name)
+
+        # Do not show storage output
         plot.selected_scalars = dp.filter_df(
             plot.selected_scalars, column_name="type", values="storage", inverse=True
         )
+
+        # for ch4, only show methanation
+        plot.selected_scalars = dp.multi_filter_df_simultaneously(
+            plot.selected_scalars, inverse=True, carrier="ch4", type="shortage"
+        )
+
         plot.selected_scalars.replace({"flow_out_*": ""}, regex=True, inplace=True)
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
+
+        # rename index to clarify that no ch4 imports or shortages are shown
+        plot.prepared_scalar_data.rename(index={"ch4": "ch4 methanation"}, inplace=True)
         plot.swap_levels()
 
         plot.draw_subplots(unit=unit, title="Summed energy", figsize=(11, 11))
@@ -779,7 +790,7 @@ if __name__ == "__main__":
     plot_flow_out_multi_carrier(CARRIERS_WO_CH4)
     plot_demands(CARRIERS)
     subplot_invest_out_multi_carrier(CARRIERS_WO_CH4)
-    subplot_flow_out_multi_carrier(CARRIERS_WO_CH4)
+    subplot_flow_out_multi_carrier(CARRIERS)
     subplot_demands(CARRIERS)
     subplot_energy_usage_multi_carrier(CARRIERS)
     plot_demands_stacked_carriers(CARRIERS)
