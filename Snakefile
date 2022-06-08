@@ -7,6 +7,13 @@ HTTP = HTTPRemoteProvider()
 scenario_groups = {
     "examples": ["example_base", "example_more_re", "example_more_re_less_fossil"],
     "all-scenarios": [os.path.splitext(scenario)[0] for scenario in os.listdir("scenarios")],
+    "all-postprocessed": [
+        scenario for scenario in os.listdir("results")
+        if (
+                os.path.exists(os.path.join("results", scenario, "postprocessed"))
+                and not "example_" in scenario
+        )
+    ],
     "main-scenarios": [
         "2050-el_eff",
         "2050-el_eff-methanation",
@@ -293,6 +300,17 @@ rule create_joined_results_table:
         logfile="logs/{scenario_group}.log"
     shell:
         "python scripts/create_results_table.py {input} {output} {params.logfile}"
+
+rule create_methanation_results_table:
+    input:
+        joined="results/joined_scenarios/{scenario_group}/joined/",
+        methanation_cost="results/_resources/scal_methanation.csv"
+    output:
+        directory("results/joined_scenarios/{scenario_group}/joined_tables_methanation/")
+    params:
+        logfile="logs/{scenario_group}.log"
+    shell:
+        "python scripts/create_methanation_results_table.py {input.joined} {input.methanation_cost} {output} {params.logfile}"
 
 rule plot_dispatch:
     input:

@@ -10,6 +10,9 @@ from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.config import config
 
 
+MW_to_W = 1e6
+
+
 def drop_near_zeros(df, tolerance=1e-3):
     # drop columns with data that is almost zero using the sum of the absolute values
     df = df.loc[:, df.abs().sum() > tolerance]
@@ -75,14 +78,43 @@ def filter_results_sequences(df, region=None, carrier=None, tech=None):
     return df
 
 
-def prepare_reaction_data(df, bus_name, labels_dict=labels_dict):
-    # This script is a copy of plots.prepare_dispatch_data excluding lines on demand
-    df.columns = df.columns.to_flat_index()
-    for i in df.columns:
-        if i[0] == bus_name:
-            df[i] = df[i] * -1
-    df = plots.map_labels(df, labels_dict)
-    return df
+def prepare_methanation_data(flows, region):
+    h2_in = filter_results_sequences(flows, region, "h2", "methanation-combine-educts")
+
+    ch4_out = filter_results_sequences(
+        flows, region, "h2", "methanation-storage_products"
+    )
+
+    ch4_out *= -1
+
+    def map_methanation_labels(col):
+        assert isinstance(col, tuple)
+
+        if "h2" in col[0] and "methanation-combine-educts" in col[1]:
+            return "H2 input"
+        elif "co2" in col[0] and "methanation-combine-educts" in col[1]:
+            return "CO2 input"
+        elif (
+            "methanation-combine-educts" in col[0]
+            and "methanation-storage_educts" in col[1]
+        ):
+            return "H2/CO2 mix input"
+        elif "methanation" in col[0] and "methanation-storage_products" in col[1]:
+            return "Methane production"
+        elif "methanation-storage_products" in col[0] and "ch4" in col[1]:
+            return "CH4 output"
+        else:
+            raise ValueError(f"Column could not be mapped {col}!")
+
+    m_reaction_data = pd.concat([h2_in, ch4_out], 1)
+
+    m_reaction_data.columns = [
+        map_methanation_labels(col) for col in m_reaction_data.columns.to_flat_index()
+    ]
+
+    m_reaction_data = m_reaction_data.loc[:, ["H2 input", "CH4 output"]]
+
+    return m_reaction_data
 
 
 def prepare_storage_data(df, labels_dict=labels_dict):
@@ -95,9 +127,10 @@ def prepare_storage_data(df, labels_dict=labels_dict):
 def plot_methanation_operation(
     sequences_el,
     sequences_heat,
-    sequences_methanation_reaction,
+    sequences_methanation_input_output,
     sequences_methanation_storage,
 ):
+    plot_title = "B-h2-methanation"
 
     # plot one winter and one summer month
     # select timeframe
@@ -105,26 +138,34 @@ def plot_methanation_operation(
     timeframe = [
         (f"{year}-01-01 00:00:00", f"{year}-01-31 23:00:00"),
         (f"{year}-07-01 00:00:00", f"{year}-07-31 23:00:00"),
+        (f"{year}-01-01 00:00:00", f"{year}-12-31 23:00:00"),
     ]
 
     for start_date, end_date in timeframe:
         sequences_el_filtered = plots.filter_timeseries(
             sequences_el, start_date, end_date
         )
+        sequences_el_filtered = drop_near_zeros(sequences_el_filtered)
 
         sequences_heat_filtered = plots.filter_timeseries(
             sequences_heat, start_date, end_date
         )
+        sequences_heat_filtered = drop_near_zeros(sequences_heat_filtered)
+
         sequences_methanation_storage_filtered = plots.filter_timeseries(
             sequences_methanation_storage, start_date, end_date
         )
-        sequences_methanation_reaction_filtered = plots.filter_timeseries(
-            sequences_methanation_reaction, start_date, end_date
+        sequences_methanation_input_output_filtered = plots.filter_timeseries(
+            sequences_methanation_input_output, start_date, end_date
         )
+        sequences_methanation_input_output_filtered = plots._replace_near_zeros(
+            sequences_methanation_input_output_filtered
+        )
+
         bus_name = ["B-electricity", "B-heat_central"]
 
         fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
-        fig.set_size_inches(12, 8, forward=True)
+        fig.set_size_inches(20, 12, forward=True)
         fig.subplots_adjust(hspace=0.5)
 
         for bus_name, df, ax in zip(
@@ -138,58 +179,60 @@ def plot_methanation_operation(
                 labels_dict=labels_dict,
             )
 
+            # convert to SI-units
+            df *= MW_to_W
+
             plots.plot_dispatch(
                 ax=ax,
                 df=df,
                 df_demand=df_demand,
-                unit="MW",
+                unit="W",
                 colors_odict=colors_odict,
             )
+
+            ax.set_title(bus_name)
 
             for tick in ax.get_xticklabels():
                 tick.set_rotation(45)
 
-        df = prepare_reaction_data(
-            sequences_methanation_reaction_filtered, "B-h2-methanation"
-        )
+        df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
+            # convert to SI-units
+            df *= MW_to_W
+
             plots.plot_dispatch(
                 ax3,
                 df,
                 df_demand=pd.DataFrame(),
-                unit="MW",
+                unit="W",
                 colors_odict=colors_odict,
             )
 
+        ax3.set_title(plot_title)
+
         df = prepare_storage_data(sequences_methanation_storage_filtered)
+
+        # convert to SI-units
+        df *= MW_to_W
+
         plots.plot_dispatch(
             ax4,
             df,
             df_demand=pd.DataFrame(),
-            unit="MWh",
+            unit="Wh",
             colors_odict=colors_odict,
         )
 
-        h_l = [ax.get_legend_handles_labels() for ax in (ax1, ax2, ax3, ax4)]
-        handles = [
-            item for sublist in list(map(lambda x: x[0], h_l)) for item in sublist
-        ]
-        labels = [
-            item for sublist in list(map(lambda x: x[1], h_l)) for item in sublist
-        ]
+        ax4.set_title("storage_content B-h2-methanation-storage")
 
-        # The last two labels are identical with the previous two and are therefore removed.
-        labels = labels[:-2]
-
-        ax4.legend(
-            handles=handles,
-            labels=labels,
-            loc="upper center",
-            bbox_to_anchor=(0.5, -0.5),
-            fancybox=True,
-            ncol=4,
-            fontsize=14,
-        )
+        for ax in [ax1, ax2, ax3, ax4]:
+            ax.legend(
+                loc="center left",
+                bbox_to_anchor=(1.0, 0, 0, 1),
+                fancybox=True,
+                ncol=1,
+                fontsize=14,
+            )
 
         ax1.set_ylabel("Power")
         ax2.set_ylabel("Power")
@@ -202,8 +245,12 @@ def plot_methanation_operation(
         ax3.axes.get_xaxis().set_visible(False)
 
         fig.tight_layout()
-
-        file_name = "methanation_operation" + "_" + start_date[5:7] + ".png"
+        plot_name = (
+            start_date[5:7] + "-" + end_date[5:7]
+            if start_date[5:7] != end_date[5:7]
+            else start_date[5:7]
+        )
+        file_name = "methanation_operation_" + plot_name + ".png"
 
         plt.savefig(os.path.join(target, file_name))
 
@@ -227,16 +274,12 @@ if __name__ == "__main__":
 
     bus_sequences = load_results_sequences(bus_directory)
 
-    methanation_reaction_sequences = load_results_sequence(
-        os.path.join(component_directory, "methanation_reactor.csv")
-    )
+    flows = load_results_sequence(os.path.join(variable_directory, "flow.csv"))
+
+    methanation_input_output_sequences = prepare_methanation_data(flows, "B")
 
     storage_sequences = load_results_sequence(
         os.path.join(variable_directory, "storage_content.csv")
-    )
-
-    methanation_reaction_sequences = filter_results_sequences(
-        methanation_reaction_sequences, "B"
     )
 
     methanation_storage_sequences = filter_results_sequences(
@@ -246,6 +289,6 @@ if __name__ == "__main__":
     plot_methanation_operation(
         bus_sequences["B-electricity"],
         bus_sequences["B-heat_central"],
-        methanation_reaction_sequences,
+        methanation_input_output_sequences,
         methanation_storage_sequences,
     )

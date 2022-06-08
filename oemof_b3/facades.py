@@ -91,6 +91,7 @@ class MethanationReactor(Transformer, Facade):
     """
     MIX_RATIO_CO2 = 0.2
     MIX_RATIO_H2 = 0.8
+    MIN_FLOW = 0.2
 
     def __init__(self, *args, **kwargs):
 
@@ -133,6 +134,8 @@ class MethanationReactor(Transformer, Facade):
 
         self.methanation_option = kwargs.get("methanation_option", 0)
 
+        self.nonconvex = kwargs.get("nonconvex", False)
+
         self.build_solph_components()
 
     def build_solph_components(self):
@@ -150,6 +153,14 @@ class MethanationReactor(Transformer, Facade):
             nominal_storage_capacity=self.storage_capacity_educts,
             loss_rate=0,
         )
+
+        if self.nonconvex:
+            self.input_parameters.update(
+                {
+                    "min": self.MIN_FLOW,
+                    "nonconvex": NonConvex(),
+                }
+            )
 
         combine_educts = Transformer(
             carrier=self.carrier,
@@ -169,6 +180,14 @@ class MethanationReactor(Transformer, Facade):
                 self.h2_bus: self.MIX_RATIO_H2,
             },
         )
+
+        if self.nonconvex:
+            self.output_parameters.update(
+                {
+                    "min": self.MIN_FLOW,
+                    "nonconvex": NonConvex(),
+                }
+            )
 
         storage_products = GenericStorage(
             carrier=self.carrier,
