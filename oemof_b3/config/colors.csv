@@ -75,7 +75,6 @@ Methanation,#b85814
 CH4 excess,#cfcfcf
 CH4 export,#cfcfcf
 H2 import,green
-H2 demand,darkgreen
 H2 input,#b85814
 H2 export,green
 CH4 output,#1474b8
