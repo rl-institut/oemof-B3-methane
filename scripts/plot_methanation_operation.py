@@ -179,6 +179,9 @@ def plot_methanation_operation(
                 labels_dict=labels_dict,
             )
 
+            for i in df_demand.columns:
+                colors_odict[i] = "#000000"
+
             # convert to SI-units
             df *= MW_to_W
 
