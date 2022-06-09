@@ -60,7 +60,7 @@ def prepare_dispatch_data(bus_file):
         labels_dict=labels_dict,
     )
 
-    return df, df_demand
+    return df, df_demand, bus_name
 
 
 def plot_dispatch_data(df, df_demand):
@@ -196,7 +196,7 @@ if __name__ == "__main__":
         busses_to_be_aggregated = [file for file in bus_files if carrier in file]
         if len(busses_to_be_aggregated) > 1:
             for bus_to_be_aggregated in busses_to_be_aggregated:
-                df, df_demand = prepare_dispatch_data(bus_to_be_aggregated)
+                df, df_demand, bus_name = prepare_dispatch_data(bus_to_be_aggregated)
 
                 df_stacked = prepare_data_for_aggregation(df_stacked, df)
                 df_demand_stacked = prepare_data_for_aggregation(
@@ -224,5 +224,5 @@ if __name__ == "__main__":
             df_demand_stacked = None
 
     for bus_file in selected_bus_files:
-        df, df_demand = prepare_dispatch_data(bus_file)
+        df, df_demand, bus_name = prepare_dispatch_data(bus_file)
         plot_dispatch_data(df, df_demand)
