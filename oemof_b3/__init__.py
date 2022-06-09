@@ -10,7 +10,9 @@ labels_dict = load_yaml(os.path.join(dir_name, "config", "labels.yml"))
 
 labels_to_german = load_yaml(os.path.join(dir_name, "config", "labels_to_german.yml"))
 
-label_simplification = load_yaml(os.path.join(dir_name, "config", "label_simplification.yml"))
+label_simplification = load_yaml(
+    os.path.join(dir_name, "config", "label_simplification.yml")
+)
 
 colors_csv = pd.read_csv(
     os.path.join(dir_name, "config", "colors.csv"), header=[0], index_col=[0]

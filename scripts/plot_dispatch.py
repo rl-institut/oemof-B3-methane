@@ -151,7 +151,6 @@ if __name__ == "__main__":
             # Simplify legend. As there is only one color per technology, there should
             # be only one label per technology.
 
-
             handles, labels = data_processing.reduce_labels(
                 ax=ax, simple_labels_dict=label_simplification
             )
