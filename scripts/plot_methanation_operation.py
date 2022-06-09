@@ -171,6 +171,8 @@ def plot_methanation_operation(
         for bus_name, df, ax in zip(
             bus_name, [sequences_el_filtered, sequences_heat_filtered], (ax1, ax2)
         ):
+            # convert to SI-units
+            df *= MW_to_W
 
             df, df_demand = plots.prepare_dispatch_data(
                 df,
@@ -181,9 +183,6 @@ def plot_methanation_operation(
 
             for i in df_demand.columns:
                 colors_odict[i] = "#000000"
-
-            # convert to SI-units
-            df *= MW_to_W
 
             plots.plot_dispatch(
                 ax=ax,
