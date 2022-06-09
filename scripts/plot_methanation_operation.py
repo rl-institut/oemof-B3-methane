@@ -5,8 +5,9 @@ import re
 import matplotlib.pyplot as plt
 import pandas as pd
 from oemoflex.tools import plots
+from oemof_b3.tools import data_processing
 
-from oemof_b3 import colors_odict, labels_dict
+from oemof_b3 import colors_odict, labels_dict, label_simplification
 from oemof_b3.config import config
 
 
@@ -228,7 +229,12 @@ def plot_methanation_operation(
         ax4.set_title("storage_content B-h2-methanation-storage")
 
         for ax in [ax1, ax2, ax3, ax4]:
+            handles, labels = data_processing.reduce_labels(
+                ax=ax, simple_labels_dict=label_simplification
+            )
             ax.legend(
+                handles=handles,
+                labels=labels,
                 loc="center left",
                 bbox_to_anchor=(1.0, 0, 0, 1),
                 fancybox=True,
