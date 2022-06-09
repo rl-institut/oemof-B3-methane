@@ -224,5 +224,5 @@ if __name__ == "__main__":
             df_demand_stacked = None
 
     for bus_file in selected_bus_files:
-        prepare_dispatch_data(bus_file)
+        df, df_demand = prepare_dispatch_data(bus_file)
         plot_dispatch_data(df, df_demand)
