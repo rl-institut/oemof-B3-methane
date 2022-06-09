@@ -62,6 +62,100 @@ def prepare_dispatch_data(bus_file):
     return df, df_demand
 
 
+def plot_dispatch_data(df, df_demand):
+    # change colors for demand in colors_odict to black
+    for i in df_demand.columns:
+        colors_odict[i] = "#000000"
+
+    # interactive plotly dispatch plot
+    fig_plotly = plots.plot_dispatch_plotly(
+        df=df, df_demand=df_demand, unit="W", colors_odict=colors_odict
+    )
+    file_name = bus_name + "_dispatch_interactive" + ".html"
+    fig_plotly.write_html(
+        file=os.path.join(plotted, file_name),
+        # The following parameters are set according to
+        # https://plotly.github.io/plotly.py-docs/generated/plotly.io.write_html.html
+        # The files are much smaller now because a script tag containing the plotly.js source
+        # code (~3MB) is not included in the output anymore. It is refered to plotlyjs via a
+        # link in div of the plot.
+        include_plotlyjs="cdn",
+        full_html=False,
+    )
+
+    # normal dispatch plot
+    # plot one winter and one summer month
+    # select timeframe
+    year = data.index[0].year
+    timeframe = [
+        (f"{year}-01-01 00:00:00", f"{year}-01-31 23:00:00"),
+        (f"{year}-07-01 00:00:00", f"{year}-07-31 23:00:00"),
+    ]
+
+    for start_date, end_date in timeframe:
+        fig, ax = plt.subplots(figsize=(12, 5))
+
+        # filter timeseries
+        df_time_filtered = plots.filter_timeseries(df, start_date, end_date)
+        df_demand_time_filtered = plots.filter_timeseries(
+            df_demand, start_date, end_date
+        )
+
+        if df_time_filtered.empty:
+            logger.warning(f"Data for bus '{bus_name}' is empty, cannot plot.")
+            continue
+
+        # plot time filtered data
+        plots.plot_dispatch(
+            ax=ax,
+            df=df_time_filtered,
+            df_demand=df_demand_time_filtered,
+            unit="W",
+            colors_odict=colors_odict,
+        )
+
+        plt.grid()
+        plt.title(bus_name + " dispatch", pad=20, fontdict={"size": 22})
+        plt.xlabel("Date", loc="right", fontdict={"size": 17})
+        plt.ylabel("Power", loc="top", fontdict={"size": 17})
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
+        # format x-axis representing the dates
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+        plt.gca().xaxis.set_major_locator(mdates.WeekdayLocator())
+
+        # Shrink current axis's height by 10% on the bottom
+        box = ax.get_position()
+        ax.set_position(
+            [box.x0, box.y0 + box.height * 0.15, box.width, box.height * 0.85]
+        )
+
+        # Simplify legend. As there is only one color per technology, there should
+        # be only one label per technology.
+
+        handles, labels = data_processing.reduce_labels(
+            ax=ax, simple_labels_dict=label_simplification
+        )
+
+        # Put a legend below current axis
+
+        ax.legend(
+            handles=handles,
+            labels=labels,
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.1),
+            fancybox=True,
+            ncol=4,
+            fontsize=14,
+        )
+
+        fig.tight_layout()
+        file_name = bus_name + "_" + start_date[5:7] + ".pdf"
+        plt.savefig(os.path.join(plotted, file_name), bbox_inches="tight")
+        file_name = bus_name + "_" + start_date[5:7] + ".png"
+        plt.savefig(os.path.join(plotted, file_name), bbox_inches="tight")
+
+
 if __name__ == "__main__":
     postprocessed = sys.argv[1]
     plotted = sys.argv[2]
@@ -84,96 +178,5 @@ if __name__ == "__main__":
     ]
 
     for bus_file in selected_bus_files:
-
-        # change colors for demand in colors_odict to black
-        for i in df_demand.columns:
-            colors_odict[i] = "#000000"
-
-        # interactive plotly dispatch plot
-        fig_plotly = plots.plot_dispatch_plotly(
-            df=df, df_demand=df_demand, unit="W", colors_odict=colors_odict
-        )
-        file_name = bus_name + "_dispatch_interactive" + ".html"
-        fig_plotly.write_html(
-            file=os.path.join(plotted, file_name),
-            # The following parameters are set according to
-            # https://plotly.github.io/plotly.py-docs/generated/plotly.io.write_html.html
-            # The files are much smaller now because a script tag containing the plotly.js source
-            # code (~3MB) is not included in the output anymore. It is refered to plotlyjs via a
-            # link in div of the plot.
-            include_plotlyjs="cdn",
-            full_html=False,
-        )
-
-        # normal dispatch plot
-        # plot one winter and one summer month
-        # select timeframe
-        year = data.index[0].year
-        timeframe = [
-            (f"{year}-01-01 00:00:00", f"{year}-01-31 23:00:00"),
-            (f"{year}-07-01 00:00:00", f"{year}-07-31 23:00:00"),
-        ]
-
-        for start_date, end_date in timeframe:
-            fig, ax = plt.subplots(figsize=(12, 5))
-
-            # filter timeseries
-            df_time_filtered = plots.filter_timeseries(df, start_date, end_date)
-            df_demand_time_filtered = plots.filter_timeseries(
-                df_demand, start_date, end_date
-            )
-
-            if df_time_filtered.empty:
-                logger.warning(f"Data for bus '{bus_name}' is empty, cannot plot.")
-                continue
-
-            # plot time filtered data
-            plots.plot_dispatch(
-                ax=ax,
-                df=df_time_filtered,
-                df_demand=df_demand_time_filtered,
-                unit="W",
-                colors_odict=colors_odict,
-            )
-
-            plt.grid()
-            plt.title(bus_name + " dispatch", pad=20, fontdict={"size": 22})
-            plt.xlabel("Date", loc="right", fontdict={"size": 17})
-            plt.ylabel("Power", loc="top", fontdict={"size": 17})
-            plt.xticks(fontsize=14)
-            plt.yticks(fontsize=14)
-            # format x-axis representing the dates
-            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
-            plt.gca().xaxis.set_major_locator(mdates.WeekdayLocator())
-
-            # Shrink current axis's height by 10% on the bottom
-            box = ax.get_position()
-            ax.set_position(
-                [box.x0, box.y0 + box.height * 0.15, box.width, box.height * 0.85]
-            )
-
-            # Simplify legend. As there is only one color per technology, there should
-            # be only one label per technology.
-
-            handles, labels = data_processing.reduce_labels(
-                ax=ax, simple_labels_dict=label_simplification
-            )
-
-            # Put a legend below current axis
-
-            ax.legend(
-                handles=handles,
-                labels=labels,
-                loc="upper center",
-                bbox_to_anchor=(0.5, -0.1),
-                fancybox=True,
-                ncol=4,
-                fontsize=14,
-            )
-
-            fig.tight_layout()
-            file_name = bus_name + "_" + start_date[5:7] + ".pdf"
-            plt.savefig(os.path.join(plotted, file_name), bbox_inches="tight")
-            file_name = bus_name + "_" + start_date[5:7] + ".png"
-            plt.savefig(os.path.join(plotted, file_name), bbox_inches="tight")
         prepare_dispatch_data(bus_file)
+        plot_dispatch_data(df, df_demand)
