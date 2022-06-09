@@ -41,6 +41,27 @@ from oemof_b3 import labels_dict, colors_odict, label_simplification
 from oemof_b3.config import config
 
 
+def prepare_dispatch_data(bus_file):
+    bus_name = os.path.splitext(bus_file)[0]
+    bus_path = os.path.join(bus_directory, bus_file)
+
+    data = pd.read_csv(bus_path, header=[0, 1, 2], parse_dates=[0], index_col=[0])
+
+    # convert data to SI-unit
+    MW_to_W = 1e6
+    data = data * MW_to_W
+
+    # prepare dispatch data
+    df, df_demand = plots.prepare_dispatch_data(
+        data,
+        bus_name=bus_name,
+        demand_name="demand",
+        labels_dict=labels_dict,
+    )
+
+    return df, df_demand
+
+
 if __name__ == "__main__":
     postprocessed = sys.argv[1]
     plotted = sys.argv[2]
@@ -63,23 +84,6 @@ if __name__ == "__main__":
     ]
 
     for bus_file in selected_bus_files:
-
-        bus_name = os.path.splitext(bus_file)[0]
-        bus_path = os.path.join(bus_directory, bus_file)
-
-        data = pd.read_csv(bus_path, header=[0, 1, 2], parse_dates=[0], index_col=[0])
-
-        # convert data to SI-unit
-        MW_to_W = 1e6
-        data = data * MW_to_W
-
-        # prepare dispatch data
-        df, df_demand = plots.prepare_dispatch_data(
-            data,
-            bus_name=bus_name,
-            demand_name="demand",
-            labels_dict=labels_dict,
-        )
 
         # change colors for demand in colors_odict to black
         for i in df_demand.columns:
@@ -172,3 +176,4 @@ if __name__ == "__main__":
             plt.savefig(os.path.join(plotted, file_name), bbox_inches="tight")
             file_name = bus_name + "_" + start_date[5:7] + ".png"
             plt.savefig(os.path.join(plotted, file_name), bbox_inches="tight")
+        prepare_dispatch_data(bus_file)
