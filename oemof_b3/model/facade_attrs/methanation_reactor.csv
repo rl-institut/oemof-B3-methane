@@ -20,3 +20,4 @@ efficiency_methanation,float,unitless,Efficiency of methanation
 input_parameters,dict,n/a,Optional parameters passed to oemof-solph's input flow
 output_parameters,dict,n/a,Optional parameters passed to oemof-solph's output flow
 methanation_option,int,n/a,Select formulation
+nonconvex,bool,n/a,Introduce binary status variables for input/output if True
