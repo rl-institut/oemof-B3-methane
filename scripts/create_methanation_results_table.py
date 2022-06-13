@@ -29,6 +29,12 @@ import oemof_b3.tools.data_processing as dp
 from oemof_b3.config import config
 
 
+AGG_METHOD = {
+    "var_value": sum,
+    "name": lambda x: "None",
+}
+
+
 def get_scenario_pairs(scenarios):
     scenarios_methanation = [scen for scen in scenarios if "methanation" in scen]
     pairs = [(scen.strip("-methanation"), scen) for scen in scenarios_methanation]
@@ -69,7 +75,8 @@ def create_table_system_cost_curtailment(scalars):
     curtailment = dp.multi_filter_df(
         scalars, var_name="flow_in_electricity", tech="curtailment"
     )
-    curtailment = dp.aggregate_scalars(curtailment, "region")
+
+    curtailment = dp.aggregate_scalars(curtailment, "region", agg_method=AGG_METHOD)
     curtailment["var_name"] = "curtailment"
 
     df = pd.concat([total_system_cost, curtailment])
@@ -95,12 +102,16 @@ def create_flh_table(scalars):
     )
 
     # aggregate regions
-    methanation_ch4_out = dp.aggregate_scalars(methanation_ch4_out, "region")
+    methanation_ch4_out = dp.aggregate_scalars(
+        methanation_ch4_out, "region", agg_method=AGG_METHOD
+    )
     methanation_ch4_out["var_name"] = "flow_out_ch4"
     methanation_ch4_out = methanation_ch4_out.set_index(["scenario_key", "var_name"])
     methanation_ch4_out = methanation_ch4_out.loc[:, ["var_value"]]
 
-    methanation_h2_in = dp.aggregate_scalars(methanation_h2_in, "region")
+    methanation_h2_in = dp.aggregate_scalars(
+        methanation_h2_in, "region", agg_method=AGG_METHOD
+    )
     methanation_h2_in["var_name"] = "flow_in_h2"
     methanation_h2_in = methanation_h2_in.set_index(["scenario_key", "var_name"])
     methanation_h2_in = methanation_h2_in.loc[:, ["var_value"]]
