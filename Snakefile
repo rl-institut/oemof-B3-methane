@@ -75,7 +75,35 @@ scenario_groups = {
         #"2050-95-gas_moreCH4-methanation",
         #"2050-100-gas_moreCH4",
         #"2050-100-gas_moreCH4-methanation",
-    ]
+    ],
+    "ba_sn": [
+        #"2050-80-el_eff-mixed_CH4",
+        #"2050-80-el_eff-mixed_CH4-methanation",
+        "2050-95-el_eff-mixed_CH4",
+        "2050-95-el_eff-mixed_CH4-methanation",
+        "2050-100-el_eff-mixed_CH4",
+        "2050-100-el_eff-mixed_CH4-methanation",
+        "2050-80-gas_moreCH4-mixed_CH4",
+        "2050-80-gas_moreCH4-mixed_CH4-methanation",
+        "2050-95-gas_moreCH4-mixed_CH4",
+        "2050-95-gas_moreCH4-mixed_CH4-methanation",
+        "2050-100-gas_moreCH4-mixed_CH4",
+        "2050-100-gas_moreCH4-mixed_CH4-methanation",
+    ],
+    "ba_sn_reduced": [
+        #"2050-80-el_eff-mixed_CH4",
+        #"2050-80-el_eff-mixed_CH4-methanation",
+        "2050-95-el_eff-mixed_CH4",
+        #"2050-95-el_eff-mixed_CH4-methanation",
+        #"2050-100-el_eff-mixed_CH4",
+        "2050-100-el_eff-mixed_CH4-methanation",
+        "2050-80-gas_moreCH4-mixed_CH4",
+        #"2050-80-gas_moreCH4-mixed_CH4-methanation",
+        #"2050-95-gas_moreCH4-mixed_CH4",
+        "2050-95-gas_moreCH4-mixed_CH4-methanation",
+        #"2050-100-gas_moreCH4-mixed_CH4",
+        "2050-100-gas_moreCH4-mixed_CH4-methanation",
+    ],
 }
 
 resource_plots = ['scal_conv_pp-capacity_net_el']
@@ -94,8 +122,8 @@ rule plot_all_examples:
             plot_type=["scalars", "dispatch"],
         )
 
-ALL_SCENARIOS = scenario_groups["all-scenarios"]
-PLOT_TYPE = ["scalars", "dispatch"]
+ALL_SCENARIOS = scenario_groups["ba_sn"]
+PLOT_TYPE = ["scalars", "dispatch", "methanation"]
 rule process_all_scenarios:
     input:
         plots=expand(
@@ -263,15 +291,15 @@ rule build_datapackage:
     shell:
         "python scripts/build_datapackage.py {input.scenario} {output} {params.logfile}"
 
-rule optimize:
-    input:
-        "results/{scenario}/preprocessed"
-    output:
-        directory("results/{scenario}/optimized/")
-    params:
-        logfile="logs/{scenario}.log"
-    shell:
-        "python scripts/optimize.py {input} {output} {params.logfile}"
+# rule optimize:
+#     input:
+#         "results/{scenario}/preprocessed"
+#     output:
+#         directory("results/{scenario}/optimized/")
+#     params:
+#         logfile="logs/{scenario}.log"
+#     shell:
+#         "python scripts/optimize.py {input} {output} {params.logfile}"
 
 rule postprocess:
     input:
