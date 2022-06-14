@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from oemoflex.tools import plots
 
-from oemof_b3 import colors_odict, labels_dict
+from oemof_b3 import colors_odict, labels_dict, label_simplification
 from oemof_b3.config import config
 from oemof_b3.tools import data_processing as dp
 
@@ -125,6 +125,9 @@ def prepare_storage_data(df, labels_dict=labels_dict):
 
 
 def prepare_methanation_operation_data(df, bus_name):
+    # convert to SI-units
+    df *= MW_to_W
+
     df, df_demand = plots.prepare_dispatch_data(
         df,
         bus_name=bus_name,
@@ -132,8 +135,8 @@ def prepare_methanation_operation_data(df, bus_name):
         labels_dict=labels_dict,
     )
 
-    # convert to SI-units
-    df *= MW_to_W
+    for i in df_demand.columns:
+        colors_odict[i] = "#000000"
 
     return df, df_demand, bus_name
 
@@ -296,7 +299,12 @@ def plot_methanation_operation(
         ax4.set_title("storage_content B-h2-methanation-storage")
 
         for ax in [ax1, ax2, ax3, ax4]:
+            handles, labels = data_processing.reduce_labels(
+                ax=ax, simple_labels_dict=label_simplification
+            )
             ax.legend(
+                handles=handles,
+                labels=labels,
                 loc="center left",
                 bbox_to_anchor=(1.0, 0, 0, 1),
                 fancybox=True,
