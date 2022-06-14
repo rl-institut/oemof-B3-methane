@@ -8,7 +8,7 @@ from oemoflex.tools import plots
 
 from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.config import config
-
+from oemof_b3.tools import data_processing as dp
 
 MW_to_W = 1e6
 
@@ -153,6 +153,15 @@ def plot_dispatch_methanation_operation(ax, df, df_demand, bus_name):
         tick.set_rotation(45)
 
 
+def prepare_data_for_aggregation(df_stacked, df):
+    if isinstance(df_stacked, type(None)):
+        df_stacked = dp.stack_timeseries(df)
+    else:
+        df_stacked = pd.concat([df_stacked, dp.stack_timeseries(df)])
+
+    return df_stacked
+
+
 def concat_flows(bus_keys):
     bus = None
     for bus_key in bus_keys:
@@ -201,38 +210,47 @@ def plot_methanation_operation(
             sequences_methanation_input_output_filtered
         )
 
-        bus_name = ["B-electricity", "B-heat_central"]
-
         fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
         fig.set_size_inches(20, 12, forward=True)
         fig.subplots_adjust(hspace=0.5)
 
-        for bus_name, df, ax in zip(
-            bus_name, [sequences_el_filtered, sequences_heat_filtered], (ax1, ax2)
+        # Plot electricity flows aggregated by region
+        bus_name_electricity = ["B-electricity", "BB-electricity"]
+        electricity_df_stacked = None
+        electricity_df_demand_stacked = None
+        for bus_name_electricity, df in zip(
+            bus_name_electricity, [sequences_el_filtered, sequences_el_filtered]
         ):
-
-            df, df_demand = plots.prepare_dispatch_data(
-                df,
-                bus_name=bus_name,
-                demand_name="demand",
-                labels_dict=labels_dict,
+            df, df_demand, bus_name = prepare_methanation_operation_data(
+                df, bus_name_electricity
             )
 
-            # convert to SI-units
-            df *= MW_to_W
-
-            plots.plot_dispatch(
-                ax=ax,
-                df=df,
-                df_demand=df_demand,
-                unit="W",
-                colors_odict=colors_odict,
+            electricity_df_stacked = prepare_data_for_aggregation(
+                electricity_df_stacked, df
+            )
+            electricity_df_demand_stacked = prepare_data_for_aggregation(
+                electricity_df_demand_stacked, df_demand
             )
 
-            ax.set_title(bus_name)
+        # Aggregate electricity flows
+        # Exchange region from bus_name with "ALL"
+        bus_name = "ALL_" + carriers[0]
 
-            for tick in ax.get_xticklabels():
-                tick.set_rotation(45)
+        # Aggregate bus data and demand
+        df_aggregated = dp.aggregate_timeseries(
+            electricity_df_stacked, columns_to_aggregate="region"
+        )
+        df_demand_aggregated = dp.aggregate_timeseries(
+            electricity_df_demand_stacked, columns_to_aggregate="region"
+        )
+        # Unstack aggregated bus data and demand
+        df_aggregated = dp.unstack_timeseries(df_aggregated)
+        df_demand_aggregated = dp.unstack_timeseries(df_demand_aggregated)
+
+        plot_dispatch_methanation_operation(
+            ax1, df_aggregated, df_demand_aggregated, bus_name
+        )
+
             df, df_demand, bus_name_heat = prepare_methanation_operation_data(
                 df, bus_name_heat
             )
