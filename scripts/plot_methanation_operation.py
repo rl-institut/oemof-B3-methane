@@ -138,6 +138,21 @@ def prepare_methanation_operation_data(df, bus_name):
     return df, df_demand, bus_name
 
 
+def plot_dispatch_methanation_operation(ax, df, df_demand, bus_name):
+    plots.plot_dispatch(
+        ax=ax,
+        df=df,
+        df_demand=df_demand,
+        unit="W",
+        colors_odict=colors_odict,
+    )
+
+    ax.set_title(bus_name)
+
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(45)
+
+
 def concat_flows(bus_keys):
     bus = None
     for bus_key in bus_keys:
@@ -221,6 +236,7 @@ def plot_methanation_operation(
             df, df_demand, bus_name_heat = prepare_methanation_operation_data(
                 df, bus_name_heat
             )
+            plot_dispatch_methanation_operation(ax2, df, df_demand, bus_name_heat)
 
         df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
