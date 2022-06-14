@@ -238,6 +238,7 @@ def plot_methanation_operation(
             )
             plot_dispatch_methanation_operation(ax2, df, df_demand, bus_name_heat)
 
+        # Plot h2 methanation
         df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
             # convert to SI-units
@@ -253,6 +254,7 @@ def plot_methanation_operation(
 
         ax3.set_title(plot_title)
 
+        # Plot methanation storage
         df = prepare_storage_data(sequences_methanation_storage_filtered)
 
         # convert to SI-units
