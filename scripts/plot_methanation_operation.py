@@ -124,6 +124,20 @@ def prepare_storage_data(df, labels_dict=labels_dict):
     return df
 
 
+def prepare_methanation_operation_data(df, bus_name):
+    df, df_demand = plots.prepare_dispatch_data(
+        df,
+        bus_name=bus_name,
+        demand_name="demand",
+        labels_dict=labels_dict,
+    )
+
+    # convert to SI-units
+    df *= MW_to_W
+
+    return df, df_demand, bus_name
+
+
 def concat_flows(bus_keys):
     bus = None
     for bus_key in bus_keys:
@@ -204,6 +218,9 @@ def plot_methanation_operation(
 
             for tick in ax.get_xticklabels():
                 tick.set_rotation(45)
+            df, df_demand, bus_name_heat = prepare_methanation_operation_data(
+                df, bus_name_heat
+            )
 
         df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
