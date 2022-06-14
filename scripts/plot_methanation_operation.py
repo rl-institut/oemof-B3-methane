@@ -124,6 +124,16 @@ def prepare_storage_data(df, labels_dict=labels_dict):
     return df
 
 
+def concat_flows(bus_keys):
+    bus = None
+    for bus_key in bus_keys:
+        if isinstance(bus, type(None)):
+            bus = bus_sequences[bus_key]
+        else:
+            bus = pd.concat([bus, bus_sequences[bus_key]], axis=1)
+    return bus
+
+
 def plot_methanation_operation(
     sequences_el,
     sequences_heat,
@@ -272,23 +282,39 @@ if __name__ == "__main__":
     if not os.path.exists(target):
         os.makedirs(target)
 
+    # Load data
     bus_sequences = load_results_sequences(bus_directory)
 
     flows = load_results_sequence(os.path.join(variable_directory, "flow.csv"))
-
-    methanation_input_output_sequences = prepare_methanation_data(flows, "B")
 
     storage_sequences = load_results_sequence(
         os.path.join(variable_directory, "storage_content.csv")
     )
 
+    # Prepare data
+    # Select carrier
+    carriers = ["electricity", "B-heat_central", "B-heat_decentral"]
+
+    # Concatenate bus sequences of regions
+    bus_electricity_keys = [i for i in bus_sequences.keys() if carriers[0] in i]
+    bus_electricity = concat_flows(bus_electricity_keys)
+
+    bus_heat_keys = [
+        i for i in bus_sequences.keys() if carriers[1] in i or carriers[2] in i
+    ]
+    bus_heat = concat_flows(bus_heat_keys)
+
+    # Prepare methanation plot data
+    methanation_input_output_sequences = prepare_methanation_data(flows, "B")
+
     methanation_storage_sequences = filter_results_sequences(
         storage_sequences, "B", "h2", "methanation"
     )
 
+    # Plot data
     plot_methanation_operation(
-        bus_sequences["B-electricity"],
-        bus_sequences["B-heat_central"],
+        bus_electricity,
+        bus_heat,
         methanation_input_output_sequences,
         methanation_storage_sequences,
     )
