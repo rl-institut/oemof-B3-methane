@@ -162,7 +162,10 @@ def plot_methanation_operation(
             sequences_methanation_input_output_filtered
         )
 
-        bus_name = ["B-electricity", "B-heat_central"]
+        bus_name = [
+            "B-electricity",
+            "B-heat_central",
+        ]  # todo note: hier electricity bus rausnehmen für steffi?
 
         fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
         fig.set_size_inches(20, 12, forward=True)
@@ -192,8 +195,8 @@ def plot_methanation_operation(
 
             ax.set_title(bus_name)
 
-            for tick in ax.get_xticklabels():
-                tick.set_rotation(45)
+        # for tick in ax.get_xticklabels():
+        #    tick.set_rotation(45)
 
         df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
@@ -240,9 +243,9 @@ def plot_methanation_operation(
         ax4.set_ylabel("Storage level / MWh")
         ax4.set_xlabel("Time")
 
-        ax1.axes.get_xaxis().set_visible(False)
-        ax2.axes.get_xaxis().set_visible(False)
-        ax3.axes.get_xaxis().set_visible(False)
+        # ax1.axes.get_xaxis().set_visible(False)
+        # ax2.axes.get_xaxis().set_visible(False)
+        # ax3.axes.get_xaxis().set_visible(False)
 
         fig.tight_layout()
         plot_name = (
