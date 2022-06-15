@@ -162,6 +162,39 @@ def add_methanation_cost(df, methanation_df):
     return df
 
 
+def add_lcoe(df, methanation_df, scalars):
+
+    methanation_cost = get_methanation_costs(methanation_df)
+
+    # get ch4 products
+    ch4 = pd.DataFrame(
+        dp.multi_filter_df(scalars, var_name="flow_out_ch4", tech="methanation", name="B-h2-methanation-storage_products")
+        #.loc[:, "var_value"]
+    )#.rename(columns={"var_value": "flow_out_ch4"})
+    ch4["var_name"] = "lcoe"
+    ch4.set_index(["scenario_key", "var_name"], inplace=True)
+    ch4 = ch4.loc[:, ["var_value"]]
+
+    # add methanation investment costs depending on year in scenario_key (index)
+    ch4["invest_costs"] = (
+        ch4.reset_index()["scenario_key"]
+        .apply(lambda x: methanation_cost[f"{x.split('-')[0]}-methanation"])
+        .values
+    )
+
+    lcoe = pd.DataFrame(ch4["invest_costs"] / ch4["var_value"]).rename(
+        columns={0: ""}
+    )
+    lcoe = lcoe.unstack("var_name")
+
+    # strip '-methanation' from indices
+    lcoe.set_index(lcoe.index.map(lambda x: x.strip("-methanation")), inplace=True)
+
+    df = df.join(lcoe)
+
+    return df
+
+
 if __name__ == "__main__":
     in_path1 = sys.argv[1]  # input data
     in_path2 = sys.argv[2]  # input data
@@ -190,6 +223,8 @@ if __name__ == "__main__":
     df = delta_scenarios(df, scenario_pairs)
 
     df["installed"] = df[("delta", "total_system_cost")] < 0
+
+    df = add_lcoe(df, methanation_df, scalars)
 
     # rename columns
     df.columns = df.columns.to_flat_index()
