@@ -137,10 +137,10 @@ def create_flh_table(scalars):
 
 def get_methanation_costs(methanation_df):
     return (
-            dp.multi_filter_df(methanation_df, var_name="storage_capacity_cost")
-                .set_index("scenario_key")
-                .loc[:, "var_value"]
-        )
+        dp.multi_filter_df(methanation_df, var_name="storage_capacity_cost")
+        .set_index("scenario_key")
+        .loc[:, "var_value"]
+    )
 
 
 def add_methanation_cost(df, methanation_df):
@@ -168,9 +168,14 @@ def add_lcoe(df, methanation_df, scalars):
 
     # get ch4 products
     ch4 = pd.DataFrame(
-        dp.multi_filter_df(scalars, var_name="flow_out_ch4", tech="methanation", name="B-h2-methanation-storage_products")
-        #.loc[:, "var_value"]
-    )#.rename(columns={"var_value": "flow_out_ch4"})
+        dp.multi_filter_df(
+            scalars,
+            var_name="flow_out_ch4",
+            tech="methanation",
+            name="B-h2-methanation-storage_products",
+        )
+        # .loc[:, "var_value"]
+    )  # .rename(columns={"var_value": "flow_out_ch4"})
     ch4["var_name"] = "lcoe"
     ch4.set_index(["scenario_key", "var_name"], inplace=True)
     ch4 = ch4.loc[:, ["var_value"]]
@@ -182,9 +187,7 @@ def add_lcoe(df, methanation_df, scalars):
         .values
     )
 
-    lcoe = pd.DataFrame(ch4["invest_costs"] / ch4["var_value"]).rename(
-        columns={0: ""}
-    )
+    lcoe = pd.DataFrame(ch4["invest_costs"] / ch4["var_value"]).rename(columns={0: ""})
     lcoe = lcoe.unstack("var_name")
 
     # strip '-methanation' from indices
