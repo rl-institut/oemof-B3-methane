@@ -135,15 +135,18 @@ def create_flh_table(scalars):
     return df
 
 
-def add_methanation_cost(df, methanation_cost):
+def get_methanation_costs(methanation_df):
+    return (
+            dp.multi_filter_df(methanation_df, var_name="storage_capacity_cost")
+                .set_index("scenario_key")
+                .loc[:, "var_value"]
+        )
+
+
+def add_methanation_cost(df, methanation_df):
 
     idx = pd.IndexSlice
-
-    methanation_cost = (
-        dp.multi_filter_df(methanation_cost, var_name="storage_capacity_cost")
-        .set_index("scenario_key")
-        .loc[:, "var_value"]
-    )
+    methanation_cost = get_methanation_costs(methanation_df)
 
     def index_is_methanation_and_year(year):
         return [(str(year) in id[0] and "methanation" in id[0]) for id in df.index]
@@ -169,7 +172,7 @@ if __name__ == "__main__":
 
     scalars = pd.read_csv(os.path.join(in_path1, "scalars.csv"))
 
-    methanation_cost = dp.load_b3_scalars(in_path2)
+    methanation_df = dp.load_b3_scalars(in_path2)
 
     # get scenario pairs
     scenarios = list(scalars["scenario"].unique())
@@ -183,7 +186,7 @@ if __name__ == "__main__":
 
     flh = create_flh_table(scalars)
     df = create_table_system_cost_curtailment(scalars)
-    df = add_methanation_cost(df, methanation_cost)
+    df = add_methanation_cost(df, methanation_df)
     df = delta_scenarios(df, scenario_pairs)
 
     df["installed"] = df[("delta", "total_system_cost")] < 0
