@@ -201,7 +201,7 @@ if __name__ == "__main__":
     out_path = sys.argv[3]
     logfile = sys.argv[4]
 
-    logger = config.add_snake_logger(logfile, "create_results_table")
+    logger = config.add_snake_logger(logfile, "create_methanation_results_table")
 
     scalars = pd.read_csv(os.path.join(in_path1, "scalars.csv"))
 
