@@ -135,15 +135,18 @@ def create_flh_table(scalars):
     return df
 
 
-def add_methanation_cost(df, methanation_cost):
-
-    idx = pd.IndexSlice
-
-    methanation_cost = (
-        dp.multi_filter_df(methanation_cost, var_name="storage_capacity_cost")
+def get_methanation_costs(methanation_df):
+    return (
+        dp.multi_filter_df(methanation_df, var_name="storage_capacity_cost")
         .set_index("scenario_key")
         .loc[:, "var_value"]
     )
+
+
+def add_methanation_cost(df, methanation_df):
+
+    idx = pd.IndexSlice
+    methanation_cost = get_methanation_costs(methanation_df)
 
     def index_is_methanation_and_year(year):
         return [(str(year) in id[0] and "methanation" in id[0]) for id in df.index]
@@ -159,17 +162,53 @@ def add_methanation_cost(df, methanation_cost):
     return df
 
 
+def add_lcoe(df, methanation_df, scalars):
+
+    methanation_cost = get_methanation_costs(methanation_df)
+
+    # get ch4 products
+    ch4 = pd.DataFrame(
+        dp.multi_filter_df(
+            scalars,
+            var_name="flow_out_ch4",
+            tech="methanation",
+            name="B-h2-methanation-storage_products",
+        )
+        # .loc[:, "var_value"]
+    )  # .rename(columns={"var_value": "flow_out_ch4"})
+    ch4["var_name"] = "lcoe"
+    ch4.set_index(["scenario_key", "var_name"], inplace=True)
+    ch4 = ch4.loc[:, ["var_value"]]
+
+    # add methanation investment costs depending on year in scenario_key (index)
+    ch4["invest_costs"] = (
+        ch4.reset_index()["scenario_key"]
+        .apply(lambda x: methanation_cost[f"{x.split('-')[0]}-methanation"])
+        .values
+    )
+
+    lcoe = pd.DataFrame(ch4["invest_costs"] / ch4["var_value"]).rename(columns={0: ""})
+    lcoe = lcoe.unstack("var_name")
+
+    # strip '-methanation' from indices
+    lcoe.set_index(lcoe.index.map(lambda x: x.strip("-methanation")), inplace=True)
+
+    df = df.join(lcoe)
+
+    return df
+
+
 if __name__ == "__main__":
     in_path1 = sys.argv[1]  # input data
     in_path2 = sys.argv[2]  # input data
     out_path = sys.argv[3]
     logfile = sys.argv[4]
 
-    logger = config.add_snake_logger(logfile, "create_results_table")
+    logger = config.add_snake_logger(logfile, "create_methanation_results_table")
 
     scalars = pd.read_csv(os.path.join(in_path1, "scalars.csv"))
 
-    methanation_cost = dp.load_b3_scalars(in_path2)
+    methanation_df = dp.load_b3_scalars(in_path2)
 
     # get scenario pairs
     scenarios = list(scalars["scenario"].unique())
@@ -183,10 +222,12 @@ if __name__ == "__main__":
 
     flh = create_flh_table(scalars)
     df = create_table_system_cost_curtailment(scalars)
-    df = add_methanation_cost(df, methanation_cost)
+    df = add_methanation_cost(df, methanation_df)
     df = delta_scenarios(df, scenario_pairs)
 
     df["installed"] = df[("delta", "total_system_cost")] < 0
+
+    df = add_lcoe(df, methanation_df, scalars)
 
     # rename columns
     df.columns = df.columns.to_flat_index()
