@@ -162,7 +162,7 @@ def add_methanation_cost(df, methanation_df):
     return df
 
 
-def add_lcoe(df, methanation_df, scalars):
+def get_lcoe(methanation_df, scalars):
 
     methanation_cost = get_methanation_costs(methanation_df)
 
@@ -174,11 +174,9 @@ def add_lcoe(df, methanation_df, scalars):
             tech="methanation",
             name="B-h2-methanation-storage_products",
         )
-        # .loc[:, "var_value"]
-    )  # .rename(columns={"var_value": "flow_out_ch4"})
-    ch4["var_name"] = "lcoe"
-    ch4.set_index(["scenario_key", "var_name"], inplace=True)
-    ch4 = ch4.loc[:, ["var_value"]]
+        .set_index("scenario_key")
+        .loc[:, "var_value"]
+    ).rename(columns={"var_value": "flow_out_ch4"})
 
     # add methanation investment costs depending on year in scenario_key (index)
     ch4["invest_costs"] = (
@@ -187,15 +185,14 @@ def add_lcoe(df, methanation_df, scalars):
         .values
     )
 
-    lcoe = pd.DataFrame(ch4["invest_costs"] / ch4["var_value"]).rename(columns={0: ""})
-    lcoe = lcoe.unstack("var_name")
+    lcoe = pd.DataFrame(ch4["invest_costs"] / ch4["flow_out_ch4"]).rename(
+        columns={0: "lcoe"}
+    )
 
     # strip '-methanation' from indices
     lcoe.set_index(lcoe.index.map(lambda x: x.strip("-methanation")), inplace=True)
 
-    df = df.join(lcoe)
-
-    return df
+    return lcoe
 
 
 if __name__ == "__main__":
@@ -221,18 +218,17 @@ if __name__ == "__main__":
         os.makedirs(out_path)
 
     flh = create_flh_table(scalars)
+    lcoe = get_lcoe(methanation_df, scalars)
     df = create_table_system_cost_curtailment(scalars)
     df = add_methanation_cost(df, methanation_df)
     df = delta_scenarios(df, scenario_pairs)
 
     df["installed"] = df[("delta", "total_system_cost")] < 0
 
-    df = add_lcoe(df, methanation_df, scalars)
-
     # rename columns
     df.columns = df.columns.to_flat_index()
     df = df.rename(columns=lambda x: " ".join(x))
 
-    df = df.join(flh)
+    df = df.join([flh, lcoe])
 
     dp.save_df(df, os.path.join(out_path, "methanation_results.csv"))
