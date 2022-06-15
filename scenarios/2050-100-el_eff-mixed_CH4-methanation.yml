@@ -4,6 +4,7 @@
 # build_datapackage
 
 name: 2050-100-el_eff-mixed_CH4-methanation
+label: 100-el_eff-methanation
 
 datetimeindex:
   start:

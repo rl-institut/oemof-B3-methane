@@ -4,6 +4,7 @@
 # build_datapackage
 
 name: 2050-95-el_eff-mixed_CH4
+label: 95-el_eff
 
 datetimeindex:
   start:
