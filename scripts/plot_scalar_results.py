@@ -819,7 +819,7 @@ if __name__ == "__main__":
     plot_flow_out_multi_carrier(CARRIERS_WO_CH4)
     plot_demands(CARRIERS)
     subplot_invest_out_multi_carrier(CARRIERS_WO_CH4)
-    subplot_flow_out_multi_carrier(CARRIERS)
+    subplot_flow_out_multi_carrier(CARRIERS_WO_CH4)
     subplot_demands(CARRIERS)
     subplot_energy_usage_multi_carrier(CARRIERS)
     plot_demands_stacked_carriers(CARRIERS)
