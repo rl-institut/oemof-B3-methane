@@ -122,7 +122,7 @@ rule plot_all_examples:
             plot_type=["scalars", "dispatch"],
         )
 
-ALL_SCENARIOS = scenario_groups["ba_sn"]
+ALL_SCENARIOS = scenario_groups["ba_sn_reduced"]
 PLOT_TYPE = ["scalars", "dispatch", "methanation"]
 rule process_all_scenarios:
     input:
