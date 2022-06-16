@@ -4,7 +4,6 @@ import re
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import datetime
 from oemoflex.tools import plots
 
 from matplotlib import dates as mdates
