@@ -360,7 +360,7 @@ def plot_methanation_operation(
                 loc="center left",
                 bbox_to_anchor=(1.0, 0, 0, 1),
                 fancybox=True,
-                ncol=1,
+                ncol=2,
                 fontsize=14,
             )
 
