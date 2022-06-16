@@ -233,10 +233,6 @@ def plot_methanation_operation(
                 fontsize=14,
             )
 
-            days_in_between = datetime.datetime.strptime(
-                end_date, "%Y-%m-%d %H:%M:%S"
-            ) - datetime.datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
-
             # remove year from xticks
             formatter = mdates.DateFormatter("%m-%d")
             ax.xaxis.set_major_formatter(formatter)
