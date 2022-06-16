@@ -175,6 +175,17 @@ def concat_flows(bus_keys):
     return bus
 
 
+def filter_df_for_bus_name(df, bus_name):
+    # Remove data of other region to prevent duplicate labels later on
+    for df_col in df.columns:
+        if (not df_col[0].startswith(bus_name)) and (
+            not df_col[1].startswith(bus_name)
+        ):
+            df = df.drop(df_col, axis=1)
+
+    return df
+
+
 def plot_methanation_operation(
     sequences_el,
     sequences_heat,
@@ -224,6 +235,7 @@ def plot_methanation_operation(
         for bus_name_electricity, df in zip(
             bus_name_electricity, [sequences_el_filtered, sequences_el_filtered]
         ):
+            df = filter_df_for_bus_name(df, bus_name_electricity)
 
             # Prepare data for plotting
             df, df_demand, bus_name = prepare_methanation_operation_data(
@@ -273,6 +285,8 @@ def plot_methanation_operation(
         for bus_name_heat, df in zip(
             bus_names_heat, [sequences_heat_filtered, sequences_heat_filtered]
         ):
+
+            df_filtered = filter_df_for_bus_name(df, bus_name_heat)
 
             df, df_demand, bus_name_heat = prepare_methanation_operation_data(
                 df_filtered, bus_name_heat
