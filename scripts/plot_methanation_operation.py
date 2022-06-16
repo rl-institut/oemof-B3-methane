@@ -4,6 +4,7 @@ import re
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import datetime
 from oemoflex.tools import plots
 
 from matplotlib import dates as mdates
@@ -232,10 +233,17 @@ def plot_methanation_operation(
                 fontsize=14,
             )
 
+            days_in_between = datetime.datetime.strptime(
+                end_date, "%Y-%m-%d %H:%M:%S"
+            ) - datetime.datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+
             # remove year from xticks
             formatter = mdates.DateFormatter("%m-%d")
             ax.xaxis.set_major_formatter(formatter)
-            locator = mdates.WeekdayLocator()
+            if days_in_between.days <= 30:
+                locator = mdates.WeekdayLocator()
+            elif days_in_between.days > 30:
+                locator = mdates.MonthLocator()
             ax.xaxis.set_major_locator(locator)
 
         ax1.set_ylabel("Power")
