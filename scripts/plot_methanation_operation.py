@@ -167,33 +167,34 @@ def plot_methanation_operation(
             "B-heat_central",
         ]  # todo note: hier electricity bus rausnehmen für steffi?
 
-        fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
-        fig.set_size_inches(20, 12, forward=True)
-        fig.subplots_adjust(hspace=0.5)
+        fig, ax = plt.subplots(1, 1)
+        # fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 1)
+        fig.set_size_inches(20, 3, forward=True)
+        # fig.subplots_adjust(hspace=0.5)
 
-        for bus_name, df, ax in zip(
-            bus_name, [sequences_el_filtered, sequences_heat_filtered], (ax1, ax2)
-        ):
-
-            df, df_demand = plots.prepare_dispatch_data(
-                df,
-                bus_name=bus_name,
-                demand_name="demand",
-                labels_dict=labels_dict,
-            )
-
-            # convert to SI-units
-            df *= MW_to_W
-
-            plots.plot_dispatch(
-                ax=ax,
-                df=df,
-                df_demand=df_demand,
-                unit="W",
-                colors_odict=colors_odict,
-            )
-
-            ax.set_title(bus_name)
+        # for bus_name, df, ax in zip(
+        #     bus_name, [sequences_el_filtered, sequences_heat_filtered], (ax1, ax2)
+        # ):
+        #
+        #     df, df_demand = plots.prepare_dispatch_data(
+        #         df,
+        #         bus_name=bus_name,
+        #         demand_name="demand",
+        #         labels_dict=labels_dict,
+        #     )
+        #
+        #     # convert to SI-units
+        #     df *= MW_to_W
+        #
+        #     plots.plot_dispatch(
+        #         ax=ax,
+        #         df=df,
+        #         df_demand=df_demand,
+        #         unit="W",
+        #         colors_odict=colors_odict,
+        #     )
+        #
+        #     ax.set_title(bus_name)
 
         df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
@@ -201,44 +202,44 @@ def plot_methanation_operation(
             df *= MW_to_W
 
             plots.plot_dispatch(
-                ax3,
+                ax,
                 df,
                 df_demand=pd.DataFrame(),
                 unit="W",
                 colors_odict=colors_odict,
             )
 
-        ax3.set_title(plot_title)
+        ax.set_title(plot_title)
 
-        df = prepare_storage_data(sequences_methanation_storage_filtered)
+        # df = prepare_storage_data(sequences_methanation_storage_filtered)
+        #
+        # # convert to SI-units
+        # df *= MW_to_W
+        #
+        # plots.plot_dispatch(
+        #     ax4,
+        #     df,
+        #     df_demand=pd.DataFrame(),
+        #     unit="Wh",
+        #     colors_odict=colors_odict,
+        # )
+        #
+        # ax4.set_title("storage_content B-h2-methanation-storage")
 
-        # convert to SI-units
-        df *= MW_to_W
-
-        plots.plot_dispatch(
-            ax4,
-            df,
-            df_demand=pd.DataFrame(),
-            unit="Wh",
-            colors_odict=colors_odict,
+        # for ax in [ax1, ax2, ax3, ax4]:
+        ax.legend(
+            loc="center left",
+            bbox_to_anchor=(1.0, 0, 0, 1),
+            fancybox=True,
+            ncol=1,
+            fontsize=14,
         )
 
-        ax4.set_title("storage_content B-h2-methanation-storage")
-
-        for ax in [ax1, ax2, ax3, ax4]:
-            ax.legend(
-                loc="center left",
-                bbox_to_anchor=(1.0, 0, 0, 1),
-                fancybox=True,
-                ncol=1,
-                fontsize=14,
-            )
-
-        ax1.set_ylabel("Power")
-        ax2.set_ylabel("Power")
-        ax3.set_ylabel("Power / MW")
-        ax4.set_ylabel("Storage level / MWh")
-        ax4.set_xlabel("Time")
+        # ax1.set_ylabel("Power")
+        # ax2.set_ylabel("Power")
+        # ax3.set_ylabel("Power / MW")
+        ax.set_ylabel("Storage level / MWh")
+        ax.set_xlabel("Time")
 
         fig.tight_layout()
         plot_name = (
