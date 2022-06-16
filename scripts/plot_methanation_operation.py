@@ -250,6 +250,17 @@ def plot_methanation_operation(
         df_aggregated = dp.unstack_timeseries(df_aggregated)
         df_demand_aggregated = dp.unstack_timeseries(df_demand_aggregated)
 
+        # Set minimal positive Curtailment to zero
+        if "Curtailment" in df_aggregated.columns:
+            for num, i in enumerate(df_aggregated["Curtailment"].values):
+                if 1 > i > 0:
+                    df_aggregated["Curtailment"][num] = 0
+                elif i >= 1:
+                    logger.warning(
+                        f"Data for bus '{bus_name}' contains positive curtailment."
+                    )
+                    continue
+
         plot_dispatch_methanation_operation(
             ax1, df_aggregated, df_demand_aggregated, bus_name
         )
@@ -263,6 +274,29 @@ def plot_methanation_operation(
         ):
             df, df_demand, bus_name_heat = prepare_methanation_operation_data(
                 df, bus_name_heat
+
+            # Set minimal negative H2 backpressure CHP to zero
+            if "H2 backpressure CHP" in df.columns:
+                for num, i in enumerate(df["H2 backpressure CHP"].values):
+                    if -10 < i < 0:
+                        df["H2 backpressure CHP"][num] = 0
+                    elif i <= -10:
+                        logger.warning(
+                            f"Data for bus '{bus_name}' contains negative H2 backpressure CHP."
+                        )
+                        continue
+
+            # Set minimal negative res. PtH to zero
+            if "res. PtH" in df.columns:
+                for num, i in enumerate(df["res. PtH"].values):
+                    if -1 < i < 0:
+                        df["res. PtH"][num] = 0
+                    elif i <= -1:
+                        logger.warning(
+                            f"Data for bus '{bus_name}' contains negative res. PtH."
+                        )
+                        continue
+
             )
             plot_dispatch_methanation_operation(ax2, df, df_demand, bus_name_heat)
 
