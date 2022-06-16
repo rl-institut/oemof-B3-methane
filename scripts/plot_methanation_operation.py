@@ -351,7 +351,7 @@ def plot_methanation_operation(
         ax4.set_title("storage_content B-h2-methanation-storage")
 
         for ax in [ax1, ax2, ax3, ax4]:
-            handles, labels = data_processing.reduce_labels(
+            handles, labels = dp.reduce_labels(
                 ax=ax, simple_labels_dict=label_simplification
             )
             ax.legend(
