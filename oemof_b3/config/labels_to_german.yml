@@ -5,7 +5,8 @@ Biomass GT: Biomass GT
 Biomass ST: Biomass ST
 Biomass: Biomasse
 CH4 Backpressure CHP: CH4 Backpressure CHP
-CH4 Boiler: CH4 Boiler
+ch4-boiler_small: CH4 boiler (domestic)
+ch4-boiler_large: CH4 boiler (DH)
 CH4 Excess: CH4 Excess
 CH4 Extraction CHP: CH4 Extraction CHP
 CH4 GT: CH4 GT
