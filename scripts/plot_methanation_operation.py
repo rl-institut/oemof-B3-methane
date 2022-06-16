@@ -281,6 +281,8 @@ def plot_methanation_operation(
         )
 
         # Plot heat flows
+        df_heat = None
+        df_demand_heat = None
         bus_names_heat = ["B-heat_central", "B-heat_decentral"]
         for bus_name_heat, df in zip(
             bus_names_heat, [sequences_heat_filtered, sequences_heat_filtered]
@@ -314,9 +316,15 @@ def plot_methanation_operation(
                         )
                         continue
 
-            plot_dispatch_methanation_operation(
-                ax2, df, df_demand, bus_names_heat[0] + ", " + bus_names_heat[1]
-            )
+            df_heat = prepare_data_for_aggregation(df_heat, df)
+            df_demand_heat = prepare_data_for_aggregation(df_demand_heat, df_demand)
+
+        df_heat = dp.unstack_timeseries(df_heat)
+        df_demand_heat = dp.unstack_timeseries(df_demand_heat)
+
+        plot_dispatch_methanation_operation(
+            ax2, df_heat, df_demand_heat, bus_names_heat[0] + ", " + bus_names_heat[1]
+        )
 
         # Plot h2 methanation
         df = sequences_methanation_input_output_filtered
