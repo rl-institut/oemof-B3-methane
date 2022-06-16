@@ -237,10 +237,6 @@ def plot_methanation_operation(
         ax4.set_ylabel("Storage level / MWh")
         ax4.set_xlabel("Time")
 
-        ax1.axes.get_xaxis().set_visible(False)
-        ax2.axes.get_xaxis().set_visible(False)
-        ax3.axes.get_xaxis().set_visible(False)
-
         fig.tight_layout()
         plot_name = (
             start_date[5:7] + "-" + end_date[5:7]
