@@ -195,9 +195,6 @@ def plot_methanation_operation(
 
             ax.set_title(bus_name)
 
-        # for tick in ax.get_xticklabels():
-        #    tick.set_rotation(45)
-
         df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
             # convert to SI-units
@@ -242,10 +239,6 @@ def plot_methanation_operation(
         ax3.set_ylabel("Power / MW")
         ax4.set_ylabel("Storage level / MWh")
         ax4.set_xlabel("Time")
-
-        # ax1.axes.get_xaxis().set_visible(False)
-        # ax2.axes.get_xaxis().set_visible(False)
-        # ax3.axes.get_xaxis().set_visible(False)
 
         fig.tight_layout()
         plot_name = (
