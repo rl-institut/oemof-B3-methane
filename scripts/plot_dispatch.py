@@ -138,7 +138,7 @@ if __name__ == "__main__":
         ]
 
         for start_date, end_date in timeframe:
-            fig, ax = plt.subplots(figsize=(12, 5))
+            fig, ax = plt.subplots(figsize=(12, 4.5))
 
             # filter timeseries
             df_time_filtered = plots.filter_timeseries(df, start_date, end_date)
@@ -160,7 +160,7 @@ if __name__ == "__main__":
             )
 
             plt.grid()
-            plt.title(bus_name + " dispatch", pad=20, fontdict={"size": 22})
+            # plt.title(bus_name + " dispatch", pad=20, fontdict={"size": 22})
             plt.xlabel("Date", loc="center", fontdict={"size": 17})
             plt.ylabel("Power", loc="center", fontdict={"size": 17})
             plt.xticks(fontsize=14)
@@ -206,6 +206,12 @@ if __name__ == "__main__":
                 ncol=4,
                 fontsize=14,
             )
+
+            # remove year from xticks
+            formatter = mdates.DateFormatter("%m-%d")
+            ax.xaxis.set_major_formatter(formatter)
+            locator = mdates.WeekdayLocator()
+            ax.xaxis.set_major_locator(locator)
 
             fig.tight_layout()
             file_name = bus_name + "_" + start_date[5:7] + ".pdf"
