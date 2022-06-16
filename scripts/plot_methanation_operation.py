@@ -192,9 +192,6 @@ def plot_methanation_operation(
 
             ax.set_title(bus_name)
 
-            for tick in ax.get_xticklabels():
-                tick.set_rotation(45)
-
         df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
             # convert to SI-units
