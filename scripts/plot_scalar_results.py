@@ -28,6 +28,7 @@ import numpy as np
 import oemoflex.tools.plots as plots
 import pandas as pd
 from oemoflex.tools.plots import plot_grouped_bar
+from oemoflex.tools.helpers import load_yaml
 
 from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.config import config
@@ -70,6 +71,20 @@ def draw_standalone_legend(c_dict):
     )
     plt.tight_layout()
     return fig
+
+
+def set_scenario_labels(df):
+    """Replaces scenario name with scenario label if possible"""
+
+    def get_scenario_label(scenario):
+        try:
+            scenario_settings = load_yaml(f"scenarios/{scenario}.yml")
+        except FileNotFoundError:
+            return scenario
+        return scenario_settings.get("label", scenario)
+
+    df.index = df.index.map(get_scenario_label)
+    return df
 
 
 def prepare_scalar_data(df, colors_odict, labels_dict, conv_number, tolerance=1e-3):
@@ -237,7 +252,14 @@ class ScalarPlot:
             r"""
             Ensures that the the MultiIndex covers the full product of the levels.
             """
-            index_full_product = pd.MultiIndex.from_product(df.index.levels)
+            # df.index.levels messes up the order of the levels, but we want to keep it
+            ordered_levels = [
+                df.index.get_level_values(level).unique()
+                for level in range(df.index.nlevels)
+            ]
+
+            index_full_product = pd.MultiIndex.from_product(ordered_levels)
+
             return df.reindex(index_full_product)
 
         self.prepared_scalar_data = set_index_full_product(self.prepared_scalar_data)
@@ -410,6 +432,7 @@ if __name__ == "__main__":
 
     # Load scalar data
     scalars = load_scalars(scalars_path)
+    scalars = set_scenario_labels(scalars)
 
     # To obey flake8
     colors_odict = colors_odict
@@ -746,8 +769,14 @@ if __name__ == "__main__":
         plot.prepared_scalar_data = plot.prepared_scalar_data.filter(
             items=["var_value"]
         )
+
+        # Remember index to apply it after unstacking
+        index = plot.prepared_scalar_data.index.get_level_values(0).unique()
         # Unstack prepared and filtered data regarding carriers
         plot.prepared_scalar_data = plot.prepared_scalar_data.unstack("var_name")
+
+        # Reindex to keep previous scenario order
+        plot.prepared_scalar_data = plot.prepared_scalar_data.reindex(index)
 
         # Get names of data's columns
         column_names = plot.prepared_scalar_data.columns
