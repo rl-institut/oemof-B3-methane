@@ -224,10 +224,13 @@ def plot_methanation_operation(
         for bus_name_electricity, df in zip(
             bus_name_electricity, [sequences_el_filtered, sequences_el_filtered]
         ):
+
+            # Prepare data for plotting
             df, df_demand, bus_name = prepare_methanation_operation_data(
                 df, bus_name_electricity
             )
 
+            # Prepare data for aggregation
             electricity_df_stacked = prepare_data_for_aggregation(
                 electricity_df_stacked, df
             )
@@ -266,14 +269,14 @@ def plot_methanation_operation(
         )
 
         # Plot heat flows
-        bus_name_heat = ["B-heat_central", "B-heat_decentral"]
-        for bus_name_heat, df, ax in zip(
-            bus_name_heat,
-            [sequences_heat_filtered, sequences_heat_filtered],
-            (ax2, ax2),
+        bus_names_heat = ["B-heat_central", "B-heat_decentral"]
+        for bus_name_heat, df in zip(
+            bus_names_heat, [sequences_heat_filtered, sequences_heat_filtered]
         ):
+
             df, df_demand, bus_name_heat = prepare_methanation_operation_data(
-                df, bus_name_heat
+                df_filtered, bus_name_heat
+            )
 
             # Set minimal negative H2 backpressure CHP to zero
             if "H2 backpressure CHP" in df.columns:
@@ -297,8 +300,9 @@ def plot_methanation_operation(
                         )
                         continue
 
+            plot_dispatch_methanation_operation(
+                ax2, df, df_demand, bus_names_heat[0] + ", " + bus_names_heat[1]
             )
-            plot_dispatch_methanation_operation(ax2, df, df_demand, bus_name_heat)
 
         # Plot h2 methanation
         df = sequences_methanation_input_output_filtered
@@ -402,7 +406,9 @@ if __name__ == "__main__":
     bus_electricity = concat_flows(bus_electricity_keys)
 
     bus_heat_keys = [
-        i for i in bus_sequences.keys() if carriers[1] in i or carriers[2] in i
+        i
+        for i in bus_sequences.keys()
+        if i.startswith(carriers[1]) or i.startswith(carriers[2])
     ]
     bus_heat = concat_flows(bus_heat_keys)
 
