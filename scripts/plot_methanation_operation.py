@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from oemoflex.tools import plots
 
+from matplotlib import dates as mdates
 from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.config import config
 
@@ -231,17 +232,18 @@ def plot_methanation_operation(
                 fontsize=14,
             )
 
+            # remove year from xticks
+            formatter = mdates.DateFormatter("%m-%d")
+            ax.xaxis.set_major_formatter(formatter)
+            locator = mdates.WeekdayLocator()
+            ax.xaxis.set_major_locator(locator)
+
         ax1.set_ylabel("Power")
         ax2.set_ylabel("Power")
         ax3.set_ylabel("Power / MW")
         ax4.set_ylabel("Storage level / MWh")
         ax4.set_xlabel("Time")
 
-        # remove year from xticks
-        for ax in [ax1, ax2, ax3, ax4]:
-            xtick_labels = [item.get_text() for item in ax.get_xticklabels()]
-            adapted_labels = ["-".join(label.split("-")[1:3]) for label in xtick_labels]
-            ax.set_xticklabels(adapted_labels)
 
         fig.tight_layout()
         plot_name = (
