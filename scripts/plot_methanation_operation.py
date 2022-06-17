@@ -163,10 +163,7 @@ def plot_methanation_operation(
             sequences_methanation_input_output_filtered
         )
 
-        bus_name = [
-            "B-electricity",
-            "B-heat_central",
-        ]  # todo note: hier electricity bus rausnehmen für steffi?
+        bus_name = ["B-electricity", "B-heat_central"]
 
         fig, ax = plt.subplots(1, 1)
         # fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 1)
@@ -235,6 +232,12 @@ def plot_methanation_operation(
             ncol=1,
             fontsize=14,
         )
+
+        # remove year from xticks
+        formatter = mdates.DateFormatter("%m-%d")
+        ax.xaxis.set_major_formatter(formatter)
+        locator = mdates.WeekdayLocator()
+        ax.xaxis.set_major_locator(locator)
 
         # ax1.set_ylabel("Power")
         # ax2.set_ylabel("Power")
