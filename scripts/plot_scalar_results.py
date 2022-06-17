@@ -445,7 +445,7 @@ if __name__ == "__main__":
         plot = ScalarPlot(scalars)
         plot.select_data(var_name=var_name)
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
-        plot.draw_plot(unit=unit, title=var_name)
+        plot.draw_plot(unit=unit, title=None)
         plot.save_plot(output_path_plot)
 
     def plot_invest_out(carrier):
@@ -456,7 +456,7 @@ if __name__ == "__main__":
         plot = ScalarPlot(scalars)
         plot.select_data(var_name=var_name)
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
-        plot.draw_plot(unit=unit, title=var_name)
+        plot.draw_plot(unit=unit, title=None)
         plot.save_plot(output_path_plot)
 
     def plot_storage_capacity(carrier):
@@ -468,7 +468,7 @@ if __name__ == "__main__":
         plot = ScalarPlot(scalars)
         plot.select_data(var_name=var_name, carrier=carrier)
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
-        plot.draw_plot(unit=unit, title=title)
+        plot.draw_plot(unit=unit, title=None)
         plot.save_plot(output_path_plot)
 
     def plot_storage_invest(carrier):
@@ -480,7 +480,7 @@ if __name__ == "__main__":
         plot = ScalarPlot(scalars)
         plot.select_data(var_name=var_name, carrier=carrier)
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
-        plot.draw_plot(unit=unit, title=title)
+        plot.draw_plot(unit=unit, title=None)
         plot.save_plot(output_path_plot)
 
     def plot_flow_out(carrier):
@@ -498,7 +498,7 @@ if __name__ == "__main__":
             inverse=True,
         )
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
-        plot.draw_plot(unit=unit, title=title)
+        plot.draw_plot(unit=unit)
         plot.save_plot(output_path_plot)
 
     def plot_storage_out(carrier):
@@ -513,14 +513,14 @@ if __name__ == "__main__":
             plot.selected_scalars, "type", ["storage", "asymmetric_storage"]
         )
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
-        plot.draw_plot(unit=unit, title=title)
+        plot.draw_plot(unit=unit, title=None)
         plot.save_plot(output_path_plot)
 
     def plot_invest_out_multi_carrier(carriers):
         var_name = [f"invest_out_{carrier}" for carrier in carriers]
         unit = "W"
         output_path_plot = os.path.join(
-            target, "invest_out_" + "_".join(carriers) + ".png"
+            target, "energy_usage_invest_out_" + "_".join(carriers) + ".png"
         )
         plot = ScalarPlot(scalars)
         plot.select_data(var_name=var_name)
@@ -528,7 +528,7 @@ if __name__ == "__main__":
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
         plot.swap_levels()
         plot.prepared_scalar_data.sort_index(level=0, inplace=True)
-        fig, ax = plot.draw_plot(unit=unit, title=var_name)
+        fig, ax = plot.draw_plot(unit=unit, title=None)
 
         try:
             # rotate hierarchical labels
@@ -549,7 +549,6 @@ if __name__ == "__main__":
                 ncol=2,
                 fontsize=14,
             )
-            ax.set_title("Invested capacity")
 
             plot.save_plot(output_path_plot)
 
@@ -560,7 +559,7 @@ if __name__ == "__main__":
         var_name = [f"flow_out_{carrier}" for carrier in carriers]
         unit = "Wh"
         output_path_plot = os.path.join(
-            target, "flow_out_" + "_".join(carriers) + ".png"
+            target, "summed_energy_flow_out_" + "_".join(carriers) + ".png"
         )
         plot = ScalarPlot(scalars)
         plot.select_data(var_name=var_name)
@@ -571,7 +570,7 @@ if __name__ == "__main__":
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
         plot.swap_levels()
         plot.prepared_scalar_data.sort_index(level=0, inplace=True)
-        fig, ax = plot.draw_plot(unit=unit, title=var_name)
+        fig, ax = plot.draw_plot(unit=unit, title=None)
 
         try:
             # rotate hierarchical labels
@@ -610,7 +609,7 @@ if __name__ == "__main__":
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
         plot.swap_levels()
         plot.prepared_scalar_data.sort_index(level=0, inplace=True)
-        fig, ax = plot.draw_plot(unit=unit, title=var_name)
+        fig, ax = plot.draw_plot(unit=unit, title=None)
 
         try:
             # rotate hierarchical labels
@@ -631,7 +630,6 @@ if __name__ == "__main__":
                 ncol=1,
                 fontsize=14,
             )
-            ax.set_title("Demand")
 
             plot.save_plot(output_path_plot)
 
@@ -642,7 +640,8 @@ if __name__ == "__main__":
         var_name = [f"invest_out_{carrier}" for carrier in carriers]
         unit = "W"
         output_path_plot = os.path.join(
-            target, "invest_out_" + "_".join(carriers) + "_subplots.png"
+            target,
+            "invested_capacity_invest_out_" + "_".join(carriers) + "_subplots.png",
         )
         plot = ScalarPlot(scalars)
         plot.select_data(var_name=var_name)
@@ -694,7 +693,7 @@ if __name__ == "__main__":
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
         plot.swap_levels()
 
-        plot.draw_subplots(unit=unit, title="Demand", figsize=(11, 11))
+        plot.draw_subplots(unit=unit, title=None, figsize=(11, 11))
 
         try:
             plt.tight_layout()
@@ -707,7 +706,7 @@ if __name__ == "__main__":
         var_name = [f"flow_in_{carrier}" for carrier in carriers]
         unit = "Wh"
         output_path_plot = os.path.join(
-            target, "flow_in_" + "_".join(carriers) + "_subplots.png"
+            target, "energy_usage_flow_in_" + "_".join(carriers) + "_subplots.png"
         )
         plot = ScalarPlot(scalars)
         plot.select_data(var_name=var_name)
@@ -719,7 +718,7 @@ if __name__ == "__main__":
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
         plot.swap_levels()
 
-        plot.draw_subplots(unit=unit, title="Energy usage", figsize=(11, 11))
+        plot.draw_subplots(unit=unit, title=None, figsize=(11, 11))
 
         try:
             plt.tight_layout()
@@ -732,7 +731,7 @@ if __name__ == "__main__":
         var_name = [f"flow_out_{carrier}" for carrier in carriers]
         unit = "Wh"
         output_path_plot = os.path.join(
-            target, "flow_out_" + "_".join(carriers) + "_subplots.png"
+            target, "summed_energy_flow_out_" + "_".join(carriers) + "_subplots.png"
         )
         plot = ScalarPlot(scalars)
         plot.select_data(var_name=var_name)
@@ -754,7 +753,7 @@ if __name__ == "__main__":
         plot.prepared_scalar_data.rename(index={"ch4": "ch4 methanation"}, inplace=True)
         plot.swap_levels()
 
-        plot.draw_subplots(unit=unit, title="Summed energy", figsize=(11, 11))
+        plot.draw_subplots(unit=unit, title=None, figsize=(11, 11))
 
         try:
             plt.tight_layout()
@@ -828,7 +827,6 @@ if __name__ == "__main__":
                 ncol=1,
                 fontsize=14,
             )
-            ax.set_title("Demand")
             plt.xticks(rotation=45, ha="right")
 
             plot.save_plot(output_path_plot)
