@@ -236,7 +236,7 @@ def plot_methanation_operation(
         # remove year from xticks
         formatter = mdates.DateFormatter("%m-%d")
         ax.xaxis.set_major_formatter(formatter)
-        locator = mdates.WeekdayLocator()
+        locator = mdates.AutoDateLocator()
         ax.xaxis.set_major_locator(locator)
 
         # ax1.set_ylabel("Power")
