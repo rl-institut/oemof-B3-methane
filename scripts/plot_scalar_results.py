@@ -591,7 +591,7 @@ if __name__ == "__main__":
                 ncol=2,
                 fontsize=14,
             )
-            ax.set_title("Summed energy")
+            #ax.set_title("Summed energy")
 
             plot.save_plot(output_path_plot)
 
@@ -651,7 +651,7 @@ if __name__ == "__main__":
         plot.prepare_data(agg_regions=config.settings.plot_scalar_results.agg_regions)
         plot.swap_levels()
 
-        plot.draw_subplots(unit=unit, title="Invested capacity", figsize=(11, 11))
+        plot.draw_subplots(unit=unit, title=None, figsize=(11, 11))
 
         try:
             plt.tight_layout()
