@@ -4,6 +4,7 @@
 # build_datapackage
 
 name: 2050-80-gas_moreCH4-fossile_CH4
+label: 80 GAS
 
 datetimeindex:
   start:
