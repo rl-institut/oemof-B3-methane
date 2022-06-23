@@ -231,18 +231,21 @@ def plot_methanation_operation(
                 ncol=1,
                 fontsize=14,
             )
+            ax.tick_params(axis="y", labelsize=12)
+            ax.xaxis.set_ticklabels([])
 
-            # remove year from xticks
-            formatter = mdates.DateFormatter("%m-%d")
-            ax.xaxis.set_major_formatter(formatter)
-            locator = mdates.AutoDateLocator()
-            ax.xaxis.set_major_locator(locator)
+        # remove year from xticks
+        formatter = mdates.DateFormatter("%m-%d")
+        ax.xaxis.set_major_formatter(formatter)
+        locator = mdates.AutoDateLocator()
+        ax.xaxis.set_major_locator(locator)
 
         ax1.set_ylabel("Power", fontsize=14)
         ax2.set_ylabel("Power", fontsize=14)
         ax3.set_ylabel("Power / MW", fontsize=14)
         ax4.set_ylabel("Storage level / MWh", fontsize=14)
         ax4.set_xlabel("Time", fontsize=14)
+        ax4.tick_params(axis="x", labelsize=12)
 
         fig.tight_layout()
         plot_name = (
