@@ -201,6 +201,40 @@ def get_lcoe(methanation_df, scalars):
     return lcoe
 
 
+def add_specific_costs(df, scalars, methanation_df, scenarios):
+    r"""
+    "delta total_system_cost / total_system_cost": depending on total system costs of system without
+        methanation
+    "delta total_system_cost / methanation_cost": depending on annuised methanation costs
+    """
+    total_system_cost = dp.filter_df(
+        scalars, "var_name", "total_system_cost"
+    ).set_index("scenario_key")
+    total_system_cost = total_system_cost.loc[
+        [scen for scen in scenarios if "methanation" not in scen]
+    ]
+
+    # df for calculations
+    calc_df = pd.DataFrame(total_system_cost["var_value"]).rename(
+        columns={"var_value": "total_system_cost"}
+    )
+    calc_df = calc_df.join(df)
+    # get methanation cost
+    methanation_cost = get_methanation_costs(methanation_df)
+    calc_df["methanation_cost"] = get_methanation_costs_depending_on_scenario_key(
+        calc_df, methanation_cost
+    )
+
+    delta_1 = pd.DataFrame(
+        calc_df["delta total_system_cost"] / calc_df["total_system_cost"]
+    ).rename(columns={0: "delta total_system_cost / total_system_cost"})
+    delta_2 = pd.DataFrame(
+        calc_df["delta total_system_cost"] / calc_df["methanation_cost"]
+    ).rename(columns={0: "delta total_system_cost / methanation_cost"})
+
+    return df.join([delta_1, delta_2])
+
+
 if __name__ == "__main__":
     in_path1 = sys.argv[1]  # input data
     in_path2 = sys.argv[2]  # input data
@@ -235,6 +269,7 @@ if __name__ == "__main__":
     df.columns = df.columns.to_flat_index()
     df = df.rename(columns=lambda x: " ".join(x))
 
+    df = add_specific_costs(df, scalars, methanation_df, scenarios)
     df = df.join([flh, lcoe])
 
     dp.save_df(df, os.path.join(out_path, "methanation_results.csv"))
