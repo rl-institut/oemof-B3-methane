@@ -109,7 +109,7 @@ class TestConstraints:
 
     def test_methanation_reactor(self):
 
-        h2_bus = solph.Bus(label="h2_co2")
+        h2_bus = solph.Bus(label="h2")
 
         co2_bus = solph.Bus(label="co2", balanced=False)
 
@@ -137,7 +137,7 @@ class TestConstraints:
 
     def test_methanation_reactor_nonconvex(self):
 
-        h2_bus = solph.Bus(label="h2_co2")
+        h2_bus = solph.Bus(label="h2")
 
         co2_bus = solph.Bus(label="co2", balanced=False)
 
