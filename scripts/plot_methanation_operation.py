@@ -265,6 +265,9 @@ def plot_methanation_operation(
         df_aggregated = dp.unstack_timeseries(df_aggregated)
         df_demand_aggregated = dp.unstack_timeseries(df_demand_aggregated)
 
+        # Drop Transmission
+        df_aggregated = df_aggregated.drop(axis=1, labels="El. transmission")
+
         # Set minimal positive Curtailment to zero
         if "Curtailment" in df_aggregated.columns:
             for num, i in enumerate(df_aggregated["Curtailment"].values):
