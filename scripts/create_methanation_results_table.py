@@ -143,6 +143,14 @@ def get_methanation_costs(methanation_df):
     )
 
 
+def get_methanation_costs_depending_on_scenario_key(df, methanation_cost):
+    return (
+        df.reset_index()["scenario_key"]
+        .apply(lambda x: methanation_cost[f"{x.split('-')[0]}-methanation"])
+        .values
+    )
+
+
 def add_methanation_cost(df, methanation_df):
 
     idx = pd.IndexSlice
@@ -179,10 +187,8 @@ def get_lcoe(methanation_df, scalars):
     ).rename(columns={"var_value": "flow_out_ch4"})
 
     # add methanation investment costs depending on year in scenario_key (index)
-    ch4["invest_costs"] = (
-        ch4.reset_index()["scenario_key"]
-        .apply(lambda x: methanation_cost[f"{x.split('-')[0]}-methanation"])
-        .values
+    ch4["invest_costs"] = get_methanation_costs_depending_on_scenario_key(
+        ch4, methanation_cost
     )
 
     lcoe = pd.DataFrame(ch4["invest_costs"] / ch4["flow_out_ch4"]).rename(
