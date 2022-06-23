@@ -320,10 +320,19 @@ def plot_methanation_operation(
             df_demand_heat = prepare_data_for_aggregation(df_demand_heat, df_demand)
 
         df_heat = dp.unstack_timeseries(df_heat)
-        df_demand_heat = dp.unstack_timeseries(df_demand_heat)
+
+        # Aggregate heat demands
+        df_demand_heat_aggregated = dp.aggregate_timeseries(
+            df_demand_heat, columns_to_aggregate="var_name"
+        )
+        df_demand_heat_aggregated["var_name"][0] = "Heat demand"
+        df_demand_heat_aggregated = dp.unstack_timeseries(df_demand_heat_aggregated)
 
         plot_dispatch_methanation_operation(
-            ax2, df_heat, df_demand_heat, bus_names_heat[0] + ", " + bus_names_heat[1]
+            ax2,
+            df_heat,
+            df_demand_heat_aggregated,
+            bus_names_heat[0] + ", " + bus_names_heat[1],
         )
 
         # Plot h2 methanation
