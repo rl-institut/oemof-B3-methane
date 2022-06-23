@@ -232,6 +232,8 @@ def plot_methanation_operation(
             ncol=1,
             fontsize=14,
         )
+	ax.tick_params(axis="y", labelsize=12)
+        ax.xaxis.set_ticklabels([])
 
         # remove year from xticks
         formatter = mdates.DateFormatter("%m-%d")
@@ -242,8 +244,9 @@ def plot_methanation_operation(
         # ax1.set_ylabel("Power")
         # ax2.set_ylabel("Power")
         # ax3.set_ylabel("Power / MW")
-        ax.set_ylabel("Storage level / MWh")
-        ax.set_xlabel("Time")
+        ax.set_ylabel("Storage level / MWh", fontsize=14)
+        ax.set_xlabel("Time", fontsize=14)
+        ax.tick_params(axis="x", labelsize=12)
 
         fig.tight_layout()
         plot_name = (
