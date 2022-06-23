@@ -89,8 +89,8 @@ class MethanationReactor(Transformer, Facade):
     ...     efficiency_methanation=0.93
     ...     )
     """
-    MIX_RATIO_CO2 = 0.2
-    MIX_RATIO_H2 = 0.8
+    MIX_RATIO_CO2 = 0.139  # tCO2/MWh_H2
+    MIX_RATIO_H2 = 1
     MIN_FLOW = 0.2
 
     def __init__(self, *args, **kwargs):

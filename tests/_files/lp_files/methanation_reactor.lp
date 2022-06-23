@@ -18,16 +18,16 @@ c_e_Bus_balance(ch4_2)_:
 +1 flow(m_reactor_storage_products_ch4_2)
 = 0
 
-c_e_Bus_balance(h2_co2_0)_:
-+1 flow(h2_co2_m_reactor_combine_educts_0)
+c_e_Bus_balance(h2_0)_:
++1 flow(h2_m_reactor_combine_educts_0)
 = 0
 
-c_e_Bus_balance(h2_co2_1)_:
-+1 flow(h2_co2_m_reactor_combine_educts_1)
+c_e_Bus_balance(h2_1)_:
++1 flow(h2_m_reactor_combine_educts_1)
 = 0
 
-c_e_Bus_balance(h2_co2_2)_:
-+1 flow(h2_co2_m_reactor_combine_educts_2)
+c_e_Bus_balance(h2_2)_:
++1 flow(h2_m_reactor_combine_educts_2)
 = 0
 
 c_e_Transformer_relation(m_reactor_m_reactor_storage_educts_m_reactor_storage_products_0)_:
@@ -47,32 +47,32 @@ c_e_Transformer_relation(m_reactor_m_reactor_storage_educts_m_reactor_storage_pr
 
 c_e_Transformer_relation(m_reactor_combine_educts_co2_m_reactor_storage_educts_0)_:
 +1 flow(co2_m_reactor_combine_educts_0)
--0.20000000000000001 flow(m_reactor_combine_educts_m_reactor_storage_educts_0)
+-0.13900000000000001 flow(m_reactor_combine_educts_m_reactor_storage_educts_0)
 = 0
 
 c_e_Transformer_relation(m_reactor_combine_educts_co2_m_reactor_storage_educts_1)_:
 +1 flow(co2_m_reactor_combine_educts_1)
--0.20000000000000001 flow(m_reactor_combine_educts_m_reactor_storage_educts_1)
+-0.13900000000000001 flow(m_reactor_combine_educts_m_reactor_storage_educts_1)
 = 0
 
 c_e_Transformer_relation(m_reactor_combine_educts_co2_m_reactor_storage_educts_2)_:
 +1 flow(co2_m_reactor_combine_educts_2)
--0.20000000000000001 flow(m_reactor_combine_educts_m_reactor_storage_educts_2)
+-0.13900000000000001 flow(m_reactor_combine_educts_m_reactor_storage_educts_2)
 = 0
 
-c_e_Transformer_relation(m_reactor_combine_educts_h2_co2_m_reactor_storage_educts_0)_:
-+1 flow(h2_co2_m_reactor_combine_educts_0)
--0.80000000000000004 flow(m_reactor_combine_educts_m_reactor_storage_educts_0)
+c_e_Transformer_relation(m_reactor_combine_educts_h2_m_reactor_storage_educts_0)_:
++1 flow(h2_m_reactor_combine_educts_0)
+-1 flow(m_reactor_combine_educts_m_reactor_storage_educts_0)
 = 0
 
-c_e_Transformer_relation(m_reactor_combine_educts_h2_co2_m_reactor_storage_educts_1)_:
-+1 flow(h2_co2_m_reactor_combine_educts_1)
--0.80000000000000004 flow(m_reactor_combine_educts_m_reactor_storage_educts_1)
+c_e_Transformer_relation(m_reactor_combine_educts_h2_m_reactor_storage_educts_1)_:
++1 flow(h2_m_reactor_combine_educts_1)
+-1 flow(m_reactor_combine_educts_m_reactor_storage_educts_1)
 = 0
 
-c_e_Transformer_relation(m_reactor_combine_educts_h2_co2_m_reactor_storage_educts_2)_:
-+1 flow(h2_co2_m_reactor_combine_educts_2)
--0.80000000000000004 flow(m_reactor_combine_educts_m_reactor_storage_educts_2)
+c_e_Transformer_relation(m_reactor_combine_educts_h2_m_reactor_storage_educts_2)_:
++1 flow(h2_m_reactor_combine_educts_2)
+-1 flow(m_reactor_combine_educts_m_reactor_storage_educts_2)
 = 0
 
 c_e_GenericStorageBlock_balance_first(m_reactor_storage_educts)_:
@@ -134,9 +134,9 @@ bounds
    0 <= flow(co2_m_reactor_combine_educts_0) <= +inf
    0 <= flow(co2_m_reactor_combine_educts_1) <= +inf
    0 <= flow(co2_m_reactor_combine_educts_2) <= +inf
-   0 <= flow(h2_co2_m_reactor_combine_educts_0) <= +inf
-   0 <= flow(h2_co2_m_reactor_combine_educts_1) <= +inf
-   0 <= flow(h2_co2_m_reactor_combine_educts_2) <= +inf
+   0 <= flow(h2_m_reactor_combine_educts_0) <= +inf
+   0 <= flow(h2_m_reactor_combine_educts_1) <= +inf
+   0 <= flow(h2_m_reactor_combine_educts_2) <= +inf
    0 <= flow(m_reactor_m_reactor_storage_products_0) <= 5
    0 <= flow(m_reactor_m_reactor_storage_products_1) <= 5
    0 <= flow(m_reactor_m_reactor_storage_products_2) <= 5
