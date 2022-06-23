@@ -29,6 +29,7 @@ H2 backpressure CHP,#0F8A8A
 CH4 backpressure CHP,#128E10
 CH4 extraction CHP,#c0e519
 
+Heat demand,#000000
 Heat cen. demand,#ff0800
 Heat cen. excess,#DBDBDB
 Heat cen. shortage,#DBDBDB
