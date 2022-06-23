@@ -5,7 +5,6 @@ import re
 import matplotlib.pyplot as plt
 import pandas as pd
 from oemoflex.tools import plots
-from oemof_b3.tools import data_processing
 
 from oemof_b3 import colors_odict, labels_dict, label_simplification
 from oemof_b3.config import config
