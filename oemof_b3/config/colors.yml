@@ -59,3 +59,7 @@ hard coal: "black"
 lignite: "saddlebrown"
 oil: "#9467bd"
 nuclear: "pink"
+
+h2-methanation-storage_products: "#1474b8"
+h2-methanation-storage_educts: "#b85814"
+h2-methanation: "#b85814"

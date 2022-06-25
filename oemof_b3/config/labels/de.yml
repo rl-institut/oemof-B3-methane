@@ -31,6 +31,9 @@ h2-export: H2 Export
 h2-gt: H2 GT
 hard coal: Steinkohle
 h2-import: H2 Import
+h2-methanation-storage_products: Methanisierung Produkte
+h2-methanation-storage_educts: Methanisierung Edukte
+h2-methanation: Methanisierung
 h2-shortage: H2 Import
 heat_central-demand: zen. Wärmebedarf
 heat_central-excess: zen. Wärmeüberschuss
