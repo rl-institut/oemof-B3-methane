@@ -148,6 +148,7 @@ def plot_dispatch_methanation_operation(ax, df, df_demand, bus_name):
         df_demand=df_demand,
         unit="W",
         colors_odict=colors_odict,
+        linewidth=0.6,
     )
 
     ax.set_title(bus_name)
