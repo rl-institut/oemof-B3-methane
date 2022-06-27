@@ -244,7 +244,7 @@ def plot_methanation_operation(
         ax2.set_ylabel("Power", fontsize=14)
         ax3.set_ylabel("Power / MW", fontsize=14)
         ax4.set_ylabel("Storage level / MWh", fontsize=14)
-        ax4.set_xlabel("Time", fontsize=14)
+        ax4.set_xlabel("Time (mm-dd)", fontsize=14)
         ax4.tick_params(axis="x", labelsize=12)
 
         fig.tight_layout()
