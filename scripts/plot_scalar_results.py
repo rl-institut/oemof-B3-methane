@@ -35,6 +35,7 @@ from oemof_b3.config import config
 from oemof_b3.tools import data_processing as dp
 
 logger = logging.getLogger()
+POS_VLINE = 3
 
 
 def aggregate_regions(df):
@@ -465,7 +466,7 @@ if __name__ == "__main__":
             ax.tick_params(axis="both", labelsize=TICK_LABEL_SIZE)
             plt.xticks(rotation=45, ha="right")
 
-            add_vertical_line_in_plot(ax, position=6)
+            add_vertical_line_in_plot(ax, position=POS_VLINE)
 
             plot.save_plot(output_path_plot)
 
@@ -573,7 +574,7 @@ if __name__ == "__main__":
             )
             ax.tick_params(axis="both", labelsize=TICK_LABEL_SIZE)
 
-            add_vertical_line_in_plot(ax, position=6)
+            add_vertical_line_in_plot(ax, position=POS_VLINE)
 
             plot.save_plot(output_path_plot)
 
@@ -616,7 +617,7 @@ if __name__ == "__main__":
             )
             ax.tick_params(axis="both", labelsize=TICK_LABEL_SIZE)
 
-            add_vertical_line_in_plot(ax, position=6)
+            add_vertical_line_in_plot(ax, position=POS_VLINE)
 
             plot.save_plot(output_path_plot)
 
@@ -657,7 +658,7 @@ if __name__ == "__main__":
             )
             ax.tick_params(axis="both", labelsize=TICK_LABEL_SIZE)
 
-            add_vertical_line_in_plot(ax, position=6)
+            add_vertical_line_in_plot(ax, position=POS_VLINE)
 
             plot.save_plot(output_path_plot)
 
@@ -682,7 +683,7 @@ if __name__ == "__main__":
         fig, axs = plot.draw_subplots(unit=unit, title=None, figsize=(11, 13))
 
         for ax in axs:
-            add_vertical_line_in_plot(ax, position=6)
+            add_vertical_line_in_plot(ax, position=POS_VLINE)
             ax.tick_params(axis="both", labelsize=TICK_LABEL_SIZE)
 
         try:
@@ -726,7 +727,7 @@ if __name__ == "__main__":
         fig, axs = plot.draw_subplots(unit=unit, title=None, figsize=(11, 13))
 
         for ax in axs:
-            add_vertical_line_in_plot(ax, position=6)
+            add_vertical_line_in_plot(ax, position=POS_VLINE)
             ax.tick_params(axis="both", labelsize=TICK_LABEL_SIZE)
 
         try:
@@ -753,7 +754,7 @@ if __name__ == "__main__":
         fig, axs = plot.draw_subplots(unit=unit, title=None, figsize=(11, 13))
 
         for ax in axs:
-            add_vertical_line_in_plot(ax, position=6)
+            add_vertical_line_in_plot(ax, position=POS_VLINE)
             ax.tick_params(axis="both", labelsize=TICK_LABEL_SIZE)
 
         try:
@@ -790,7 +791,7 @@ if __name__ == "__main__":
         fig, axs = plot.draw_subplots(unit=unit, title=None, figsize=(11, 13))
 
         for ax in axs:
-            add_vertical_line_in_plot(ax, position=6)
+            add_vertical_line_in_plot(ax, position=POS_VLINE)
             ax.tick_params(axis="both", labelsize=TICK_LABEL_SIZE)
 
         try:
@@ -867,7 +868,7 @@ if __name__ == "__main__":
             ax.tick_params(axis="both", labelsize=TICK_LABEL_SIZE)
             plt.xticks(rotation=45, ha="right")
 
-            add_vertical_line_in_plot(ax, position=6)
+            add_vertical_line_in_plot(ax, position=POS_VLINE)
 
             plot.save_plot(output_path_plot)
 
