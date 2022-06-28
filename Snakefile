@@ -35,6 +35,28 @@ scenario_groups = {
         "2050-80-gas_moreCH4-methanation",
         "2050-95-gas_moreCH4-methanation",
         "2050-100-gas_moreCH4-methanation",
+    ],
+    "all-reduction-fossile": [
+        "2050-80-el_eff-fossile_CH4",
+        "2050-80-el_eff-fossile_CH4-methanation",
+        "2050-95-el_eff-fossile_CH4",
+        "2050-95-el_eff-fossile_CH4-methanation",
+        "2050-100-el_eff-fossile_CH4",
+        "2050-100-el_eff-fossile_CH4-methanation",
+        "2050-80-gas_moreCH4-fossile_CH4",
+        "2050-80-gas_moreCH4-fossile_CH4-methanation",
+        "2050-95-gas_moreCH4-fossile_CH4",
+        "2050-95-gas_moreCH4-fossile_CH4-methanation",
+        "2050-100-gas_moreCH4-fossile_CH4",
+        "2050-100-gas_moreCH4-fossile_CH4-methanation",
+    ],
+    "all-reduction-fossile-no-methanation": [
+        "2050-80-el_eff-fossile_CH4",
+        "2050-95-el_eff-fossile_CH4",
+        "2050-100-el_eff-fossile_CH4",
+        "2050-80-gas_moreCH4-fossile_CH4",
+        "2050-95-gas_moreCH4-fossile_CH4",
+        "2050-100-gas_moreCH4-fossile_CH4",
     ]
 }
 
@@ -223,15 +245,15 @@ rule build_datapackage:
     shell:
         "python scripts/build_datapackage.py {input.scenario} {output} {params.logfile}"
 
-# rule optimize:
-#     input:
-#         "results/{scenario}/preprocessed"
-#     output:
-#         directory("results/{scenario}/optimized/")
-#     params:
-#         logfile="logs/{scenario}.log"
-#     shell:
-#         "python scripts/optimize.py {input} {output} {params.logfile}"
+rule optimize:
+    input:
+        "results/{scenario}/preprocessed"
+    output:
+        directory("results/{scenario}/optimized/")
+    params:
+        logfile="logs/{scenario}.log"
+    shell:
+        "python scripts/optimize.py {input} {output} {params.logfile}"
 
 rule postprocess:
     input:
@@ -377,10 +399,10 @@ def get_scenarios_in_group(wildcards):
     return [os.path.join("results", scenario, "postprocessed") for scenario in scenario_groups[wildcards.scenario_group]]
 
 
-# rule join_scenario_results:
-#     input:
-#         get_scenarios_in_group
-#     output:
-#         directory("results/joined_scenarios/{scenario_group}/joined/")
-#     shell:
-#         "python scripts/join_scenarios.py {input} {output}"
+rule join_scenario_results:
+    input:
+        get_scenarios_in_group
+    output:
+        directory("results/joined_scenarios/{scenario_group}/joined/")
+    shell:
+        "python scripts/join_scenarios.py {input} {output}"
