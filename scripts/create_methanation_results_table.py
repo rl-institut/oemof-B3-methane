@@ -162,7 +162,7 @@ def add_methanation_cost(df, methanation_df):
     return df
 
 
-def get_lcoe(methanation_df, scalars):
+def get_lcom(methanation_df, scalars):
 
     methanation_cost = get_methanation_costs(methanation_df)
 
@@ -185,14 +185,14 @@ def get_lcoe(methanation_df, scalars):
         .values
     )
 
-    lcoe = pd.DataFrame(ch4["invest_costs"] / ch4["flow_out_ch4"]).rename(
-        columns={0: "lcoe"}
+    lcom = pd.DataFrame(ch4["invest_costs"] / ch4["flow_out_ch4"]).rename(
+        columns={0: "LCOM"}
     )
 
     # strip '-methanation' from indices
-    lcoe.set_index(lcoe.index.map(lambda x: x.strip("-methanation")), inplace=True)
+    lcom.set_index(lcom.index.map(lambda x: x.strip("-methanation")), inplace=True)
 
-    return lcoe
+    return lcom
 
 
 if __name__ == "__main__":
@@ -218,7 +218,7 @@ if __name__ == "__main__":
         os.makedirs(out_path)
 
     flh = create_flh_table(scalars)
-    lcoe = get_lcoe(methanation_df, scalars)
+    lcom = get_lcom(methanation_df, scalars)
     df = create_table_system_cost_curtailment(scalars)
     df = add_methanation_cost(df, methanation_df)
     df = delta_scenarios(df, scenario_pairs)
@@ -229,6 +229,6 @@ if __name__ == "__main__":
     df.columns = df.columns.to_flat_index()
     df = df.rename(columns=lambda x: " ".join(x))
 
-    df = df.join([flh, lcoe])
+    df = df.join([flh, lcom])
 
     dp.save_df(df, os.path.join(out_path, "methanation_results.csv"))
