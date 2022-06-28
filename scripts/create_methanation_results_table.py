@@ -90,6 +90,36 @@ def create_table_system_cost_curtailment(scalars):
     return df
 
 
+def create_methane_production_table(scalars):
+    # filter data
+    methanation_ch4_out = dp.multi_filter_df(
+        scalars, tech="methanation", var_name="flow_out_ch4"
+    )
+    # aggregate regions
+    methanation_ch4_out = dp.aggregate_scalars(
+        methanation_ch4_out, "region", agg_method=AGG_METHOD
+    )
+    # format data
+    methanation_ch4_out["var_name"] = "flow_out_ch4"
+    methanation_ch4_out = methanation_ch4_out.set_index(["scenario_key", "var_name"])
+    methanation_ch4_out = methanation_ch4_out.loc[:, ["var_value"]]
+
+    methanation_ch4_out = methanation_ch4_out.unstack("var_name")
+
+    methanation_ch4_out = dp.round_setting_int(
+        methanation_ch4_out, decimals={col: 0 for col in methanation_ch4_out.columns}
+    )
+
+    methanation_ch4_out = methanation_ch4_out.rename(
+        index=lambda x: x.strip("-methanation")
+    )
+    methanation_ch4_out.columns = methanation_ch4_out.columns.get_level_values(
+        "var_name"
+    )
+
+    return methanation_ch4_out
+
+
 def create_flh_table(scalars):
     capacity_in = 2.8
     capacity_out = 7.7
@@ -257,6 +287,7 @@ if __name__ == "__main__":
     if not os.path.exists(out_path):
         os.makedirs(out_path)
 
+    methane_production = create_methane_production_table(scalars)
     flh = create_flh_table(scalars)
     lcom = get_lcom(methanation_df, scalars)
     df = create_table_system_cost_curtailment(scalars)
@@ -270,6 +301,6 @@ if __name__ == "__main__":
     df = df.rename(columns=lambda x: " ".join(x))
 
     df = add_specific_costs(df, scalars, methanation_df, scenarios)
-    df = df.join([flh, lcom])
+    df = df.join([methane_production, flh, lcom])
 
     dp.save_df(df, os.path.join(out_path, "methanation_results.csv"))
