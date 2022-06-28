@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from oemoflex.tools import plots
 
+from matplotlib import dates as mdates
 from oemof_b3 import colors_odict, labels_dict
 from oemof_b3.config import config
 
@@ -192,9 +193,6 @@ def plot_methanation_operation(
 
             ax.set_title(bus_name)
 
-            for tick in ax.get_xticklabels():
-                tick.set_rotation(45)
-
         df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
             # convert to SI-units
@@ -233,16 +231,21 @@ def plot_methanation_operation(
                 ncol=1,
                 fontsize=14,
             )
+            ax.tick_params(axis="y", labelsize=12)
+            ax.xaxis.set_ticklabels([])
 
-        ax1.set_ylabel("Power")
-        ax2.set_ylabel("Power")
-        ax3.set_ylabel("Power / MW")
-        ax4.set_ylabel("Storage level / MWh")
-        ax4.set_xlabel("Time")
+        # remove year from xticks
+        formatter = mdates.DateFormatter("%m-%d")
+        ax.xaxis.set_major_formatter(formatter)
+        locator = mdates.AutoDateLocator()
+        ax.xaxis.set_major_locator(locator)
 
-        ax1.axes.get_xaxis().set_visible(False)
-        ax2.axes.get_xaxis().set_visible(False)
-        ax3.axes.get_xaxis().set_visible(False)
+        ax1.set_ylabel("Power", fontsize=14)
+        ax2.set_ylabel("Power", fontsize=14)
+        ax3.set_ylabel("Power / MW", fontsize=14)
+        ax4.set_ylabel("Storage level / MWh", fontsize=14)
+        ax4.set_xlabel("Time (mm-dd)", fontsize=14)
+        ax4.tick_params(axis="x", labelsize=12)
 
         fig.tight_layout()
         plot_name = (
