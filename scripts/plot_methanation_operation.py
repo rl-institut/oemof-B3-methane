@@ -12,6 +12,8 @@ from oemof_b3.config import config
 
 
 MW_to_W = 1e6
+COLORS["H2 input"] = "#b85814"
+COLORS["CH4 output"] = "#1474b8"
 
 
 def drop_near_zeros(df, tolerance=1e-3):
