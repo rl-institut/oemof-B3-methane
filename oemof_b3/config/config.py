@@ -60,3 +60,5 @@ for label, color in raw_colors.items():
     COLORS[LABELS[label]] = color
     COLORS[f"{LABELS[label]} in"] = color
     COLORS[f"{LABELS[label]} out"] = color
+
+LABEL_SIMPLIFICATION = load_yaml(CONFIG_PATH / "label_simplification.yml")

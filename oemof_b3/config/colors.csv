@@ -29,6 +29,7 @@ H2 backpressure CHP,#0F8A8A
 CH4 backpressure CHP,#128E10
 CH4 extraction CHP,#c0e519
 
+Heat demand,#000000
 Heat cen. demand,#ff0800
 Heat cen. excess,#DBDBDB
 Heat cen. shortage,#DBDBDB
@@ -42,7 +43,8 @@ Heat dec. storage out,#e2c319
 Heat dec. storage in,#e2c319
 Heat dec. storage,#e2c319
 
-CH4 boiler,#e5194d
+CH4 boiler (DH),#e5194d
+CH4 boiler (domestic),#d97d95
 CH4 boiler in,#d62728
 Heat pump (DH),#9912A1
 Heat pump (domestic),#f288e3

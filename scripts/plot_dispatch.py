@@ -35,37 +35,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import oemoflex.tools.plots as plots
 import matplotlib.dates as mdates
+import oemof_b3.tools.data_processing as dp
 
-from oemof_b3.config.config import LABELS, COLORS
+from oemof_b3.config.config import LABELS, COLORS, LABEL_SIMPLIFICATION
 from oemof_b3.config import config
-
-
-def reduce_labels(ax, simple_labels_dict):
-    """
-    Replaces two labels by one as defined in a dictionary.
-
-    Parameters
-    ----------
-    ax: matplotlib.axes
-        The axes containing the plot for which the labels shall be simplified
-    simple_labels_dict:
-        dictionary which contains the simplified label as a key
-        and for every key a list of two labels
-        which shall be replaced by the simplified label as value
-
-    Returns
-    -------
-
-    """
-    handles, labels = ax.get_legend_handles_labels()
-
-    for key, value in simple_labels_dict.items():
-        if value[0] in labels and value[1] in labels:
-            labels = [
-                key if item == value[0] else "_Hidden" if item == value[1] else item
-                for item in labels
-            ]
-    return handles, labels
 
 
 if __name__ == "__main__":
@@ -176,22 +149,9 @@ if __name__ == "__main__":
 
             # Simplify legend. As there is only one color per technology, there should
             # be only one label per technology.
-            simple_labels_dict = {
-                "Battery": ["Battery out", "Battery in"],
-                "El. transmission external": ["El. import", "El. export"],
-                "El. transmission B-BB": [
-                    "El. transmission in",
-                    "El. transmission out",
-                ],
-                "El. shortage / curtailment": ["El. shortage", "Curtailment"],
-                "Heat cen. storage": ["Heat cen. storage out", "Heat cen. storage in"],
-                "Heat cen. mismatch": ["Heat cen. excess", "Heat cen. shortage"],
-                "Heat dec. storage": ["Heat dec. storage out", "Heat dec. storage in"],
-                "Heat dec. mismatch": ["Heat dec. excess", "Heat dec. shortage"],
-            }
 
-            handles, labels = reduce_labels(
-                ax=ax, simple_labels_dict=simple_labels_dict
+            handles, labels = dp.reduce_labels(
+                ax=ax, simple_labels_dict=LABEL_SIMPLIFICATION
             )
 
             # Put a legend below current axis
