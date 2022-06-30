@@ -7,7 +7,7 @@ import pandas as pd
 from oemoflex.tools import plots
 from oemof_b3.tools import data_processing as dp
 
-from oemof_b3 import colors_odict, labels_dict, label_simplification
+from oemof_b3.config.config import LABELS, COLORS, LABEL_SIMPLIFICATION
 from oemof_b3.config import config
 
 
@@ -118,9 +118,9 @@ def prepare_methanation_data(flows, region):
     return m_reaction_data
 
 
-def prepare_storage_data(df, labels_dict=labels_dict):
+def prepare_storage_data(df, labels_dict=LABELS):
 
-    df = plots.map_labels(df, labels_dict=labels_dict)
+    df = plots.map_labels(df, labels_dict=LABELS)
 
     return df
 
@@ -179,18 +179,18 @@ def plot_methanation_operation(
                 df,
                 bus_name=bus_name,
                 demand_name="demand",
-                labels_dict=labels_dict,
+                labels_dict=LABELS,
             )
 
             for i in df_demand.columns:
-                colors_odict[i] = "#000000"
+                COLORS[i] = "#000000"
 
             plots.plot_dispatch(
                 ax=ax,
                 df=df,
                 df_demand=df_demand,
                 unit="W",
-                colors_odict=colors_odict,
+                colors_odict=COLORS,
             )
 
             ax.set_title(bus_name)
@@ -208,7 +208,7 @@ def plot_methanation_operation(
                 df,
                 df_demand=pd.DataFrame(),
                 unit="W",
-                colors_odict=colors_odict,
+                colors_odict=COLORS,
             )
 
         ax3.set_title(plot_title)
@@ -223,14 +223,14 @@ def plot_methanation_operation(
             df,
             df_demand=pd.DataFrame(),
             unit="Wh",
-            colors_odict=colors_odict,
+            colors_odict=COLORS,
         )
 
         ax4.set_title("storage_content B-h2-methanation-storage")
 
         for ax in [ax1, ax2, ax3, ax4]:
             handles, labels = dp.reduce_labels(
-                ax=ax, simple_labels_dict=label_simplification
+                ax=ax, simple_labels_dict=LABEL_SIMPLIFICATION
             )
             ax.legend(
                 handles=handles,

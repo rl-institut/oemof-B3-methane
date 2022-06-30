@@ -35,6 +35,28 @@ scenario_groups = {
         "2050-80-gas_moreCH4-methanation",
         "2050-95-gas_moreCH4-methanation",
         "2050-100-gas_moreCH4-methanation",
+    ],
+    "all-reduction-fossile": [
+        "2050-80-el_eff-fossile_CH4",
+        "2050-80-el_eff-fossile_CH4-methanation",
+        "2050-95-el_eff-fossile_CH4",
+        "2050-95-el_eff-fossile_CH4-methanation",
+        "2050-100-el_eff-fossile_CH4",
+        "2050-100-el_eff-fossile_CH4-methanation",
+        "2050-80-gas_moreCH4-fossile_CH4",
+        "2050-80-gas_moreCH4-fossile_CH4-methanation",
+        "2050-95-gas_moreCH4-fossile_CH4",
+        "2050-95-gas_moreCH4-fossile_CH4-methanation",
+        "2050-100-gas_moreCH4-fossile_CH4",
+        "2050-100-gas_moreCH4-fossile_CH4-methanation",
+    ],
+    "all-reduction-fossile-no-methanation": [
+        "2050-80-el_eff-fossile_CH4",
+        "2050-95-el_eff-fossile_CH4",
+        "2050-100-el_eff-fossile_CH4",
+        "2050-80-gas_moreCH4-fossile_CH4",
+        "2050-95-gas_moreCH4-fossile_CH4",
+        "2050-100-gas_moreCH4-fossile_CH4",
     ]
 }
 
@@ -88,7 +110,7 @@ rule create_input_data_overview:
     output:
         "results/_tables/technical_and_cost_assumptions_{scenario_key}.csv"
     params:
-        logfile="logs/{scenario}.log"
+        logfile="logs/{scenario_key}.log"
     shell:
         "python scripts/create_input_data_overview.py {input} {wildcards.scenario_key} {output} {params.logfile}"
 
