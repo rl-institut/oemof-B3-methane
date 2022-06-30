@@ -35,7 +35,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import oemoflex.tools.plots as plots
 import matplotlib.dates as mdates
-import oemof_b3.tools.data_processing as data_processing
+import oemof_b3.tools.data_processing as data_processing as dp
 
 from oemof_b3 import labels_dict, colors_odict, label_simplification
 from oemof_b3.config import config
@@ -151,7 +151,7 @@ if __name__ == "__main__":
             # Simplify legend. As there is only one color per technology, there should
             # be only one label per technology.
 
-            handles, labels = data_processing.reduce_labels(
+            handles, labels = dp.reduce_labels(
                 ax=ax, simple_labels_dict=label_simplification
             )
 
