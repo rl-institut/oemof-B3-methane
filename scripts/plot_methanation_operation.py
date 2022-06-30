@@ -5,15 +5,15 @@ import re
 import matplotlib.pyplot as plt
 import pandas as pd
 from oemoflex.tools import plots
-from oemof_b3.tools import data_processing as dp
 
 from oemof_b3.config.config import LABELS, COLORS, LABEL_SIMPLIFICATION
 from oemof_b3.config import config
-
+from oemof_b3.tools import data_processing as dp
 
 MW_to_W = 1e6
 COLORS["H2 input"] = "#b85814"
 COLORS["CH4 output"] = "#1474b8"
+COLORS["Heat demand"] = "#000000"
 
 
 def drop_near_zeros(df, tolerance=1e-3):
@@ -127,6 +127,69 @@ def prepare_storage_data(df, labels_dict=LABELS):
     return df
 
 
+def prepare_methanation_operation_data(df, bus_name):
+    # convert to SI-units
+    df *= MW_to_W
+
+    df, df_demand = plots.prepare_dispatch_data(
+        df,
+        bus_name=bus_name,
+        demand_name="demand",
+        labels_dict=LABELS,
+    )
+
+    for i in df_demand.columns:
+        COLORS[i] = "#000000"
+
+    return df, df_demand, bus_name
+
+
+def plot_dispatch_methanation_operation(ax, df, df_demand, bus_name):
+    plots.plot_dispatch(
+        ax=ax,
+        df=df,
+        df_demand=df_demand,
+        unit="W",
+        colors_odict=COLORS,
+        linewidth=0.6,
+    )
+
+    ax.set_title(bus_name)
+
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(45)
+
+
+def prepare_data_for_aggregation(df_stacked, df):
+    if isinstance(df_stacked, type(None)):
+        df_stacked = dp.stack_timeseries(df)
+    else:
+        df_stacked = pd.concat([df_stacked, dp.stack_timeseries(df)])
+
+    return df_stacked
+
+
+def concat_flows(bus_keys):
+    bus = None
+    for bus_key in bus_keys:
+        if isinstance(bus, type(None)):
+            bus = bus_sequences[bus_key]
+        else:
+            bus = pd.concat([bus, bus_sequences[bus_key]], axis=1)
+    return bus
+
+
+def filter_df_for_bus_name(df, bus_name):
+    # Remove data of other region to prevent duplicate labels later on
+    for df_col in df.columns:
+        if (not df_col[0].startswith(bus_name)) and (
+            not df_col[1].startswith(bus_name)
+        ):
+            df = df.drop(df_col, axis=1)
+
+    return df
+
+
 def plot_methanation_operation(
     sequences_el,
     sequences_heat,
@@ -165,41 +228,124 @@ def plot_methanation_operation(
             sequences_methanation_input_output_filtered
         )
 
-        bus_name = ["B-electricity", "B-heat_central"]
-
         fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
         fig.set_size_inches(20, 12, forward=True)
         fig.subplots_adjust(hspace=0.5)
 
-        for bus_name, df, ax in zip(
-            bus_name, [sequences_el_filtered, sequences_heat_filtered], (ax1, ax2)
+        # Plot electricity flows aggregated by region
+        bus_name_electricity = ["B-electricity", "BB-electricity"]
+        electricity_df_stacked = None
+        electricity_df_demand_stacked = None
+        for bus_name_electricity, df in zip(
+            bus_name_electricity, [sequences_el_filtered, sequences_el_filtered]
         ):
-            # convert to SI-units
-            df *= MW_to_W
+            df = filter_df_for_bus_name(df, bus_name_electricity)
 
-            df, df_demand = plots.prepare_dispatch_data(
-                df,
-                bus_name=bus_name,
-                demand_name="demand",
-                labels_dict=LABELS,
+            # Prepare data for plotting
+            df, df_demand, bus_name = prepare_methanation_operation_data(
+                df, bus_name_electricity
             )
 
-            for i in df_demand.columns:
-                COLORS[i] = "#000000"
-
-            plots.plot_dispatch(
-                ax=ax,
-                df=df,
-                df_demand=df_demand,
-                unit="W",
-                colors_odict=COLORS,
+            # Prepare data for aggregation
+            electricity_df_stacked = prepare_data_for_aggregation(
+                electricity_df_stacked, df
+            )
+            electricity_df_demand_stacked = prepare_data_for_aggregation(
+                electricity_df_demand_stacked, df_demand
             )
 
-            ax.set_title(bus_name)
+        # Aggregate electricity flows
+        # Exchange region from bus_name with "ALL"
+        bus_name = "ALL_" + carriers[0]
 
-            for tick in ax.get_xticklabels():
-                tick.set_rotation(45)
+        # Aggregate bus data and demand
+        df_aggregated = dp.aggregate_timeseries(
+            electricity_df_stacked, columns_to_aggregate="region"
+        )
+        df_demand_aggregated = dp.aggregate_timeseries(
+            electricity_df_demand_stacked, columns_to_aggregate="region"
+        )
+        # Unstack aggregated bus data and demand
+        df_aggregated = dp.unstack_timeseries(df_aggregated)
+        df_demand_aggregated = dp.unstack_timeseries(df_demand_aggregated)
 
+        # Drop Transmission
+        transmission_cols = [
+            col for col in df_aggregated.columns if "El. transmission" in col
+        ]
+        df_aggregated = df_aggregated.drop(columns=transmission_cols)
+
+        # Set minimal positive Curtailment to zero
+        if "Curtailment" in df_aggregated.columns:
+            for num, i in enumerate(df_aggregated["Curtailment"].values):
+                if 1 > i > 0:
+                    df_aggregated["Curtailment"][num] = 0
+                elif i >= 1:
+                    logger.warning(
+                        f"Data for bus '{bus_name}' contains positive curtailment."
+                    )
+                    continue
+
+        plot_dispatch_methanation_operation(
+            ax1, df_aggregated, df_demand_aggregated, bus_name
+        )
+
+        # Plot heat flows
+        df_heat = None
+        df_demand_heat = None
+        bus_names_heat = ["B-heat_central", "B-heat_decentral"]
+        for bus_name_heat, df in zip(
+            bus_names_heat, [sequences_heat_filtered, sequences_heat_filtered]
+        ):
+
+            df_filtered = filter_df_for_bus_name(df, bus_name_heat)
+
+            df, df_demand, bus_name_heat = prepare_methanation_operation_data(
+                df_filtered, bus_name_heat
+            )
+
+            # Set minimal negative H2 backpressure CHP to zero
+            if "H2 backpressure CHP" in df.columns:
+                for num, i in enumerate(df["H2 backpressure CHP"].values):
+                    if -10 < i < 0:
+                        df["H2 backpressure CHP"][num] = 0
+                    elif i <= -10:
+                        logger.warning(
+                            f"Data for bus '{bus_name}' contains negative H2 backpressure CHP."
+                        )
+                        continue
+
+            # Set minimal negative res. PtH to zero
+            if "res. PtH" in df.columns:
+                for num, i in enumerate(df["res. PtH"].values):
+                    if -1 < i < 0:
+                        df["res. PtH"][num] = 0
+                    elif i <= -1:
+                        logger.warning(
+                            f"Data for bus '{bus_name}' contains negative res. PtH."
+                        )
+                        continue
+
+            df_heat = prepare_data_for_aggregation(df_heat, df)
+            df_demand_heat = prepare_data_for_aggregation(df_demand_heat, df_demand)
+
+        df_heat = dp.unstack_timeseries(df_heat)
+
+        # Aggregate heat demands
+        df_demand_heat_aggregated = dp.aggregate_timeseries(
+            df_demand_heat, columns_to_aggregate="var_name"
+        )
+        df_demand_heat_aggregated["var_name"][0] = "Heat demand"
+        df_demand_heat_aggregated = dp.unstack_timeseries(df_demand_heat_aggregated)
+
+        plot_dispatch_methanation_operation(
+            ax2,
+            df_heat,
+            df_demand_heat_aggregated,
+            bus_names_heat[0] + ", " + bus_names_heat[1],
+        )
+
+        # Plot h2 methanation
         df = sequences_methanation_input_output_filtered
         if not (df.empty or (df == 0).all().all()):
             # convert to SI-units
@@ -215,6 +361,7 @@ def plot_methanation_operation(
 
         ax3.set_title(plot_title)
 
+        # Plot methanation storage
         df = prepare_storage_data(sequences_methanation_storage_filtered)
 
         # convert to SI-units
@@ -240,7 +387,7 @@ def plot_methanation_operation(
                 loc="center left",
                 bbox_to_anchor=(1.0, 0, 0, 1),
                 fancybox=True,
-                ncol=1,
+                ncol=2,
                 fontsize=14,
             )
 
@@ -282,23 +429,41 @@ if __name__ == "__main__":
     if not os.path.exists(target):
         os.makedirs(target)
 
+    # Load data
     bus_sequences = load_results_sequences(bus_directory)
 
     flows = load_results_sequence(os.path.join(variable_directory, "flow.csv"))
-
-    methanation_input_output_sequences = prepare_methanation_data(flows, "B")
 
     storage_sequences = load_results_sequence(
         os.path.join(variable_directory, "storage_content.csv")
     )
 
+    # Prepare data
+    # Select carrier
+    carriers = ["electricity", "B-heat_central", "B-heat_decentral"]
+
+    # Concatenate bus sequences of regions
+    bus_electricity_keys = [i for i in bus_sequences.keys() if carriers[0] in i]
+    bus_electricity = concat_flows(bus_electricity_keys)
+
+    bus_heat_keys = [
+        i
+        for i in bus_sequences.keys()
+        if i.startswith(carriers[1]) or i.startswith(carriers[2])
+    ]
+    bus_heat = concat_flows(bus_heat_keys)
+
+    # Prepare methanation plot data
+    methanation_input_output_sequences = prepare_methanation_data(flows, "B")
+
     methanation_storage_sequences = filter_results_sequences(
         storage_sequences, "B", "h2", "methanation"
     )
 
+    # Plot data
     plot_methanation_operation(
-        bus_sequences["B-electricity"],
-        bus_sequences["B-heat_central"],
+        bus_electricity,
+        bus_heat,
         methanation_input_output_sequences,
         methanation_storage_sequences,
     )

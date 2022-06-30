@@ -2,7 +2,8 @@
 biomass-gt: Biomass GT
 biomass-st: Biomass ST
 biomass: Biomass
-ch4-boiler: CH4 boiler
+ch4-boiler_small: CH4 boiler (domestic)
+ch4-boiler_large: CH4 boiler (DH)
 ch4-bpchp: CH4 backpressure CHP
 ch4-demand: CH4 demand
 ch4-excess: CH4 excess
