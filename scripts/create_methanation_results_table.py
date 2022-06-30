@@ -90,6 +90,36 @@ def create_table_system_cost_curtailment(scalars):
     return df
 
 
+def create_methane_production_table(scalars):
+    # filter data
+    methanation_ch4_out = dp.multi_filter_df(
+        scalars, tech="methanation", var_name="flow_out_ch4"
+    )
+    # aggregate regions
+    methanation_ch4_out = dp.aggregate_scalars(
+        methanation_ch4_out, "region", agg_method=AGG_METHOD
+    )
+    # format data
+    methanation_ch4_out["var_name"] = "flow_out_ch4"
+    methanation_ch4_out = methanation_ch4_out.set_index(["scenario_key", "var_name"])
+    methanation_ch4_out = methanation_ch4_out.loc[:, ["var_value"]]
+
+    methanation_ch4_out = methanation_ch4_out.unstack("var_name")
+
+    methanation_ch4_out = dp.round_setting_int(
+        methanation_ch4_out, decimals={col: 0 for col in methanation_ch4_out.columns}
+    )
+
+    methanation_ch4_out = methanation_ch4_out.rename(
+        index=lambda x: x.strip("-methanation")
+    )
+    methanation_ch4_out.columns = methanation_ch4_out.columns.get_level_values(
+        "var_name"
+    )
+
+    return methanation_ch4_out
+
+
 def create_flh_table(scalars):
     capacity_in = 2.8
     capacity_out = 7.7
@@ -143,6 +173,14 @@ def get_methanation_costs(methanation_df):
     )
 
 
+def get_methanation_costs_depending_on_scenario_key(df, methanation_cost):
+    return (
+        df.reset_index()["scenario_key"]
+        .apply(lambda x: methanation_cost[f"{x.split('-')[0]}-methanation"])
+        .values
+    )
+
+
 def add_methanation_cost(df, methanation_df):
 
     idx = pd.IndexSlice
@@ -162,7 +200,7 @@ def add_methanation_cost(df, methanation_df):
     return df
 
 
-def get_lcoe(methanation_df, scalars):
+def get_lcom(methanation_df, scalars):
 
     methanation_cost = get_methanation_costs(methanation_df)
 
@@ -179,20 +217,52 @@ def get_lcoe(methanation_df, scalars):
     ).rename(columns={"var_value": "flow_out_ch4"})
 
     # add methanation investment costs depending on year in scenario_key (index)
-    ch4["invest_costs"] = (
-        ch4.reset_index()["scenario_key"]
-        .apply(lambda x: methanation_cost[f"{x.split('-')[0]}-methanation"])
-        .values
+    ch4["invest_costs"] = get_methanation_costs_depending_on_scenario_key(
+        ch4, methanation_cost
     )
 
-    lcoe = pd.DataFrame(ch4["invest_costs"] / ch4["flow_out_ch4"]).rename(
-        columns={0: "lcoe"}
+    lcom = pd.DataFrame(ch4["invest_costs"] / ch4["flow_out_ch4"]).rename(
+        columns={0: "LCOM"}
     )
 
     # strip '-methanation' from indices
-    lcoe.set_index(lcoe.index.map(lambda x: x.strip("-methanation")), inplace=True)
+    lcom.set_index(lcom.index.map(lambda x: x.strip("-methanation")), inplace=True)
 
-    return lcoe
+    return lcom
+
+
+def add_specific_costs(df, scalars, methanation_df, scenarios):
+    r"""
+    "delta total_system_cost / total_system_cost": depending on total system costs of system without
+        methanation
+    "delta total_system_cost / methanation_cost": depending on annuised methanation costs
+    """
+    total_system_cost = dp.filter_df(
+        scalars, "var_name", "total_system_cost"
+    ).set_index("scenario_key")
+    total_system_cost = total_system_cost.loc[
+        [scen for scen in scenarios if "methanation" not in scen]
+    ]
+
+    # df for calculations
+    calc_df = pd.DataFrame(total_system_cost["var_value"]).rename(
+        columns={"var_value": "total_system_cost"}
+    )
+    calc_df = calc_df.join(df)
+    # get methanation cost
+    methanation_cost = get_methanation_costs(methanation_df)
+    calc_df["methanation_cost"] = get_methanation_costs_depending_on_scenario_key(
+        calc_df, methanation_cost
+    )
+
+    delta_1 = pd.DataFrame(
+        calc_df["delta total_system_cost"] / calc_df["total_system_cost"]
+    ).rename(columns={0: "delta total_system_cost / total_system_cost"})
+    delta_2 = pd.DataFrame(
+        calc_df["delta total_system_cost"] / calc_df["methanation_cost"]
+    ).rename(columns={0: "delta total_system_cost / methanation_cost"})
+
+    return df.join([delta_1, delta_2])
 
 
 if __name__ == "__main__":
@@ -217,8 +287,9 @@ if __name__ == "__main__":
     if not os.path.exists(out_path):
         os.makedirs(out_path)
 
+    methane_production = create_methane_production_table(scalars)
     flh = create_flh_table(scalars)
-    lcoe = get_lcoe(methanation_df, scalars)
+    lcom = get_lcom(methanation_df, scalars)
     df = create_table_system_cost_curtailment(scalars)
     df = add_methanation_cost(df, methanation_df)
     df = delta_scenarios(df, scenario_pairs)
@@ -229,6 +300,7 @@ if __name__ == "__main__":
     df.columns = df.columns.to_flat_index()
     df = df.rename(columns=lambda x: " ".join(x))
 
-    df = df.join([flh, lcoe])
+    df = add_specific_costs(df, scalars, methanation_df, scenarios)
+    df = df.join([methane_production, flh, lcom])
 
     dp.save_df(df, os.path.join(out_path, "methanation_results.csv"))

@@ -3,6 +3,7 @@ import logging
 import pathlib
 
 from dynaconf import Dynaconf
+from oemoflex.tools.helpers import load_yaml
 
 CONFIG_PATH = pathlib.Path(__file__).parent
 
@@ -48,3 +49,16 @@ def add_snake_logger(logfile, rulename):
     handler.setFormatter(file_formatter)
     logger.addHandler(handler)
     return logger
+
+
+LABELS = load_yaml(CONFIG_PATH / "labels" / f"{settings.labels}.yml")
+raw_colors = load_yaml(CONFIG_PATH / "colors.yml")
+COLORS = {}
+for label, color in raw_colors.items():
+    if label not in LABELS:
+        continue
+    COLORS[LABELS[label]] = color
+    COLORS[f"{LABELS[label]} in"] = color
+    COLORS[f"{LABELS[label]} out"] = color
+
+LABEL_SIMPLIFICATION = load_yaml(CONFIG_PATH / "label_simplification.yml")

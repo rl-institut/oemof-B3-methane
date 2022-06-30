@@ -35,9 +35,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import oemoflex.tools.plots as plots
 import matplotlib.dates as mdates
-import oemof_b3.tools.data_processing as data_processing
+import oemof_b3.tools.data_processing as dp
 
-from oemof_b3 import labels_dict, colors_odict, label_simplification
+from oemof_b3.config.config import LABELS, COLORS, LABEL_SIMPLIFICATION
 from oemof_b3.config import config
 
 
@@ -78,16 +78,16 @@ if __name__ == "__main__":
             data,
             bus_name=bus_name,
             demand_name="demand",
-            labels_dict=labels_dict,
+            labels_dict=LABELS,
         )
 
         # change colors for demand in colors_odict to black
         for i in df_demand.columns:
-            colors_odict[i] = "#000000"
+            COLORS[i] = "#000000"
 
         # interactive plotly dispatch plot
         fig_plotly = plots.plot_dispatch_plotly(
-            df=df, df_demand=df_demand, unit="W", colors_odict=colors_odict
+            df=df, df_demand=df_demand, unit="W", colors_odict=COLORS
         )
         file_name = bus_name + "_dispatch_interactive" + ".html"
         fig_plotly.write_html(
@@ -129,13 +129,12 @@ if __name__ == "__main__":
                 df=df_time_filtered,
                 df_demand=df_demand_time_filtered,
                 unit="W",
-                colors_odict=colors_odict,
+                colors_odict=COLORS,
             )
 
             plt.grid()
-            plt.title(bus_name + " dispatch", pad=20, fontdict={"size": 22})
-            plt.xlabel("Date", loc="right", fontdict={"size": 17})
-            plt.ylabel("Power", loc="top", fontdict={"size": 17})
+            plt.xlabel("Date (mm-dd)", loc="center", fontdict={"size": 17})
+            plt.ylabel("Power", loc="center", fontdict={"size": 17})
             plt.xticks(fontsize=14)
             plt.yticks(fontsize=14)
             # format x-axis representing the dates
@@ -151,8 +150,8 @@ if __name__ == "__main__":
             # Simplify legend. As there is only one color per technology, there should
             # be only one label per technology.
 
-            handles, labels = data_processing.reduce_labels(
-                ax=ax, simple_labels_dict=label_simplification
+            handles, labels = dp.reduce_labels(
+                ax=ax, simple_labels_dict=LABEL_SIMPLIFICATION
             )
 
             # Put a legend below current axis
@@ -161,11 +160,17 @@ if __name__ == "__main__":
                 handles=handles,
                 labels=labels,
                 loc="upper center",
-                bbox_to_anchor=(0.5, -0.1),
+                bbox_to_anchor=(0.5, -0.25),
                 fancybox=True,
                 ncol=4,
                 fontsize=14,
             )
+
+            # remove year from xticks
+            formatter = mdates.DateFormatter("%m-%d")
+            ax.xaxis.set_major_formatter(formatter)
+            locator = mdates.AutoDateLocator()
+            ax.xaxis.set_major_locator(locator)
 
             fig.tight_layout()
             file_name = bus_name + "_" + start_date[5:7] + ".pdf"

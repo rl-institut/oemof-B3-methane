@@ -247,9 +247,7 @@ if __name__ == "__main__":
 
         # set idle time between storage input and output
         if config.settings.optimize.set_idle_time:
-            a = [f for f in m.flows if f[0].label == "B-h2-methanation-combine-educts"][
-                0
-            ]
+            a = [f for f in m.flows if f[0].label == "B-h2-methanation-combine-educts"]
             b = [
                 f
                 for f in m.flows
@@ -257,8 +255,10 @@ if __name__ == "__main__":
                     f[0].label == "B-h2-methanation-storage_products"
                     and f[1].label == "B-ch4"
                 )
-            ][0]
-            set_idle_time(m, a, b, config.settings.optimize.idle_time)
+            ]
+            if a and b:
+                assert len(a) == len(b) == 1
+                set_idle_time(m, a[0], b[0], config.settings.optimize.idle_time)
 
         # tell the model to get the dual variables when solving
         if config.settings.optimize.receive_duals:
