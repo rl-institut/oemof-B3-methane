@@ -306,6 +306,16 @@ rule plot_dispatch:
     shell:
         "python scripts/plot_dispatch.py {input} {output} {params.logfile}"
 
+rule plot_storage_level:
+    input:
+        "results/{scenario}/postprocessed/"
+    output:
+        directory("results/{scenario}/plotted/storage_level")
+    params:
+        logfile="logs/{scenario}.log"
+    shell:
+        "python scripts/plot_storage_levels.py {input} {output} {params.logfile}"
+
 rule plot_methanation_operation:
     input:
         "results/{scenario}/postprocessed/"
