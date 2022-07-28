@@ -16,7 +16,7 @@ COLORS["CH4 output"] = "#1474b8"
 COLORS["Heat demand"] = "#000000"
 
 
-def drop_near_zeros(df, tolerance=1e-3):
+def drop_columns_near_zero(df, tolerance=1e-3):
     # drop columns with data that is almost zero using the sum of the absolute values
     df = df.loc[:, df.abs().sum() > tolerance]
     return df
@@ -211,12 +211,12 @@ def plot_methanation_operation(
         sequences_el_filtered = plots.filter_timeseries(
             sequences_el, start_date, end_date
         )
-        sequences_el_filtered = drop_near_zeros(sequences_el_filtered)
+        sequences_el_filtered = drop_columns_near_zero(sequences_el_filtered)
 
         sequences_heat_filtered = plots.filter_timeseries(
             sequences_heat, start_date, end_date
         )
-        sequences_heat_filtered = drop_near_zeros(sequences_heat_filtered)
+        sequences_heat_filtered = drop_columns_near_zero(sequences_heat_filtered)
 
         sequences_methanation_storage_filtered = plots.filter_timeseries(
             sequences_methanation_storage, start_date, end_date
@@ -275,16 +275,7 @@ def plot_methanation_operation(
         ]
         df_aggregated = df_aggregated.drop(columns=transmission_cols)
 
-        # Set minimal positive Curtailment to zero
-        if "Curtailment" in df_aggregated.columns:
-            for num, i in enumerate(df_aggregated["Curtailment"].values):
-                if 1 > i > 0:
-                    df_aggregated["Curtailment"][num] = 0
-                elif i >= 1:
-                    logger.warning(
-                        f"Data for bus '{bus_name}' contains positive curtailment."
-                    )
-                    continue
+        df_aggregated = plots._replace_near_zeros(df_aggregated, tolerance=1e-2)
 
         plot_dispatch_methanation_operation(
             ax1, df_aggregated, df_demand_aggregated, bus_name
