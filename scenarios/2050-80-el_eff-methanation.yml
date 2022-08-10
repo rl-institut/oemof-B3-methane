@@ -3,8 +3,8 @@
 
 # build_datapackage
 
-name: 2050-95-gas_moreCH4-fossile_CH4-methanation
-label: 95 GAS Methanation
+name: 2050-80-el_eff-methanation
+label: 80 EL-EFF Methanation
 
 datetimeindex:
   start:
@@ -35,9 +35,9 @@ filter_scalars:
   1:
     scenario_key:
       - "ALL"
-      - "2050-gas_moreCH4"
+      - "2050-el_eff"
       - "2050-base"
-      - "reduction_95"
+      - "reduction_80"
       - "2050-methanation"
 
 paths_timeseries:
@@ -51,7 +51,7 @@ paths_timeseries:
 
 filter_timeseries:
   scenario_key:
-    - "2050-gas_moreCH4"
+    - "2050-el_eff"
     - "ALL"
   timeindex_start:
     "2017-01-01 00:00:00"

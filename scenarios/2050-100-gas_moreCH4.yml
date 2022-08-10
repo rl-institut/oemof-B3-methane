@@ -3,8 +3,8 @@
 
 # build_datapackage
 
-name: 2050-100-gas_moreCH4-fossile_CH4-methanation
-label: 100 GAS Methanation
+name: 2050-100-gas_moreCH4
+label: 100 GAS
 
 datetimeindex:
   start:
@@ -15,7 +15,7 @@ datetimeindex:
     8760
 
 model_structure:
-  model_structure_full_methanation
+  model_structure_full
 
 # parametrize
 
@@ -29,7 +29,6 @@ paths_scalars:
   - raw/scalars/el_gas_constraint.csv
   - results/_resources/scal_costs_efficiencies.csv
   - results/_resources/scal_load_heat.csv
-  - raw/scalars_methanation.csv
 
 filter_scalars:
   1:

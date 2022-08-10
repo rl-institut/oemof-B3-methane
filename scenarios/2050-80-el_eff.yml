@@ -3,8 +3,8 @@
 
 # build_datapackage
 
-name: 2050-95-el_eff-fossile_CH4
-label: 95 EL-EFF
+name: 2050-80-el_eff
+label: 80 EL-EFF
 
 datetimeindex:
   start:
@@ -36,7 +36,7 @@ filter_scalars:
       - "ALL"
       - "2050-el_eff"
       - "2050-base"
-      - "reduction_95"
+      - "reduction_80"
       - "2050-methanation"
 
 paths_timeseries:
