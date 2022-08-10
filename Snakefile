@@ -15,28 +15,6 @@ scenario_groups = {
         )
     ],
     "main-scenarios": [
-        "2050-el_eff",
-        "2050-el_eff-methanation",
-        "2050-gas_lessCH4",
-        "2050-gas_lessCH4-methanation",
-        "2050-gas_moreCH4",
-        "2050-gas_moreCH4-methanation",
-        "2050-80-gas_moreCH4",
-        "2050-80-gas_moreCH4-methanation",
-        "2050-95-gas_moreCH4",
-        "2050-95-gas_moreCH4-methanation",
-        "2050-100-gas_moreCH4",
-        "2050-100-gas_moreCH4-methanation",
-    ],
-    "main-scenarios-methanation": [
-        "2050-el_eff-methanation",
-        "2050-gas_lessCH4-methanation",
-        "2050-gas_moreCH4-methanation",
-        "2050-80-gas_moreCH4-methanation",
-        "2050-95-gas_moreCH4-methanation",
-        "2050-100-gas_moreCH4-methanation",
-    ],
-    "all-reduction-fossile": [
         "2050-80-el_eff-fossile_CH4",
         "2050-80-el_eff-fossile_CH4-methanation",
         "2050-95-el_eff-fossile_CH4",
@@ -50,7 +28,7 @@ scenario_groups = {
         "2050-100-gas_moreCH4-fossile_CH4",
         "2050-100-gas_moreCH4-fossile_CH4-methanation",
     ],
-    "all-reduction-fossile-no-methanation": [
+    "no-methanation": [
         "2050-80-el_eff-fossile_CH4",
         "2050-95-el_eff-fossile_CH4",
         "2050-100-el_eff-fossile_CH4",
