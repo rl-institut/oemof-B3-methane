@@ -4,6 +4,7 @@
 # build_datapackage
 
 name: 2050-80-gas_moreCH4-methanation
+label: 80 GAS Methanation
 
 datetimeindex:
   start:
