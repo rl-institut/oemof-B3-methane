@@ -1,8 +1,12 @@
-# oemof-B3
+# oemof-B3-methane
 
 Oemof-B3 is an energy system model of Berlin and Brandenburg. It represents many sectors:
 Electricity, central and decentral heat, hydrogen, CO2 and methane. It is a multi-node-model, which
 means that several distinct regions are represented that are connected via transmission lines.
+
+Oemof-B3-methane has been developed within the project [UMAS](https://reiner-lemoine-institut.de/en/umas/). The model is a fork of oemof-B3 and is
+basically the same, with the addition of a component 'methanation' which represents biological 
+methanation in an underground storage.
 
 <img src="/docs/_img/model_structure.svg" width="900"/>
 
