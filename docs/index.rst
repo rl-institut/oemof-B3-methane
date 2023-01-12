@@ -19,7 +19,16 @@ oemof-B3: A sector-integrated energy system model of Brandenburg and Berlin
    :caption: User's guide
 
    model_pipeline
-   model_structure
+   model_structure   
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Components Power to Gas  
+
+   model_methanisation_storage
+   model_plasmalyser
+   model_pem_electrolyser
+   model_ael_electrolyser
 
 .. toctree::
    :maxdepth: 1

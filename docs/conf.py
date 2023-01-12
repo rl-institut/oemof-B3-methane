@@ -37,6 +37,7 @@ extensions = [
     'sphinxcontrib.bibtex',
     'sphinx.ext.autosectionlabel'
 ]
+bibtex_bibfiles = ['bibliography.bib']
 
 # specify bibfiles for sphinxcontrib.bibtex
 bibtex_bibfiles = ['bibliography.bib']

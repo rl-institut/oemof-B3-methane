@@ -1,3 +1,4 @@
+docs/_build/
 .idea/
 .snakemake/
 __pycache__/
