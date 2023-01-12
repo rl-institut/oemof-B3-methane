@@ -1,0 +1,31 @@
+Battery:
+  - Battery out
+  - Battery in
+
+El. transmission external:
+  - El. import
+  - El. export
+
+El. transmission B-BB:
+  - El. transmission in
+  - El. transmission out
+
+El. shortage / curtailment:
+  - El. shortage
+  - Curtailment
+
+Heat cen. storage:
+  - Heat cen. storage out
+  - Heat cen. storage in
+
+Heat cen. mismatch:
+  - Heat cen. excess
+  - Heat cen. shortage
+
+Heat dec. storage:
+  - Heat dec. storage out
+  - Heat dec. storage in
+
+Heat dec. mismatch:
+  - Heat dec. excess
+  - Heat dec. shortage

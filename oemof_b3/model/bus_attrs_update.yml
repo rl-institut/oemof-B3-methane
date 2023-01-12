@@ -1,0 +1,20 @@
+h2:
+  balanced:
+    True
+
+heat_central:
+  balanced:
+    True
+
+heat_decentral:
+  balanced:
+    True
+
+ch4:
+  balanced:
+    True
+
+co2:
+  balanced:
+    False
+
