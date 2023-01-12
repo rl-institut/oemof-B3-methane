@@ -39,6 +39,7 @@ class MethanationReactor(Transformer, Facade):
 
     Parameters
     ----------
+    label : str
     h2_bus : oemof.solph.Bus
     co2_bus : oemof.solph.Bus
     ch4_bus : oemof.solph.Bus
@@ -58,9 +59,41 @@ class MethanationReactor(Transformer, Facade):
     expandable : boolean
     methanation_option : str
 
+
     The reactor is modelled as two storages connected by a transformer with a fixed flow:
 
+    Mixing of CO2 and H2
+
     .. math::
+        x^{flow, from, H2}(t) \cdot c^{efficiency, H2}(t) + x^{flow, from, CO2}(t) \cdot
+        c^{efficiency, CO2}(t) = x^{flow, to}(t)
+        \qquad \forall t \in T
+
+    Capacities for charging/discharging
+
+
+    Efficiencies for charging/discharging
+
+
+    Storage capacities for educts and products
+
+
+    Storage levels for educts and products
+
+    .. math::
+        x^{level, educts}(t) & =
+        x^{level, educts}(t-1) \cdot(1 - c^{loss\_rate, educts}(t))
+        + x^{profile, educts}(t) - \frac{x^{flow, out, educts}(t)}{c^{efficiency, educts}(t)}
+        \qquad \forall t \in T
+
+        x^{level, products}(t) & =
+        x^{level, products}(t-1) \cdot (1 - c^{loss\_rate, products}(t))
+        + x^{profile, products}(t) - \frac{x^{flow, out, products}(t)}{c^{efficiency, products}(t)}
+        \qquad \forall t \in T
+
+    Methanation rate
+
+    Methanation efficiency
 
     Examples
     --------
@@ -72,21 +105,24 @@ class MethanationReactor(Transformer, Facade):
     >>> bus_co2 = solph.Bus('hco2')
     >>> bus_ch4 = solph.Bus('ch4')
     >>> m_reactor = MethanationReactor(
-    ...     name='m_reactor',
-    ...     carrier='h2_co2',
-    ...     tech='methanation_reactor',
-    ...     h2_bus=bus_h2,
-    ...     co2_bus=bus_co2,
-    ...     ch4_bus=bus_ch4,
-    ...     capacity_charge=50,
-    ...     capacity_discharge=50,
-    ...     storage_capacity_educts=100,
-    ...     storage_capacity_products=1000,
+    ...     label="m_reactor",
+    ...     carrier="h2_co2",
+    ...     tech="methanation_reactor",
+    ...     h2_bus=h2_bus,
+    ...     co2_bus=co2_bus,
+    ...     ch4_bus=ch4_bus,
+    ...     capacity_charge=2.8,
+    ...     capacity_discharge=7.7,
+    ...     storage_capacity_educts=24e3,
+    ...     storage_capacity_products=24e3,
     ...     efficiency_charge=1,
     ...     efficiency_discharge=1,
-    ...     availability=[0.8, 0.7, 0.6],
-    ...     methanation_rate=[0.3, 0.2, 0.5],
-    ...     efficiency_methanation=0.93
+    ...     methanation_rate=2,
+    ...     efficiency_methanation=0.93,
+    ...     marginal_cost=0,
+    ...     input_parameters={},
+    ...     output_parameters={},
+    ...     methanation_option=methanation_option,
     ...     )
     """
     MIX_RATIO_CO2 = 0.139  # tCO2/MWh_H2
