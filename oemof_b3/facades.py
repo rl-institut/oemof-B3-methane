@@ -62,25 +62,38 @@ class MethanationReactor(Transformer, Facade):
 
     The reactor is modelled as two storages connected by a transformer with a fixed flow:
 
-    .. math::
-
-        x^{level, educts}(t) =
-        x^{level, educts}(t-1) \cdot (1 - c^{loss\_rate, educts}(t))
-        + x^{profile, educts}(t) - \frac{x^{flow, out, educts}(t)}{c^{efficiency, educts}(t)}
-        \qquad \forall t \in T
+    Mixing of CO2 and H2
 
     .. math::
-
         x^{flow, from, H2}(t) \cdot c^{efficiency, H2}(t) + x^{flow, from, CO2}(t) \cdot
         c^{efficiency, CO2}(t) = x^{flow, to}(t)
         \qquad \forall t \in T
 
-    .. math::
+    Capacities for charging/discharging
 
-        x^{level, products}(t) =
+
+    Efficiencies for charging/discharging
+
+
+    Storage capacities for educts and products
+
+
+    Storage levels for educts and products
+
+    .. math::
+        x^{level, educts}(t) & =
+        x^{level, educts}(t-1) \cdot(1 - c^{loss\_rate, educts}(t))
+        + x^{profile, educts}(t) - \frac{x^{flow, out, educts}(t)}{c^{efficiency, educts}(t)}
+        \qquad \forall t \in T
+
+        x^{level, products}(t) & =
         x^{level, products}(t-1) \cdot (1 - c^{loss\_rate, products}(t))
         + x^{profile, products}(t) - \frac{x^{flow, out, products}(t)}{c^{efficiency, products}(t)}
         \qquad \forall t \in T
+
+    Methanation rate
+
+    Methanation efficiency
 
     Examples
     --------
