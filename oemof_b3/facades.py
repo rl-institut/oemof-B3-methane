@@ -59,6 +59,7 @@ class MethanationReactor(Transformer, Facade):
     expandable : boolean
     methanation_option : str
 
+
     The reactor is modelled as two storages connected by a transformer with a fixed flow:
 
     .. math::
@@ -69,6 +70,7 @@ class MethanationReactor(Transformer, Facade):
         \qquad \forall t \in T
 
     .. math::
+
         x^{flow, from, H2}(t) \cdot c^{efficiency, H2}(t) + x^{flow, from, CO2}(t) \cdot
         c^{efficiency, CO2}(t) = x^{flow, to}(t)
         \qquad \forall t \in T
